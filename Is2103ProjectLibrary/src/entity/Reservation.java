@@ -7,10 +7,13 @@ package entity;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.List;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToMany;
 
 /**
  *
@@ -28,7 +31,9 @@ public class Reservation implements Serializable {
     // private Car car;
     private String pickUpLocation;
     private String returnLocation;
-    private RentalRateRecord rentalRateRecord;
+    @ManyToMany
+    @JoinColumn (nullable = false)
+    private List<RentalRateRecord> rentalRates;
     private String paymentStatus;
 
     public Reservation() {
@@ -143,6 +148,20 @@ public class Reservation implements Serializable {
      */
     public void setPaymentStatus(String paymentStatus) {
         this.paymentStatus = paymentStatus;
+    }
+
+    /**
+     * @return the rentalRates
+     */
+    public List<RentalRateRecord> getRentalRates() {
+        return rentalRates;
+    }
+
+    /**
+     * @param rentalRates the rentalRates to set
+     */
+    public void setRentalRates(List<RentalRateRecord> rentalRates) {
+        this.rentalRates = rentalRates;
     }
     
 }

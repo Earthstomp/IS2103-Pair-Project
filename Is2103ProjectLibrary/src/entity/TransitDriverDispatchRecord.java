@@ -23,11 +23,13 @@ public class TransitDriverDispatchRecord implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    // private Driver driver;
+    // @OneToOne
+    // @JoinColumn
+    // private Employee employee;
     private String pickupLocation;
     private String returnLocation;
-    private Date startDate;
-    private Date endDate;
+    private Date startDateTime;
+    private Date endDateTime;
 
     public TransitDriverDispatchRecord() {
     }
@@ -35,8 +37,8 @@ public class TransitDriverDispatchRecord implements Serializable {
     public TransitDriverDispatchRecord(String pickupLocation, String returnLocation, Date startDate, Date endDate) {
         this.pickupLocation = pickupLocation;
         this.returnLocation = returnLocation;
-        this.startDate = startDate;
-        this.endDate = endDate;
+        this.startDateTime = startDateTime;
+        this.endDateTime = endDateTime;
     }
    
     public Long getId() {
@@ -101,31 +103,31 @@ public class TransitDriverDispatchRecord implements Serializable {
     }
 
     /**
-     * @return the startDate
+     * @return the startDateTime
      */
-    public Date getStartDate() {
-        return startDate;
+    public Date getStartDateTime() {
+        return startDateTime;
     }
 
     /**
-     * @param startDate the startDate to set
+     * @param startDateTime the startDateTime to set
      */
-    public void setStartDate(Date startDate) {
-        this.startDate = startDate;
+    public void setStartDateTime(Date startDateTime) {
+        this.startDateTime = startDateTime;
     }
 
     /**
-     * @return the endDate
+     * @return the endDateTime
      */
-    public Date getEndDate() {
-        return endDate;
+    public Date getEndDateTime() {
+        return endDateTime;
     }
 
     /**
-     * @param endDate the endDate to set
+     * @param endDateTime the endDateTime to set
      */
-    public void setEndDate(Date endDate) {
-        this.endDate = endDate;
+    public void setEndDateTime(Date endDateTime) {
+        this.endDateTime = endDateTime;
     }
     
 }
