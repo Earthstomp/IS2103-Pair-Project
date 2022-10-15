@@ -8,6 +8,7 @@ package entity;
 import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -24,9 +25,12 @@ public class RentalRateRecord implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    @Column(nullable = false, length = 64, unique = true)
     private String recordName;
     // private CarCategory category;
+    @Column(nullable = false, length = 12)
     private double rate;
+    @Column(nullable = false, length = 64)
     private List<Date> validityPeriod;
 
     public RentalRateRecord() {

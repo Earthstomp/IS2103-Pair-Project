@@ -8,6 +8,7 @@ package entity;
 import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -25,15 +26,20 @@ public class Reservation implements Serializable {
     private static final long serialVersionUID = 1L;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long reservationId;
+    private Long id;
+    @Column(nullable = false, length = 32)
     private Date startDateTime;
+    @Column(nullable = false, length = 32)
     private Date endDateTime;
     // private Car car;
+    @Column(nullable = false, length = 64)
     private String pickUpLocation;
+    @Column(nullable = false, length = 64)
     private String returnLocation;
     @ManyToMany
     @JoinColumn (nullable = false)
     private List<RentalRateRecord> rentalRates;
+    @Column(nullable = false, length = 32)
     private String paymentStatus;
 
     public Reservation() {
@@ -47,29 +53,29 @@ public class Reservation implements Serializable {
         this.paymentStatus = paymentStatus;
     }
     
-    public Long getReservationId() {
-        return reservationId;
+    public Long getId() {
+        return id;
     }
 
-    public void setReservationId(Long reservationId) {
-        this.reservationId = reservationId;
+    public void setId(Long id) {
+        this.id = id;
     }
 
     @Override
     public int hashCode() {
         int hash = 0;
-        hash += (reservationId != null ? reservationId.hashCode() : 0);
+        hash += (id != null ? id.hashCode() : 0);
         return hash;
     }
 
     @Override
     public boolean equals(Object object) {
-        // TODO: Warning - this method won't work in the case the reservationId fields are not set
+        // TODO: Warning - this method won't work in the case the id fields are not set
         if (!(object instanceof Reservation)) {
             return false;
         }
         Reservation other = (Reservation) object;
-        if ((this.reservationId == null && other.reservationId != null) || (this.reservationId != null && !this.reservationId.equals(other.reservationId))) {
+        if ((this.id == null && other.id != null) || (this.id != null && !this.id.equals(other.id))) {
             return false;
         }
         return true;
@@ -77,7 +83,7 @@ public class Reservation implements Serializable {
 
     @Override
     public String toString() {
-        return "entity.Reservation[ id=" + reservationId + " ]";
+        return "entity.Reservation[ id=" + id + " ]";
     }
 
     /**

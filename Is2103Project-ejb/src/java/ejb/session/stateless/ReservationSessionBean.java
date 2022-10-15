@@ -27,7 +27,7 @@ public class ReservationSessionBean implements ReservationSessionBeanRemote, Res
         em.persist(reservation);
         em.flush();
 
-        return reservation.getReservationId();
+        return reservation.getId();
     }
 
     @Override

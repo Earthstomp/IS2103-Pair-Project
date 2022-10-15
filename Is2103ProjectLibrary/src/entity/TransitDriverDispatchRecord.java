@@ -7,6 +7,7 @@ package entity;
 
 import java.io.Serializable;
 import java.util.Date;
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -26,9 +27,13 @@ public class TransitDriverDispatchRecord implements Serializable {
     // @OneToOne
     // @JoinColumn
     // private Employee employee;
+    @Column(nullable = false, length = 64)
     private String pickupLocation;
+    @Column(nullable = false, length = 64)
     private String returnLocation;
+    @Column(nullable = false, length = 32)
     private Date startDateTime;
+    @Column(nullable = false, length = 32)
     private Date endDateTime;
 
     public TransitDriverDispatchRecord() {
