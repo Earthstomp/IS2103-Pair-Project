@@ -24,14 +24,6 @@ public class RentalRateRecordSessionBean implements RentalRateRecordSessionBeanR
     private EntityManager em;
 
     @Override
-    public Long createRentalRateRecord(RentalRateRecord rentalRateRecord) {
-        em.persist(rentalRateRecord);
-        em.flush();
-
-        return rentalRateRecord.getId();
-    }
-
-    @Override
     public List<RentalRateRecord> retrieveAllRateRecords() {
         Query query = em.createQuery("SELECT r FROM RentalRateRecord r");
 
