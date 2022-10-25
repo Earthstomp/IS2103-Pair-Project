@@ -14,7 +14,7 @@ import javax.persistence.Id;
 
 /**
  *
- * @author Keith test
+ * @author Keith test Dorothy Test
  */
 @Entity
 public class Partner implements Serializable {
