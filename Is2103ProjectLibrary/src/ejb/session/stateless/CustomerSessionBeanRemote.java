@@ -5,8 +5,8 @@
  */
 package ejb.session.stateless;
 
-import entity.RentalRateRecord;
-import java.util.List;
+import entity.Customer;
+import entity.Reservation;
 import javax.ejb.Remote;
 
 /**
@@ -14,12 +14,10 @@ import javax.ejb.Remote;
  * @author Keith test
  */
 @Remote
-public interface RentalRateRecordSessionBeanRemote {
+public interface CustomerSessionBeanRemote {
 
-    public void removeRentalRateRecord(Long id);
+    public Long createNewReservation(Reservation reservation, Long customerId);
 
-    public RentalRateRecord retrieveRentalRateRecordById(Long id);
-
-    public List<RentalRateRecord> retrieveAllRateRecords();
-
+    public Long createNewCustomer(Customer customer);
+    
 }

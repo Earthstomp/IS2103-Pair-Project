@@ -13,6 +13,7 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.ManyToOne;
 
 /**
  *
@@ -27,7 +28,8 @@ public class RentalRateRecord implements Serializable {
     private Long id;
     @Column(nullable = false, length = 64, unique = true)
     private String recordName;
-    // private CarCategory category;
+    @ManyToOne
+    private Category category;
     @Column(nullable = false, length = 12)
     private double rate;
     @Column(nullable = false, length = 64)

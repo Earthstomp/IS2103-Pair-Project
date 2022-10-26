@@ -5,7 +5,7 @@
  */
 package ejb.session.stateless;
 
-import entity.RentalRateRecord;
+import entity.Outlet;
 import java.util.List;
 import javax.ejb.Local;
 
@@ -14,12 +14,8 @@ import javax.ejb.Local;
  * @author Keith test
  */
 @Local
-public interface RentalRateRecordSessionBeanLocal {
+public interface OutletSessionBeanLocal {
 
-    public void removeRentalRateRecord(Long id);
-
-    public RentalRateRecord retrieveRentalRateRecordById(Long id);
-
-    public List<RentalRateRecord> retrieveAllRateRecords();
+    public List<Outlet> retrieveAllOutlets();
     
 }

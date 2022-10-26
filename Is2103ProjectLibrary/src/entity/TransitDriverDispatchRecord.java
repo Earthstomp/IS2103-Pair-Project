@@ -12,6 +12,8 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 
 /**
  *
@@ -24,9 +26,9 @@ public class TransitDriverDispatchRecord implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    // @OneToOne
-    // @JoinColumn
-    // private Employee employee;
+    @ManyToOne
+    @JoinColumn(nullable = false)
+    private Employee employee;
     @Column(nullable = false, length = 64)
     private String pickupLocation;
     @Column(nullable = false, length = 64)
@@ -39,13 +41,14 @@ public class TransitDriverDispatchRecord implements Serializable {
     public TransitDriverDispatchRecord() {
     }
 
-    public TransitDriverDispatchRecord(String pickupLocation, String returnLocation, Date startDate, Date endDate) {
+    public TransitDriverDispatchRecord(String pickupLocation, String returnLocation, Date startDateTime, Date endDateTime, Employee employee) {
         this.pickupLocation = pickupLocation;
         this.returnLocation = returnLocation;
         this.startDateTime = startDateTime;
         this.endDateTime = endDateTime;
+        this.employee = employee;
     }
-   
+
     public Long getId() {
         return id;
     }
@@ -134,5 +137,19 @@ public class TransitDriverDispatchRecord implements Serializable {
     public void setEndDateTime(Date endDateTime) {
         this.endDateTime = endDateTime;
     }
-    
+
+    /**
+     * @return the employee
+     */
+    public Employee getEmployee() {
+        return employee;
+    }
+
+    /**
+     * @param employee the employee to set
+     */
+    public void setEmployee(Employee employee) {
+        this.employee = employee;
+    }
+
 }

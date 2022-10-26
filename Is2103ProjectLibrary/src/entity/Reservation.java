@@ -15,6 +15,8 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToMany;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToOne;
 
 /**
  *
@@ -31,28 +33,36 @@ public class Reservation implements Serializable {
     private Date startDateTime;
     @Column(nullable = false, length = 32)
     private Date endDateTime;
-    // private Car car;
+    @OneToOne
+    @Column(nullable = false)
+    private Car car;
     @Column(nullable = false, length = 64)
-    private String pickUpLocation;
+    @ManyToOne
+    private Outlet pickUpLocation;
     @Column(nullable = false, length = 64)
-    private String returnLocation;
+    @ManyToOne
+    private Outlet returnLocation;
     @ManyToMany
-    @JoinColumn (nullable = false)
+//    @JoinColumn(nullable = false) // not sure if correct
     private List<RentalRateRecord> rentalRates;
     @Column(nullable = false, length = 32)
     private String paymentStatus;
+    @ManyToOne
+    @JoinColumn (nullable=false)
+    private Customer customer;
 
     public Reservation() {
     }
 
-    public Reservation(Date startDateTime, Date endDateTime, String pickUpLocation, String returnLocation, String paymentStatus) {
+    public Reservation(Date startDateTime, Date endDateTime, Outlet pickUpLocation, Outlet returnLocation, String paymentStatus, Customer customer) {
         this.startDateTime = startDateTime;
         this.endDateTime = endDateTime;
         this.pickUpLocation = pickUpLocation;
         this.returnLocation = returnLocation;
         this.paymentStatus = paymentStatus;
+        this.customer = customer;
     }
-    
+
     public Long getId() {
         return id;
     }
@@ -117,28 +127,28 @@ public class Reservation implements Serializable {
     /**
      * @return the pickUpLocation
      */
-    public String getPickUpLocation() {
+    public Outlet getPickUpLocation() {
         return pickUpLocation;
     }
 
     /**
      * @param pickUpLocation the pickUpLocation to set
      */
-    public void setPickUpLocation(String pickUpLocation) {
+    public void setPickUpLocation(Outlet pickUpLocation) {
         this.pickUpLocation = pickUpLocation;
     }
 
     /**
      * @return the returnLocation
      */
-    public String getReturnLocation() {
+    public Outlet getReturnLocation() {
         return returnLocation;
     }
 
     /**
      * @param returnLocation the returnLocation to set
      */
-    public void setReturnLocation(String returnLocation) {
+    public void setReturnLocation(Outlet returnLocation) {
         this.returnLocation = returnLocation;
     }
 
@@ -169,5 +179,19 @@ public class Reservation implements Serializable {
     public void setRentalRates(List<RentalRateRecord> rentalRates) {
         this.rentalRates = rentalRates;
     }
-    
+
+    /**
+     * @return the customer
+     */
+    public Customer getCustomer() {
+        return customer;
+    }
+
+    /**
+     * @param customer the customer to set
+     */
+    public void setCustomer(Customer customer) {
+        this.customer = customer;
+    }
+
 }
