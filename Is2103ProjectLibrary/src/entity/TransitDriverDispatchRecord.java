@@ -14,6 +14,8 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
 
 /**
  *
@@ -29,19 +31,19 @@ public class TransitDriverDispatchRecord implements Serializable {
     @ManyToOne
     @JoinColumn(nullable = false)
     private Employee employee;
-    @Column(nullable = false, length = 64)
-    private String pickupLocation;
-    @Column(nullable = false, length = 64)
-    private String returnLocation;
-    @Column(nullable = false, length = 32)
+    @Column(nullable = false)
+    private Outlet pickupLocation;
+    @Column(nullable = false)
+    private Outlet returnLocation;
+    @Temporal(TemporalType.TIMESTAMP)
     private Date startDateTime;
-    @Column(nullable = false, length = 32)
+    @Temporal(TemporalType.TIMESTAMP)
     private Date endDateTime;
 
     public TransitDriverDispatchRecord() {
     }
 
-    public TransitDriverDispatchRecord(String pickupLocation, String returnLocation, Date startDateTime, Date endDateTime, Employee employee) {
+    public TransitDriverDispatchRecord(Outlet pickupLocation, Outlet returnLocation, Date startDateTime, Date endDateTime, Employee employee) {
         this.pickupLocation = pickupLocation;
         this.returnLocation = returnLocation;
         this.startDateTime = startDateTime;
@@ -85,28 +87,28 @@ public class TransitDriverDispatchRecord implements Serializable {
     /**
      * @return the pickupLocation
      */
-    public String getPickupLocation() {
+    public Outlet getPickupLocation() {
         return pickupLocation;
     }
 
     /**
      * @param pickupLocation the pickupLocation to set
      */
-    public void setPickupLocation(String pickupLocation) {
+    public void setPickupLocation(Outlet pickupLocation) {
         this.pickupLocation = pickupLocation;
     }
 
     /**
      * @return the returnLocation
      */
-    public String getReturnLocation() {
+    public Outlet getReturnLocation() {
         return returnLocation;
     }
 
     /**
      * @param returnLocation the returnLocation to set
      */
-    public void setReturnLocation(String returnLocation) {
+    public void setReturnLocation(Outlet returnLocation) {
         this.returnLocation = returnLocation;
     }
 
