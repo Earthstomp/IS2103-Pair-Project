@@ -29,12 +29,21 @@ public class Car implements Serializable {
     @JoinColumn (nullable = false)
     private Model model;
     private String status;
-    private String location; // needs to be Long because it can either be Outlet or Customer
+    private Long location; // either Outlet or Customer
     private String plateNumber;
     private String color;
     
     public Car() {
         
+    }
+
+    public Car(Long carId, Model model, String status, Long location, String plateNumber, String color) {
+        this.carId = carId;
+        this.model = model;
+        this.status = status;
+        this.location = location;
+        this.plateNumber = plateNumber;
+        this.color = color;
     }
 
     public Long getCarId() {
@@ -109,14 +118,14 @@ public class Car implements Serializable {
     /**
      * @return the location
      */
-    public String getLocation() {
+    public Long getLocation() {
         return location;
     }
 
     /**
      * @param location the location to set
      */
-    public void setLocation(String location) {
+    public void setLocation(Long location) {
         this.location = location;
     }
 

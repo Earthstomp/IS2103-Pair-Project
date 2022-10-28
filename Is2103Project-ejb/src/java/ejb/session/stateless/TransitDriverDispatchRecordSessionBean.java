@@ -11,6 +11,8 @@ import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
+import util.exception.ReservationNotFoundException;
+import util.exception.TransitDriverDispatchRecordNotFoundException;
 
 /**
  *
@@ -38,15 +40,13 @@ public class TransitDriverDispatchRecordSessionBean implements TransitDriverDisp
     }
     
     @Override
-    public TransitDriverDispatchRecord retrieveReservationById(Long id) { // throws exception
+    public TransitDriverDispatchRecord retrieveTransitDriverDispatchRecordById(Long id) throws TransitDriverDispatchRecordNotFoundException {
         TransitDriverDispatchRecord transitDriverDispatchRecord = em.find(TransitDriverDispatchRecord.class, id);
 
         if (transitDriverDispatchRecord != null) {
             return transitDriverDispatchRecord;
         } else {
-            // throw exception
-            // delete line below
-            return transitDriverDispatchRecord;
+            throw new TransitDriverDispatchRecordNotFoundException("Unable to locate record with id: " + id);
         }
     }
     

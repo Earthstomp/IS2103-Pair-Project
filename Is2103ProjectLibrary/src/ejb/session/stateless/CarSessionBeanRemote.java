@@ -8,6 +8,7 @@ package ejb.session.stateless;
 import entity.Car;
 import java.util.List;
 import javax.ejb.Remote;
+import util.exception.CarNotFoundException;
 
 /**
  *
@@ -18,7 +19,7 @@ public interface CarSessionBeanRemote {
 
     public List<Car> retrieveAllCars();
 
-    public Car retrieveCarById(Long carId);
+    public Car retrieveCarById(Long carId) throws CarNotFoundException;
 
     public void removeCar(Long reservationId);
     

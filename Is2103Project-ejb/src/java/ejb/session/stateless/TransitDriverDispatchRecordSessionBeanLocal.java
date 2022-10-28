@@ -8,6 +8,7 @@ package ejb.session.stateless;
 import entity.TransitDriverDispatchRecord;
 import java.util.List;
 import javax.ejb.Local;
+import util.exception.TransitDriverDispatchRecordNotFoundException;
 
 /**
  *
@@ -18,7 +19,7 @@ public interface TransitDriverDispatchRecordSessionBeanLocal {
 
     public void removeTransitDriverDispatchRecord(Long id);
 
-    public TransitDriverDispatchRecord retrieveReservationById(Long id);
+    public TransitDriverDispatchRecord retrieveTransitDriverDispatchRecordById(Long id) throws TransitDriverDispatchRecordNotFoundException;
 
     public List<TransitDriverDispatchRecord> retrieveAllTransitDriverDispatchRecord();
 

@@ -33,6 +33,12 @@ public class Partner implements Serializable {
     public Partner() {
     }
 
+    public Partner(Long id, String name, List<Customer> customers) {
+        this.id = id;
+        this.name = name;
+        this.customers = customers;
+    }
+
     public Partner(String name) {
         this.name = name;
     }

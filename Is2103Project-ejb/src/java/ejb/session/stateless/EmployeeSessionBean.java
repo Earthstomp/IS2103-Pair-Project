@@ -28,7 +28,7 @@ public class EmployeeSessionBean implements EmployeeSessionBeanRemote, EmployeeS
         
         Outlet outlet = em.find(Outlet.class, outletId);
         employee.setOutlet(outlet); 
-        // not setting outlet to employee cause unidfrectional
+        // not setting outlet to employee cause unidirectional
         
         em.flush();
 

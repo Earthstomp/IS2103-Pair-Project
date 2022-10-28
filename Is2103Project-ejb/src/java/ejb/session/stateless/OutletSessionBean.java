@@ -11,6 +11,7 @@ import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
+import util.exception.OutletNotFoundException;
 
 /**
  *
@@ -39,15 +40,13 @@ public class OutletSessionBean implements OutletSessionBeanRemote, OutletSession
     }
 
     @Override
-    public Outlet retrieveReservationById(Long outletId) { // throws exception
+    public Outlet retrieveReservationById(Long outletId) throws OutletNotFoundException {
         Outlet outlet = em.find(Outlet.class, outletId);
 
         if (outlet != null) {
             return outlet;
         } else {
-            // throw exception
-            // delete line below
-            return outlet;
+             throw new OutletNotFoundException("Unable to locate outlet with id: " + outletId);
         }
     }
 

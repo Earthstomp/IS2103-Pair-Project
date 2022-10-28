@@ -36,6 +36,15 @@ public class Customer implements Serializable {
     private List<Reservation> reservations;
     // add credit card entity class with corresponding relationship  
 
+    public Customer(Long customerId, Partner partner, String mobileNumber, String passportNumber, String email, List<Reservation> reservations) {
+        this.customerId = customerId;
+        this.partner = partner;
+        this.mobileNumber = mobileNumber;
+        this.passportNumber = passportNumber;
+        this.email = email;
+        this.reservations = reservations;
+    }
+
     public Long getCustomerId() {
         return customerId;
         

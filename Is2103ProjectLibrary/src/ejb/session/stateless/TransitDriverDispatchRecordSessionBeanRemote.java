@@ -5,10 +5,10 @@
  */
 package ejb.session.stateless;
 
-import entity.Reservation;
 import entity.TransitDriverDispatchRecord;
 import java.util.List;
 import javax.ejb.Remote;
+import util.exception.TransitDriverDispatchRecordNotFoundException;
 
 /**
  *
@@ -19,7 +19,7 @@ public interface TransitDriverDispatchRecordSessionBeanRemote {
     
     public void removeTransitDriverDispatchRecord(Long id);
 
-    public TransitDriverDispatchRecord retrieveReservationById(Long id);
+    public TransitDriverDispatchRecord retrieveTransitDriverDispatchRecordById(Long id) throws TransitDriverDispatchRecordNotFoundException ;
 
     public List<TransitDriverDispatchRecord> retrieveAllTransitDriverDispatchRecord();
 

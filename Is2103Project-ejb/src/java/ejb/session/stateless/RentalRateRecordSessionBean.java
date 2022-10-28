@@ -12,6 +12,7 @@ import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
+import util.exception.RentalRateRecordNotFoundException;
 
 /**
  *
@@ -31,15 +32,14 @@ public class RentalRateRecordSessionBean implements RentalRateRecordSessionBeanR
     }
 
     @Override
-    public RentalRateRecord retrieveRentalRateRecordById(Long id) { // throws exception
-        RentalRateRecord rentalRateRecord = em.find(RentalRateRecord.class, id);
+    public RentalRateRecord retrieveRentalRateRecordById(Long id) throws RentalRateRecordNotFoundException{
 
+        RentalRateRecord rentalRateRecord = em.find(RentalRateRecord.class, id);
+        
         if (rentalRateRecord != null) {
             return rentalRateRecord;
         } else {
-            // throw exception
-            // delete line below
-            return rentalRateRecord;
+            throw new RentalRateRecordNotFoundException("Unable to locate record with id: " + id);
         }
     }
 

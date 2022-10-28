@@ -32,8 +32,14 @@ public class Employee implements Serializable {
     private Outlet outlet;
     @OneToMany (mappedBy = "driver")
     private List<TransitDriverDispatchRecord> dispatches;
-    
 
+    public Employee(Long customerId, String role, Outlet outlet, List<TransitDriverDispatchRecord> dispatches) {
+        this.customerId = customerId;
+        this.role = role;
+        this.outlet = outlet;
+        this.dispatches = dispatches;
+    }
+    
     public Long getEmployeeId() {
         return customerId;
     }
