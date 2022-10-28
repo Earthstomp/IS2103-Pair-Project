@@ -72,16 +72,16 @@ public class SalesManagementModule {
                 } else if (response == 2) {
                     doPickUpCar();
                 } else if (response == 3) {
-                    doViewAllStaffs();
-                } else if (response == 4) {
-                    doCreateNewProduct();
-                } else if (response == 5) {
-                    doViewProductDetails();
-                } else if (response == 6) {
-                    doViewAllProducts();
-                } else if (response == 7) {
-                    break;
-                } else {
+                    doReturnCar();
+                } // else if (response == 4) {
+//                    doCreateNewProduct();
+//                } else if (response == 5) {
+//                    doViewProductDetails();
+//                } else if (response == 6) {
+//                    doViewAllProducts();
+//                } else if (response == 7) {
+//                    break;
+                 else {
                     System.out.println("Invalid option, please try again!\n");
                 }
             }
@@ -123,7 +123,7 @@ public class SalesManagementModule {
         System.out.println("New model created successfully!: " + model.getModel() + "\n");
     }
 
-    public void pickUpCar() {
+    public void doPickUpCar() {
         Scanner scanner = new Scanner(System.in);
         int i = 1;
 
@@ -160,7 +160,7 @@ public class SalesManagementModule {
         }
     }
 
-    public void returnCar() {
+    public void doReturnCar() {
         Scanner scanner = new Scanner(System.in);
         int i = 1;
 
@@ -193,6 +193,4 @@ public class SalesManagementModule {
         System.out.println("Car " + reservedCar.getPlateNumber() + " for Reservation " + selectedReservation.getId() + "has been returned!\n");
 
     }
-}
-
 }
