@@ -18,6 +18,6 @@ public interface EmployeeSessionBeanRemote {
 
     public Long createNewEmployeeWithExistingOutlet(Employee employee, Long outletId);
 
-    public TransitDriverDispatchRecord createNewTransitDriverDispatchRecordWithExistingEmployee(TransitDriverDispatchRecord dispatchRecord, Long employeeId);
+    public Long createNewTransitDriverDispatchRecordWithExistingEmployee(TransitDriverDispatchRecord dispatchRecord, Long employeeId);
     
 }

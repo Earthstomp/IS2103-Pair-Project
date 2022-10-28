@@ -5,6 +5,8 @@
  */
 package ejb.session.stateless;
 
+import entity.Customer;
+import entity.Reservation;
 import javax.ejb.Local;
 
 /**

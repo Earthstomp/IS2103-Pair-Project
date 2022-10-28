@@ -26,7 +26,9 @@ public class CarSessionBean implements CarSessionBeanRemote, CarSessionBeanLocal
 
     public CarSessionBean() {
     }
+    
     // car creation method inside model session bean as it is compulsory
+    
     @Override
     public List<Car> retrieveAllCars() {
         Query query = em.createQuery("SELECT c FROM Car C");

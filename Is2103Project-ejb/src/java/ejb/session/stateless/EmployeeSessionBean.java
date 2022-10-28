@@ -36,7 +36,7 @@ public class EmployeeSessionBean implements EmployeeSessionBeanRemote, EmployeeS
     }
     
     @Override
-    public TransitDriverDispatchRecord createNewTransitDriverDispatchRecordWithExistingEmployee(TransitDriverDispatchRecord dispatchRecord, Long employeeId) {
+    public Long createNewTransitDriverDispatchRecordWithExistingEmployee(TransitDriverDispatchRecord dispatchRecord, Long employeeId) {
         em.persist(dispatchRecord);
         
         Employee employee = em.find(Employee.class, employeeId);
@@ -44,7 +44,7 @@ public class EmployeeSessionBean implements EmployeeSessionBeanRemote, EmployeeS
         
         em.flush();
 
-        return dispatchRecord;
+        return dispatchRecord.getId();
     }
 
     // Add business logic below. (Right-click in editor and choose

@@ -22,19 +22,19 @@ public class Car implements Serializable {
 
     private static final long serialVersionUID = 1L;
     @Id
-        @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long carId;
-    
+
     @ManyToOne
-    @JoinColumn (nullable = false)
+    @JoinColumn(nullable = false)
     private Model model;
     private String status;
     private Long location; // either Outlet or Customer
     private String plateNumber;
     private String color;
-    
+
     public Car() {
-        
+
     }
 
     public Car(Long carId, Model model, String status, Long location, String plateNumber, String color) {
@@ -85,8 +85,6 @@ public class Car implements Serializable {
     /**
      * @param category the category to set
      */
-
-
     /**
      * @return the model
      */
@@ -156,5 +154,5 @@ public class Car implements Serializable {
     public void setColor(String color) {
         this.color = color;
     }
-    
+
 }
