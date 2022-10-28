@@ -28,7 +28,7 @@ public class Category implements Serializable {
     @Column (nullable = false)
     private String categoryName;
     
-    @OneToMany // not sure if this is correct, cause this relationship is unidirectional
+    @OneToMany (mappedBy = "category")
     private List<Model> models;
     @OneToMany (mappedBy = "category")
     private List<RentalRateRecord> rateRecords;

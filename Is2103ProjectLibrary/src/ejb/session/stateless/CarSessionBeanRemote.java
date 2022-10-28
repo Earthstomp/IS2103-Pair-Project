@@ -22,5 +22,7 @@ public interface CarSessionBeanRemote {
     public Car retrieveCarById(Long carId) throws CarNotFoundException;
 
     public void removeCar(Long reservationId);
+
+    public void updateCarStatusLocation(Car car, String status, String location);
     
 }

@@ -6,6 +6,7 @@
 package entity;
 
 import java.io.Serializable;
+import java.util.List;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
@@ -15,6 +16,7 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import util.enumeration.CarStatusEnum;
+import javax.persistence.OneToMany;
 
 /**
  *
@@ -33,10 +35,13 @@ public class Car implements Serializable {
     private Model model;
     @Enumerated(EnumType.STRING)
     private CarStatusEnum status;
-    private Long location; // customerId or outletId
+    private String location;
     private String plateNumber;
     private String color;
-
+    @OneToMany (mappedBy = "car")
+    private List<Reservation> reservation;
+    private boolean enabled;
+    
     public Car() {
 
     }
@@ -159,4 +164,31 @@ public class Car implements Serializable {
         this.color = color;
     }
 
+    /**
+     * @return the reservation
+     */
+    public List<Reservation> getReservation() {
+        return reservation;
+    }
+
+    /**
+     * @param reservation the reservation to set
+     */
+    public void setReservation(List<Reservation> reservation) {
+        this.reservation = reservation;
+    }
+
+    /**
+     * @return the enabled
+     */
+    public boolean isEnabled() {
+        return enabled;
+    }
+
+    /**
+     * @param enabled the enabled to set
+     */
+    public void setEnabled(boolean enabled) {
+        this.enabled = enabled;
+    }
 }

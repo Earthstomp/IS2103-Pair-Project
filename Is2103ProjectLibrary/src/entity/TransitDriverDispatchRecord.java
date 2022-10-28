@@ -32,13 +32,16 @@ public class TransitDriverDispatchRecord implements Serializable {
     @JoinColumn(nullable = false)
     private Employee employee;
     @JoinColumn(nullable = false)
+    @ManyToOne
     private Outlet pickupLocation;
     @JoinColumn(nullable = false)
+    @ManyToOne
     private Outlet returnLocation;
     @Temporal(TemporalType.TIMESTAMP)
     private Date startDateTime;
     @Temporal(TemporalType.TIMESTAMP)
     private Date endDateTime;
+    private String status;
 
     public TransitDriverDispatchRecord() {
     }
@@ -152,6 +155,20 @@ public class TransitDriverDispatchRecord implements Serializable {
      */
     public void setEmployee(Employee employee) {
         this.employee = employee;
+    }
+
+    /**
+     * @return the status
+     */
+    public String getStatus() {
+        return status;
+    }
+
+    /**
+     * @param status the status to set
+     */
+    public void setStatus(String status) {
+        this.status = status;
     }
 
 }

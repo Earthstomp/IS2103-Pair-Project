@@ -35,6 +35,7 @@ public class RentalRateRecord implements Serializable {
     private BigDecimal rate;
     @Column(nullable = false, length = 64)
     private List<Date> validityPeriod;
+    private boolean enabled;
 
     public RentalRateRecord() {
     }
@@ -119,6 +120,34 @@ public class RentalRateRecord implements Serializable {
      */
     public void setValidityPeriod(List<Date> validityPeriod) {
         this.validityPeriod = validityPeriod;
+    }
+
+    /**
+     * @return the category
+     */
+    public Category getCategory() {
+        return category;
+    }
+
+    /**
+     * @param category the category to set
+     */
+    public void setCategory(Category category) {
+        this.category = category;
+    }
+
+    /**
+     * @return the enabled
+     */
+    public boolean isEnabled() {
+        return enabled;
+    }
+
+    /**
+     * @param enabled the enabled to set
+     */
+    public void setEnabled(boolean enabled) {
+        this.enabled = enabled;
     }
     
 }

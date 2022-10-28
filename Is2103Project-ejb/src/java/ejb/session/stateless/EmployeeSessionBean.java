@@ -35,8 +35,12 @@ public class EmployeeSessionBean implements EmployeeSessionBeanRemote, EmployeeS
 
     @Override
     public Long createNewEmployeeWithExistingOutlet(Employee employee, Long outletId) throws EmployeeExistsException, UnknownPersistenceException {
-        try {
-            em.persist(employee);
+        em.persist(employee);
+        
+        Outlet outlet = em.find(Outlet.class, outletId);
+        employee.setOutlet(outlet); 
+        outlet.getEmployees().add(employee);
+        em.flush();
 
             Outlet outlet = em.find(Outlet.class, outletId);
             employee.setOutlet(outlet);

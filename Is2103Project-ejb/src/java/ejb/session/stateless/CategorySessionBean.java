@@ -5,10 +5,10 @@
  */
 package ejb.session.stateless;
 
-import entity.Car;
 import entity.Category;
 import entity.Model;
 import entity.RentalRateRecord;
+import java.util.List;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
@@ -30,6 +30,12 @@ public class CategorySessionBean implements CategorySessionBeanRemote, CategoryS
 
         return category.getCategoryId();
     }
+    
+    @Override
+    public List<Category> retrieveAllCategories() {
+        return em.createQuery("SELECT c FROM Category c").getResultList();
+        
+    }
 
     @Override
     public Long createNewModelWithExistingCategory(Model model, Long categoryId) {
@@ -37,6 +43,23 @@ public class CategorySessionBean implements CategorySessionBeanRemote, CategoryS
 
         Category category = em.find(Category.class, categoryId);
         category.getModels().add(model);
+        model.setCategory(category);
+
+        em.flush();
+
+        return model.getModelId();
+    }
+    
+    public Long createNewModelWithExistingCategoryClass(Model model, Category category) { //  need to account for exception
+        em.persist(model);
+        
+        // need to account for exception
+        Category managedCategory = (Category) em.createQuery("SELECT c FROM Category c WHERE c = :category")
+                .setParameter("category", category)
+                .getSingleResult();
+        
+        managedCategory.getModels().add(model);
+        model.setCategory(managedCategory);
 
         em.flush();
 

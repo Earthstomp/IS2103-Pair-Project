@@ -9,6 +9,7 @@ import entity.Car;
 import entity.Category;
 import entity.Model;
 import entity.RentalRateRecord;
+import java.util.List;
 import javax.ejb.Remote;
 
 /**
@@ -23,5 +24,9 @@ public interface CategorySessionBeanRemote {
     public Long createNewModelWithExistingCategory(Model model, Long categoryId);
 
     public Long createRentalRateRecord(RentalRateRecord rateRecord, Long categoryId);
+
+    public List<Category> retrieveAllCategories();
+
+    public Long createNewModelWithExistingCategoryClass(Model model, Category category);
     
 }

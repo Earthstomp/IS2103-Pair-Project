@@ -7,12 +7,14 @@ package entity;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.List;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
+import javax.persistence.OneToMany;
 
 /**
  *
@@ -30,6 +32,10 @@ public class Outlet implements Serializable {
     private Date openingTime;
     @Temporal(TemporalType.TIMESTAMP)
     private Date closingTime;
+    @OneToMany (mappedBy = "outlet")
+    private List<Employee> employees;
+    @OneToMany (mappedBy = "returnLocation")
+    private List<TransitDriverDispatchRecord> dispatches;
 
     public Outlet() {
     }
@@ -115,4 +121,17 @@ public class Outlet implements Serializable {
         this.closingTime = closingTime;
     }
 
+    /**
+     * @return the employees
+     */
+    public List<Employee> getEmployees() {
+        return employees;
+    }
+
+    /**
+     * @param employees the employees to set
+     */
+    public void setEmployees(List<Employee> employees) {
+        this.employees = employees;
+    }
 }
