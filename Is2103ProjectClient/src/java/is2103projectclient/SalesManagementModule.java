@@ -12,6 +12,8 @@ import entity.Customer;
 import entity.Reservation;
 import java.util.List;
 import java.util.Scanner;
+import util.enumeration.CarStatusEnum;
+import util.exception.CarNotFoundException;
 
 /*
  * To change this license header, choose License Headers in Project Properties.
@@ -72,13 +74,13 @@ public class SalesManagementModule {
                 } else if (response == 2) {
                     doPickUpCar();
                 } else if (response == 3) {
-                    doViewAllStaffs();
-                } else if (response == 4) {
-                    doCreateNewProduct();
-                } else if (response == 5) {
-                    doViewProductDetails();
-                } else if (response == 6) {
-                    doViewAllProducts();
+                    doReturnCar();
+                 // else if (response == 4) {
+//                    doCreateNewProduct();
+//                } else if (response == 5) {
+//                    doViewProductDetails();
+//                } else if (response == 6) {
+//                    doViewAllProducts();
                 } else if (response == 7) {
                     break;
                 } else {
@@ -123,7 +125,7 @@ public class SalesManagementModule {
         System.out.println("New model created successfully!: " + model.getModel() + "\n");
     }
 
-    public void pickUpCar() {
+    public void doPickUpCar() {
         Scanner scanner = new Scanner(System.in);
         int i = 1;
 
@@ -154,13 +156,17 @@ public class SalesManagementModule {
         if (selectedReservation.getPaymentStatus() == "false") { // convert to boolean?
             // request for payment using credit card classes
         } else { // payment has been made
-            Car reservedCar = carSessionBeanRemote.retrieveCarById(selectedReservation.getCar().getCarId());
-            carSessionBeanRemote.updateCarStatusLocation(reservedCar, "On rental", customer.getMobileNumber()); // using mobile number to uniquely identify customer
-            System.out.println("Car " + reservedCar.getPlateNumber() + " for Reservation " + selectedReservation.getId() + "has been picked up!\n");
+            try {
+                Car reservedCar = carSessionBeanRemote.retrieveCarById(selectedReservation.getCar().getCarId());
+                carSessionBeanRemote.updateCarStatusLocation(reservedCar, CarStatusEnum.RESERVED, customer.getMobileNumber()); // using mobile number to uniquely identify customer
+                System.out.println("Car " + reservedCar.getPlateNumber() + " for Reservation " + selectedReservation.getId() + "has been picked up!\n");
+            } catch (CarNotFoundException ex) {
+                System.out.println("Car not found!");
+            }
         }
     }
 
-    public void returnCar() {
+    public void doReturnCar() {
         Scanner scanner = new Scanner(System.in);
         int i = 1;
 
@@ -188,11 +194,13 @@ public class SalesManagementModule {
                 System.out.println("Invalid option, please try again!\n");
             }
         }
-        Car reservedCar = carSessionBeanRemote.retrieveCarById(selectedReservation.getCar().getCarId());
-        carSessionBeanRemote.updateCarStatusLocation(reservedCar, "In outlet", selectedReservation.getReturnLocation().toString()); // using mobile number to uniquely identify customer
-        System.out.println("Car " + reservedCar.getPlateNumber() + " for Reservation " + selectedReservation.getId() + "has been returned!\n");
+        try {
+            Car reservedCar = carSessionBeanRemote.retrieveCarById(selectedReservation.getCar().getCarId());
 
+            carSessionBeanRemote.updateCarStatusLocation(reservedCar, CarStatusEnum.AVAILABLE, selectedReservation.getReturnLocation().toString()); // using mobile number to uniquely identify customer
+            System.out.println("Car " + reservedCar.getPlateNumber() + " for Reservation " + selectedReservation.getId() + "has been returned!\n");
+        } catch (CarNotFoundException ex) {
+            System.out.println("Car not found!");
+        }
     }
-}
-
 }

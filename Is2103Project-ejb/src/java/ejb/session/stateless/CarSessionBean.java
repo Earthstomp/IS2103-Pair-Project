@@ -12,6 +12,7 @@ import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
+import util.enumeration.CarStatusEnum;
 import util.exception.CarNotFoundException;
 
 /**
@@ -69,7 +70,7 @@ public class CarSessionBean implements CarSessionBeanRemote, CarSessionBeanLocal
 
     }
 
-    public void updateCarStatusLocation(Car car, String status, String location) {
+    public void updateCarStatusLocation(Car car, CarStatusEnum status, String location) {
         Car updatedCar = em.find(Car.class, car.getCarId());
         updatedCar.setStatus(status);
         updatedCar.setLocation(location);

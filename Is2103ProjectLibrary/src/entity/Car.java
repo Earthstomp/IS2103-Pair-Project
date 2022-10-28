@@ -46,7 +46,7 @@ public class Car implements Serializable {
 
     }
 
-    public Car(Long carId, Model model, CarStatusEnum status, Long location, String plateNumber, String color) {
+    public Car(Long carId, Model model, CarStatusEnum status, String location, String plateNumber, String color) {
         this.carId = carId;
         this.model = model;
         this.status = status;
@@ -125,14 +125,14 @@ public class Car implements Serializable {
     /**
      * @return the location
      */
-    public Long getLocation() {
+    public String getLocation() {
         return location;
     }
 
     /**
      * @param location the location to set
      */
-    public void setLocation(Long location) {
+    public void setLocation(String location) {
         this.location = location;
     }
 
@@ -150,16 +150,10 @@ public class Car implements Serializable {
         this.plateNumber = plateNumber;
     }
 
-    /**
-     * @return the color
-     */
     public String getColor() {
         return color;
     }
 
-    /**
-     * @param color the color to set
-     */
     public void setColor(String color) {
         this.color = color;
     }
