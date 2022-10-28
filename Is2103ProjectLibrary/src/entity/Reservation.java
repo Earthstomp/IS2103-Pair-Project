@@ -35,13 +35,11 @@ public class Reservation implements Serializable {
     private Date startDateTime;
     @Temporal(TemporalType.TIMESTAMP)
     private Date endDateTime;
-    @OneToOne
-    @Column(nullable = false)
     private Car car;
-    @Column(nullable = false, length = 64)
+    @JoinColumn(nullable = false)
     @ManyToOne
     private Outlet pickUpLocation;
-    @Column(nullable = false, length = 64)
+    @JoinColumn(nullable = false)
     @ManyToOne
     private Outlet returnLocation;
     @ManyToMany

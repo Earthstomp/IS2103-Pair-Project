@@ -8,5 +8,6 @@ public enum CarStatusEnum {
     AVAILABLE,
     RESERVED,
     TRANSIT,
-    SERVICING_OR_REPAIR
+    SERVICING_OR_REPAIR,
+    DISABLED
 }

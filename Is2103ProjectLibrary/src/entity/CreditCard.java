@@ -28,11 +28,13 @@ public class CreditCard implements Serializable {
     private String name;
     @Column(precision = 11, scale = 2)
     private BigDecimal penaltyAmount;
+    private Customer customer; 
 
-    public CreditCard(Long ccId, String name, BigDecimal penaltyAmount) {
+    public CreditCard(Long ccId, String name, BigDecimal penaltyAmount, Customer customer) {
         this.ccId = ccId;
         this.name = name;
         this.penaltyAmount = penaltyAmount;
+        this.customer = customer;
     }
 
     public Long getCcId() {
@@ -94,6 +96,20 @@ public class CreditCard implements Serializable {
      */
     public void setPenaltyAmount(BigDecimal penaltyAmount) {
         this.penaltyAmount = penaltyAmount;
+    }
+
+    /**
+     * @return the customer
+     */
+    public Customer getCustomer() {
+        return customer;
+    }
+
+    /**
+     * @param customer the customer to set
+     */
+    public void setCustomer(Customer customer) {
+        this.customer = customer;
     }
     
 }

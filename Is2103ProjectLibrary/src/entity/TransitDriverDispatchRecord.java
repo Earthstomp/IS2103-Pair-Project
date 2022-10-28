@@ -31,9 +31,9 @@ public class TransitDriverDispatchRecord implements Serializable {
     @ManyToOne
     @JoinColumn(nullable = false)
     private Employee employee;
-    @Column(nullable = false)
+    @JoinColumn(nullable = false)
     private Outlet pickupLocation;
-    @Column(nullable = false)
+    @JoinColumn(nullable = false)
     private Outlet returnLocation;
     @Temporal(TemporalType.TIMESTAMP)
     private Date startDateTime;

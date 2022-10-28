@@ -33,7 +33,7 @@ public class Employee implements Serializable {
     private EmployeeRoleEnum role;
     @ManyToOne // idk if this is nullable 
     private Outlet outlet;
-    @OneToMany (mappedBy = "driver")
+    @OneToMany (mappedBy = "employee")
     private List<TransitDriverDispatchRecord> dispatches;
     // login credentials
     @Column(unique = true)
