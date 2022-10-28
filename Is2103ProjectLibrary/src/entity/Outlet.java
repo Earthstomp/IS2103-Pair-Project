@@ -34,8 +34,7 @@ public class Outlet implements Serializable {
     public Outlet() {
     }
 
-    public Outlet(Long outletId, String location, Date openingTime, Date closingTime) {
-        this.outletId = outletId;
+    public Outlet(String location, Date openingTime, Date closingTime) {
         this.location = location;
         this.openingTime = openingTime;
         this.closingTime = closingTime;

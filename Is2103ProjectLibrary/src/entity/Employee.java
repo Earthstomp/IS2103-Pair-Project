@@ -7,6 +7,7 @@ package entity;
 
 import java.io.Serializable;
 import java.util.List;
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
@@ -27,39 +28,36 @@ public class Employee implements Serializable {
     private static final long serialVersionUID = 1L;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long customerId;
+    private Long employeeId;
     @Enumerated(EnumType.STRING)
     private EmployeeRoleEnum role;
     @ManyToOne // idk if this is nullable 
     private Outlet outlet;
     @OneToMany (mappedBy = "driver")
     private List<TransitDriverDispatchRecord> dispatches;
-    
-    /* login credentials
+    // login credentials
     @Column(unique = true)
     private String username;
     private String password;
-    */
 
-    public Employee(Long customerId, EmployeeRoleEnum role, Outlet outlet, List<TransitDriverDispatchRecord> dispatches) {
-        this.customerId = customerId;
+    public Employee(EmployeeRoleEnum role, String username, String password) {
         this.role = role;
-        this.outlet = outlet;
-        this.dispatches = dispatches;
+        this.username = username;
+        this.password = password;
     }
     
     public Long getEmployeeId() {
-        return customerId;
+        return employeeId;
     }
 
-    public void setEmployeeId(Long customerId) {
-        this.customerId = customerId;
+    public void setEmployeeId(Long employeeId) {
+        this.employeeId = employeeId;
     }
 
     @Override
     public int hashCode() {
         int hash = 0;
-        hash += (customerId != null ? customerId.hashCode() : 0);
+        hash += (employeeId != null ? employeeId.hashCode() : 0);
         return hash;
     }
 
@@ -70,7 +68,7 @@ public class Employee implements Serializable {
             return false;
         }
         Employee other = (Employee) object;
-        if ((this.customerId == null && other.customerId != null) || (this.customerId != null && !this.customerId.equals(other.customerId))) {
+        if ((this.employeeId == null && other.employeeId != null) || (this.employeeId != null && !this.employeeId.equals(other.employeeId))) {
             return false;
         }
         return true;
@@ -78,49 +76,50 @@ public class Employee implements Serializable {
 
     @Override
     public String toString() {
-        return "entity.Employee[ id=" + customerId + " ]";
+        return "entity.Employee[ id=" + employeeId + " ]";
     }
 
-    /**
-     * @return the role
-     */
     public EmployeeRoleEnum getRole() {
         return role;
     }
 
-    /**
-     * @param role the role to set
-     */
     public void setRole(EmployeeRoleEnum role) {
         this.role = role;
     }
 
-    /**
-     * @return the outlet
-     */
     public Outlet getOutlet() {
         return outlet;
     }
 
-    /**
-     * @param outlet the outlet to set
-     */
     public void setOutlet(Outlet outlet) {
         this.outlet = outlet;
     }
 
-    /**
-     * @return the dispatches
-     */
     public List<TransitDriverDispatchRecord> getDispatches() {
         return dispatches;
     }
 
-    /**
-     * @param dispatches the dispatches to set
-     */
     public void setDispatches(List<TransitDriverDispatchRecord> dispatches) {
         this.dispatches = dispatches;
+    }
+
+    public String getUsername() {
+        return username;
+    }
+
+    
+    public void setUsername(String username) {
+        this.username = username;
+    }
+
+    
+    public String getPassword() {
+        return password;
+    }
+
+    
+    public void setPassword(String password) {
+        this.password = password;
     }
     
 }
