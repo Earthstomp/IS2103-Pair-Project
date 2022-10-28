@@ -19,5 +19,7 @@ public interface CustomerSessionBeanRemote {
     public Long createNewReservation(Reservation reservation, Long customerId);
 
     public Long createNewCustomer(Customer customer);
+
+    public Customer retrieveCustomerByMobileNumber(Integer mobileNumber);
     
 }

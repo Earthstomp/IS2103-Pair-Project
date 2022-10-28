@@ -6,6 +6,7 @@
 package ejb.session.stateless;
 
 import entity.Car;
+import entity.Reservation;
 import java.util.List;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
@@ -27,9 +28,7 @@ public class CarSessionBean implements CarSessionBeanRemote, CarSessionBeanLocal
 
     // Add business logic below. (Right-click in editor and choose
     // "Insert Code > Add Business Method")
-    
     // car creation method inside model session bean as it is compulsory
-
     @Override
     public List<Car> retrieveAllCars() {
         Query query = em.createQuery("SELECT c FROM Car C");
@@ -46,6 +45,7 @@ public class CarSessionBean implements CarSessionBeanRemote, CarSessionBeanLocal
         } else {
             // throw exception
             // delete line below
+            System.out.println("Car was not found");
             return car;
         }
     }
@@ -54,5 +54,40 @@ public class CarSessionBean implements CarSessionBeanRemote, CarSessionBeanLocal
     public void removeCar(Long reservationId) {
         // more details need to be thought out
     }
-    
+
+    public List<Car> viewAllCars() {
+        return em.createQuery("SELECT c FROM Car c"
+                + "ORDER BY c.category, c.model, c.plateNumber")
+                .getResultList();
+    }
+
+    // not sure
+    public void updateCar(Car newCar, Long carId) {
+        Car car = em.find(Car.class, carId);
+        car = newCar;
+
+    }
+
+    public void updateCarStatusLocation(Car car, String status, String location) {
+        Car updatedCar = em.find(Car.class, car.getCarId());
+        updatedCar.setStatus(status);
+        updatedCar.setLocation(location);
+    }
+
+    public void deleteCar(Long carId) {
+        Car car = em.find(Car.class, carId);
+        // need to find a way to know if reservation  is still active, check by date? but how
+        List<Reservation> reservationsUsed = em.createQuery("SELECT r FROM Reservation r WHERE r.car = car").getResultList();
+
+        if (reservationsUsed.size() > 0) {
+            System.out.print("There are reservations that use this car, car is disabled instead of deleted");
+            car.setEnabled(false);
+
+        } else { // record is not being used, can delete
+            car.getModel().getCars().remove(car);
+            em.remove(car);
+        }
+
+    }
+
 }

@@ -34,21 +34,18 @@ public class Reservation implements Serializable {
     @Column(nullable = false, length = 32)
     private Date endDateTime;
     @OneToOne
-    @Column(nullable = false)
+    @JoinColumn(nullable = false)
     private Car car;
-    @Column(nullable = false, length = 64)
     @ManyToOne
+    @JoinColumn(nullable = false)
     private Outlet pickUpLocation;
-    @Column(nullable = false, length = 64)
+    @JoinColumn(nullable = false)
     @ManyToOne
     private Outlet returnLocation;
-    @ManyToMany
-//    @JoinColumn(nullable = false) // not sure if correct
-    private List<RentalRateRecord> rentalRates;
     @Column(nullable = false, length = 32)
     private String paymentStatus;
     @ManyToOne
-    @JoinColumn (nullable=false)
+    @JoinColumn(nullable = false)
     private Customer customer;
 
     public Reservation() {
@@ -169,16 +166,10 @@ public class Reservation implements Serializable {
     /**
      * @return the rentalRates
      */
-    public List<RentalRateRecord> getRentalRates() {
-        return rentalRates;
-    }
 
     /**
      * @param rentalRates the rentalRates to set
      */
-    public void setRentalRates(List<RentalRateRecord> rentalRates) {
-        this.rentalRates = rentalRates;
-    }
 
     /**
      * @return the customer
@@ -192,6 +183,20 @@ public class Reservation implements Serializable {
      */
     public void setCustomer(Customer customer) {
         this.customer = customer;
+    }
+
+    /**
+     * @return the car
+     */
+    public Car getCar() {
+        return car;
+    }
+
+    /**
+     * @param car the car to set
+     */
+    public void setCar(Car car) {
+        this.car = car;
     }
 
 }

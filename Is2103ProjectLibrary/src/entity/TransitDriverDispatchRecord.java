@@ -29,19 +29,22 @@ public class TransitDriverDispatchRecord implements Serializable {
     @ManyToOne
     @JoinColumn(nullable = false)
     private Employee employee;
-    @Column(nullable = false, length = 64)
-    private String pickupLocation;
-    @Column(nullable = false, length = 64)
-    private String returnLocation;
+    @JoinColumn(nullable = false)
+    @ManyToOne
+    private Outlet pickupLocation;
+    @JoinColumn(nullable = false)
+    @ManyToOne
+    private Outlet returnLocation;
     @Column(nullable = false, length = 32)
     private Date startDateTime;
     @Column(nullable = false, length = 32)
     private Date endDateTime;
+    private String status;
 
     public TransitDriverDispatchRecord() {
     }
 
-    public TransitDriverDispatchRecord(String pickupLocation, String returnLocation, Date startDateTime, Date endDateTime, Employee employee) {
+    public TransitDriverDispatchRecord(Outlet pickupLocation, Outlet returnLocation, Date startDateTime, Date endDateTime, Employee employee) {
         this.pickupLocation = pickupLocation;
         this.returnLocation = returnLocation;
         this.startDateTime = startDateTime;
@@ -85,28 +88,28 @@ public class TransitDriverDispatchRecord implements Serializable {
     /**
      * @return the pickupLocation
      */
-    public String getPickupLocation() {
+    public Outlet getPickupLocation() {
         return pickupLocation;
     }
 
     /**
      * @param pickupLocation the pickupLocation to set
      */
-    public void setPickupLocation(String pickupLocation) {
+    public void setPickupLocation(Outlet pickupLocation) {
         this.pickupLocation = pickupLocation;
     }
 
     /**
      * @return the returnLocation
      */
-    public String getReturnLocation() {
+    public Outlet getReturnLocation() {
         return returnLocation;
     }
 
     /**
      * @param returnLocation the returnLocation to set
      */
-    public void setReturnLocation(String returnLocation) {
+    public void setReturnLocation(Outlet returnLocation) {
         this.returnLocation = returnLocation;
     }
 
@@ -150,6 +153,20 @@ public class TransitDriverDispatchRecord implements Serializable {
      */
     public void setEmployee(Employee employee) {
         this.employee = employee;
+    }
+
+    /**
+     * @return the status
+     */
+    public String getStatus() {
+        return status;
+    }
+
+    /**
+     * @param status the status to set
+     */
+    public void setStatus(String status) {
+        this.status = status;
     }
 
 }

@@ -7,10 +7,12 @@ package entity;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.List;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.OneToMany;
 
 /**
  *
@@ -26,6 +28,10 @@ public class Outlet implements Serializable {
     private String location;
     private Date openingTime;
     private Date closingTime;
+    @OneToMany (mappedBy = "outlet")
+    private List<Employee> employees;
+    @OneToMany (mappedBy = "returnLocation")
+    private List<TransitDriverDispatchRecord> dispatches;
 
     public Outlet() {
     }
@@ -104,6 +110,20 @@ public class Outlet implements Serializable {
      */
     public void setClosingTime(Date closingTime) {
         this.closingTime = closingTime;
+    }
+
+    /**
+     * @return the employees
+     */
+    public List<Employee> getEmployees() {
+        return employees;
+    }
+
+    /**
+     * @param employees the employees to set
+     */
+    public void setEmployees(List<Employee> employees) {
+        this.employees = employees;
     }
     
 }

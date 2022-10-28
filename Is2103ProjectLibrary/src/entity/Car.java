@@ -6,12 +6,14 @@
 package entity;
 
 import java.io.Serializable;
+import java.util.List;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 
 /**
  *
@@ -28,10 +30,13 @@ public class Car implements Serializable {
     @ManyToOne
     @JoinColumn (nullable = false)
     private Model model;
-    private String status;
+    private String status; // in outlet or on rental
     private String location; // needs to be Long because it can either be Outlet or Customer
     private String plateNumber;
     private String color;
+    @OneToMany (mappedBy = "car")
+    private List<Reservation> reservation;
+    private boolean enabled;
     
     public Car() {
         
@@ -146,6 +151,34 @@ public class Car implements Serializable {
      */
     public void setColor(String color) {
         this.color = color;
+    }
+
+    /**
+     * @return the reservation
+     */
+    public List<Reservation> getReservation() {
+        return reservation;
+    }
+
+    /**
+     * @param reservation the reservation to set
+     */
+    public void setReservation(List<Reservation> reservation) {
+        this.reservation = reservation;
+    }
+
+    /**
+     * @return the enabled
+     */
+    public boolean isEnabled() {
+        return enabled;
+    }
+
+    /**
+     * @param enabled the enabled to set
+     */
+    public void setEnabled(boolean enabled) {
+        this.enabled = enabled;
     }
     
 }

@@ -30,7 +30,7 @@ public class Employee implements Serializable {
     private String role;
     @ManyToOne // idk if this is nullable 
     private Outlet outlet;
-    @OneToMany (mappedBy = "driver")
+    @OneToMany (mappedBy = "employee")
     private List<TransitDriverDispatchRecord> dispatches;
     
 
@@ -64,7 +64,7 @@ public class Employee implements Serializable {
 
     @Override
     public String toString() {
-        return "entity.Employee[ id=" + customerId + " ]";
+        return "entity.Emee[ id=" + customerId + " ]";
     }
 
     /**

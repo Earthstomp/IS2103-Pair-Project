@@ -21,6 +21,4 @@ public interface ReservationSessionBeanRemote {
     public Reservation retrieveReservationById(Long reservationId);
 
     public List<Reservation> retrieveAllReservations();
-
-    public Long createNewReservation(Reservation reservation);
 }

@@ -21,5 +21,7 @@ public interface CarSessionBeanRemote {
     public Car retrieveCarById(Long carId);
 
     public void removeCar(Long reservationId);
+
+    public void updateCarStatusLocation(Car car, String status, String location);
     
 }
