@@ -23,7 +23,7 @@ public class Category implements Serializable {
 
     private static final long serialVersionUID = 1L;
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long categoryId;
     @Column (nullable = false)
     private String categoryName;
@@ -33,6 +33,13 @@ public class Category implements Serializable {
     @OneToMany (mappedBy = "category")
     private List<RentalRateRecord> rateRecords;
 
+    public Category(Long categoryId, String categoryName, List<Model> models, List<RentalRateRecord> rateRecords) {
+        this.categoryId = categoryId;
+        this.categoryName = categoryName;
+        this.models = models;
+        this.rateRecords = rateRecords;
+    }
+    
     public Long getCategoryId() {
         return categoryId;
     }

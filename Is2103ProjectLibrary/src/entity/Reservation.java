@@ -17,6 +17,8 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToOne;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
 
 /**
  *
@@ -29,9 +31,9 @@ public class Reservation implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @Column(nullable = false, length = 32)
+    @Temporal(TemporalType.TIMESTAMP)
     private Date startDateTime;
-    @Column(nullable = false, length = 32)
+    @Temporal(TemporalType.TIMESTAMP)
     private Date endDateTime;
     @OneToOne
     @JoinColumn(nullable = false)

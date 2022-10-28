@@ -8,6 +8,7 @@ package ejb.session.stateless;
 import entity.Partner;
 import java.util.List;
 import javax.ejb.Remote;
+import util.exception.PartnerNotFoundException;
 
 /**
  *
@@ -18,7 +19,7 @@ public interface PartnerSessionBeanRemote {
 
     public void removePartner(Long id);
 
-    public Partner retrievePartnerById(Long id);
+    public Partner retrievePartnerById(Long id) throws PartnerNotFoundException;
 
     public List<Partner> retrieveAllPartners();
 

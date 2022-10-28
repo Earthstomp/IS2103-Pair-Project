@@ -12,6 +12,8 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
 import javax.persistence.OneToMany;
 
 /**
@@ -26,7 +28,9 @@ public class Outlet implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long outletId;
     private String location;
+    @Temporal(TemporalType.TIMESTAMP)
     private Date openingTime;
+    @Temporal(TemporalType.TIMESTAMP)
     private Date closingTime;
     @OneToMany (mappedBy = "outlet")
     private List<Employee> employees;
@@ -36,7 +40,12 @@ public class Outlet implements Serializable {
     public Outlet() {
     }
 
-    
+    public Outlet(String location, Date openingTime, Date closingTime) {
+        this.location = location;
+        this.openingTime = openingTime;
+        this.closingTime = closingTime;
+    }
+
     public Long getOutletId() {
         return outletId;
     }
@@ -125,5 +134,4 @@ public class Outlet implements Serializable {
     public void setEmployees(List<Employee> employees) {
         this.employees = employees;
     }
-    
 }

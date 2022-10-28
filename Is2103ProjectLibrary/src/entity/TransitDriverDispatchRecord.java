@@ -14,6 +14,8 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
 
 /**
  *
@@ -35,9 +37,9 @@ public class TransitDriverDispatchRecord implements Serializable {
     @JoinColumn(nullable = false)
     @ManyToOne
     private Outlet returnLocation;
-    @Column(nullable = false, length = 32)
+    @Temporal(TemporalType.TIMESTAMP)
     private Date startDateTime;
-    @Column(nullable = false, length = 32)
+    @Temporal(TemporalType.TIMESTAMP)
     private Date endDateTime;
     private String status;
 

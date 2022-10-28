@@ -5,6 +5,9 @@
  */
 package ejb.session.stateless;
 
+import entity.Category;
+import entity.Model;
+import entity.RentalRateRecord;
 import javax.ejb.Local;
 
 /**
@@ -13,5 +16,11 @@ import javax.ejb.Local;
  */
 @Local
 public interface CategorySessionBeanLocal {
+    
+    public Long createNewCategory(Category category);
+
+    public Long createNewModelWithExistingCategory(Model model, Long categoryId);
+
+    public Long createRentalRateRecord(RentalRateRecord rateRecord, Long categoryId);
     
 }

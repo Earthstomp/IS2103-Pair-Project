@@ -8,11 +8,14 @@ package entity;
 import java.io.Serializable;
 import java.util.List;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import util.enumeration.CarStatusEnum;
 import javax.persistence.OneToMany;
 
 /**
@@ -24,14 +27,15 @@ public class Car implements Serializable {
 
     private static final long serialVersionUID = 1L;
     @Id
-        @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long carId;
-    
+
     @ManyToOne
-    @JoinColumn (nullable = false)
+    @JoinColumn(nullable = false)
     private Model model;
-    private String status; // in outlet or on rental
-    private String location; // needs to be Long because it can either be Outlet or Customer
+    @Enumerated(EnumType.STRING)
+    private CarStatusEnum status;
+    private String location;
     private String plateNumber;
     private String color;
     @OneToMany (mappedBy = "car")
@@ -39,7 +43,16 @@ public class Car implements Serializable {
     private boolean enabled;
     
     public Car() {
-        
+
+    }
+
+    public Car(Long carId, Model model, CarStatusEnum status, Long location, String plateNumber, String color) {
+        this.carId = carId;
+        this.model = model;
+        this.status = status;
+        this.location = location;
+        this.plateNumber = plateNumber;
+        this.color = color;
     }
 
     public Long getCarId() {
@@ -81,8 +94,6 @@ public class Car implements Serializable {
     /**
      * @param category the category to set
      */
-
-
     /**
      * @return the model
      */
@@ -100,28 +111,28 @@ public class Car implements Serializable {
     /**
      * @return the status
      */
-    public String getStatus() {
+    public CarStatusEnum getStatus() {
         return status;
     }
 
     /**
      * @param status the status to set
      */
-    public void setStatus(String status) {
+    public void setStatus(CarStatusEnum status) {
         this.status = status;
     }
 
     /**
      * @return the location
      */
-    public String getLocation() {
+    public Long getLocation() {
         return location;
     }
 
     /**
      * @param location the location to set
      */
-    public void setLocation(String location) {
+    public void setLocation(Long location) {
         this.location = location;
     }
 
@@ -180,5 +191,4 @@ public class Car implements Serializable {
     public void setEnabled(boolean enabled) {
         this.enabled = enabled;
     }
-    
 }

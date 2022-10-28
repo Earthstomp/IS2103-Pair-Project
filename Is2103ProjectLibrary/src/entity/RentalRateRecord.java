@@ -6,6 +6,7 @@
 package entity;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
 import javax.persistence.Column;
@@ -17,7 +18,7 @@ import javax.persistence.ManyToOne;
 
 /**
  *
- * @author Keith test
+ * @author Keith
  */
 @Entity
 public class RentalRateRecord implements Serializable {
@@ -30,8 +31,8 @@ public class RentalRateRecord implements Serializable {
     private String recordName;
     @ManyToOne
     private Category category;
-    @Column(nullable = false, length = 12)
-    private double rate;
+    @Column(precision = 11, scale = 2)
+    private BigDecimal rate;
     @Column(nullable = false, length = 64)
     private List<Date> validityPeriod;
     private boolean enabled;
@@ -39,7 +40,7 @@ public class RentalRateRecord implements Serializable {
     public RentalRateRecord() {
     }
 
-    public RentalRateRecord(String recordName, double rate, List<Date> validityPeriod) {
+    public RentalRateRecord(String recordName, BigDecimal rate, List<Date> validityPeriod) {
         this.recordName = recordName;
         this.rate = rate;
         this.validityPeriod = validityPeriod;
@@ -96,14 +97,14 @@ public class RentalRateRecord implements Serializable {
     /**
      * @return the rate
      */
-    public double getRate() {
+    public BigDecimal getRate() {
         return rate;
     }
 
     /**
      * @param rate the rate to set
      */
-    public void setRate(double rate) {
+    public void setRate(BigDecimal rate) {
         this.rate = rate;
     }
 

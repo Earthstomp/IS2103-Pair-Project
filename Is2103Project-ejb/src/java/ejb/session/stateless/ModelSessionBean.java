@@ -23,7 +23,7 @@ public class ModelSessionBean implements ModelSessionBeanRemote, ModelSessionBea
     private EntityManager em;
 
     @Override
-    public Car createNewCarWithExistingModel(Car car, Long modelId) {
+    public Long createNewCarWithExistingModel(Car car, Long modelId) {
         em.persist(car);
 
         Model model = em.find(Model.class, modelId);
@@ -31,7 +31,7 @@ public class ModelSessionBean implements ModelSessionBeanRemote, ModelSessionBea
 
         em.flush();
 
-        return car;
+        return car.getCarId();
     }
 
     public List<Model> viewAllModels() {

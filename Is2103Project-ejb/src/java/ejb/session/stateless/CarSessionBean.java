@@ -12,6 +12,7 @@ import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
+import util.exception.CarNotFoundException;
 
 /**
  *
@@ -22,13 +23,14 @@ public class CarSessionBean implements CarSessionBeanRemote, CarSessionBeanLocal
 
     @PersistenceContext(unitName = "Is2103Project-ejbPU")
     private EntityManager em;
+    private String name;
 
     public CarSessionBean() {
     }
 
-    // Add business logic below. (Right-click in editor and choose
-    // "Insert Code > Add Business Method")
     // car creation method inside model session bean as it is compulsory
+    
+
     @Override
     public List<Car> retrieveAllCars() {
         Query query = em.createQuery("SELECT c FROM Car C");
@@ -37,23 +39,22 @@ public class CarSessionBean implements CarSessionBeanRemote, CarSessionBeanLocal
     }
 
     @Override
-    public Car retrieveCarById(Long carId) { // throws exception
+    public Car retrieveCarById(Long carId) throws CarNotFoundException {
+        
         Car car = em.find(Car.class, carId);
 
         if (car != null) {
             return car;
-        } else {
-            // throw exception
-            // delete line below
-            System.out.println("Car was not found");
-            return car;
-        }
+        } 
+            throw new CarNotFoundException("Unable to locate car with id: " + carId);
+
     }
 
     @Override
     public void removeCar(Long reservationId) {
         // more details need to be thought out
     }
+
 
     public List<Car> viewAllCars() {
         return em.createQuery("SELECT c FROM Car c"

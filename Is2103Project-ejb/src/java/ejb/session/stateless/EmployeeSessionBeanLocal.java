@@ -5,7 +5,13 @@
  */
 package ejb.session.stateless;
 
+import entity.Employee;
+import entity.TransitDriverDispatchRecord;
+import java.util.List;
 import javax.ejb.Local;
+import util.exception.EmployeeExistsException;
+import util.exception.EmployeeNotFoundException;
+import util.exception.UnknownPersistenceException;
 
 /**
  *
@@ -13,5 +19,15 @@ import javax.ejb.Local;
  */
 @Local
 public interface EmployeeSessionBeanLocal {
+    
+    public Long createNewEmployeeWithExistingOutlet(Employee employee, Long outletId) throws EmployeeExistsException, UnknownPersistenceException;
+
+    public Long createNewTransitDriverDispatchRecordWithExistingEmployee(TransitDriverDispatchRecord dispatchRecord, Long employeeId);
+    
+    public List<Employee> retrieveAllEmployees();
+    
+    public Employee retrieveEmployeeByUsername(String username) throws EmployeeNotFoundException; 
+            
+    public Employee retrieveEmployeeByEmployeeId(Long employeeId) throws EmployeeNotFoundException;
     
 }

@@ -36,6 +36,12 @@ public class Model implements Serializable {
     
     public Model() {
     }
+
+    public Model(Long modelId, String model, List<Car> cars) {
+        this.modelId = modelId;
+        this.model = model;
+        this.cars = cars;
+    }
         
     
     public Long getModelId() {

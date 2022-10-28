@@ -16,7 +16,7 @@ import javax.persistence.OneToMany;
 
 /**
  *
- * @author Keith test
+ * @author 
  */
 @Entity
 public class Partner implements Serializable {
@@ -29,8 +29,20 @@ public class Partner implements Serializable {
     private String name;
     @OneToMany (mappedBy = "partner")
     private List<Customer> customers;
+    
+    /* login credentials
+    @Column(unique = true)
+    private String username;
+    private String password;
+    */
 
     public Partner() {
+    }
+
+    public Partner(Long id, String name, List<Customer> customers) {
+        this.id = id;
+        this.name = name;
+        this.customers = customers;
     }
 
     public Partner(String name) {

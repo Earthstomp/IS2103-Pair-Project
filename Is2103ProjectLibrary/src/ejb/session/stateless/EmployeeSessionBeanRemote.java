@@ -7,7 +7,11 @@ package ejb.session.stateless;
 
 import entity.Employee;
 import entity.TransitDriverDispatchRecord;
+import java.util.List;
 import javax.ejb.Remote;
+import util.exception.EmployeeExistsException;
+import util.exception.EmployeeNotFoundException;
+import util.exception.UnknownPersistenceException;
 
 /**
  *
@@ -16,8 +20,14 @@ import javax.ejb.Remote;
 @Remote
 public interface EmployeeSessionBeanRemote {
 
-    public Long createNewEmployeeWithExistingOutlet(Employee employee, Long outletId);
+    public Long createNewEmployeeWithExistingOutlet(Employee employee, Long outletId) throws EmployeeExistsException, UnknownPersistenceException;
 
-    public TransitDriverDispatchRecord createNewTransitDriverDispatchRecordWithExistingEmployee(TransitDriverDispatchRecord dispatchRecord, Long employeeId);
+    public Long createNewTransitDriverDispatchRecordWithExistingEmployee(TransitDriverDispatchRecord dispatchRecord, Long employeeId);
+    
+    public List<Employee> retrieveAllEmployees();
+    
+    public Employee retrieveEmployeeByUsername(String username) throws EmployeeNotFoundException ;
+    
+    public Employee retrieveEmployeeByEmployeeId(Long employeeId) throws EmployeeNotFoundException;
     
 }
