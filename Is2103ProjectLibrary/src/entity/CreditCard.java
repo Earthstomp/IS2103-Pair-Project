@@ -6,6 +6,7 @@
 package entity;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -25,9 +26,10 @@ public class CreditCard implements Serializable {
     private Long ccId;
     @Column(nullable = false)
     private String name;
-    private double penaltyAmount;
+    @Column(precision = 11, scale = 2)
+    private BigDecimal penaltyAmount;
 
-    public CreditCard(Long ccId, String name, double penaltyAmount) {
+    public CreditCard(Long ccId, String name, BigDecimal penaltyAmount) {
         this.ccId = ccId;
         this.name = name;
         this.penaltyAmount = penaltyAmount;
@@ -83,14 +85,14 @@ public class CreditCard implements Serializable {
     /**
      * @return the penaltyAmount
      */
-    public double getPenaltyAmount() {
+    public BigDecimal getPenaltyAmount() {
         return penaltyAmount;
     }
 
     /**
      * @param penaltyAmount the penaltyAmount to set
      */
-    public void setPenaltyAmount(double penaltyAmount) {
+    public void setPenaltyAmount(BigDecimal penaltyAmount) {
         this.penaltyAmount = penaltyAmount;
     }
     

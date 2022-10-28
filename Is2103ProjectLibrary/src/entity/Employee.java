@@ -7,13 +7,15 @@ package entity;
 
 import java.io.Serializable;
 import java.util.List;
-import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
+import util.enumeration.EmployeeRoleEnum;
 
 /**
  *
@@ -26,14 +28,20 @@ public class Employee implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long customerId;
-    @Column (nullable = false)
-    private String role;
+    @Enumerated(EnumType.STRING)
+    private EmployeeRoleEnum role;
     @ManyToOne // idk if this is nullable 
     private Outlet outlet;
     @OneToMany (mappedBy = "driver")
     private List<TransitDriverDispatchRecord> dispatches;
+    
+    /* login credentials
+    @Column(unique = true)
+    private String username;
+    private String password;
+    */
 
-    public Employee(Long customerId, String role, Outlet outlet, List<TransitDriverDispatchRecord> dispatches) {
+    public Employee(Long customerId, EmployeeRoleEnum role, Outlet outlet, List<TransitDriverDispatchRecord> dispatches) {
         this.customerId = customerId;
         this.role = role;
         this.outlet = outlet;
@@ -76,14 +84,14 @@ public class Employee implements Serializable {
     /**
      * @return the role
      */
-    public String getRole() {
+    public EmployeeRoleEnum getRole() {
         return role;
     }
 
     /**
      * @param role the role to set
      */
-    public void setRole(String role) {
+    public void setRole(EmployeeRoleEnum role) {
         this.role = role;
     }
 

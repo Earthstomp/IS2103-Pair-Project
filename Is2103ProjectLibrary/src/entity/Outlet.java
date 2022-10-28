@@ -11,6 +11,8 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
 
 /**
  *
@@ -24,7 +26,9 @@ public class Outlet implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long outletId;
     private String location;
+    @Temporal(TemporalType.TIMESTAMP)
     private Date openingTime;
+    @Temporal(TemporalType.TIMESTAMP)
     private Date closingTime;
 
     public Outlet() {
@@ -37,7 +41,6 @@ public class Outlet implements Serializable {
         this.closingTime = closingTime;
     }
 
-    
     public Long getOutletId() {
         return outletId;
     }
@@ -112,5 +115,5 @@ public class Outlet implements Serializable {
     public void setClosingTime(Date closingTime) {
         this.closingTime = closingTime;
     }
-    
+
 }

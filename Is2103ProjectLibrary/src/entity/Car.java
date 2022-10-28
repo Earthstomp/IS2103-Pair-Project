@@ -7,11 +7,14 @@ package entity;
 
 import java.io.Serializable;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import util.enumeration.CarStatusEnum;
 
 /**
  *
@@ -28,8 +31,9 @@ public class Car implements Serializable {
     @ManyToOne
     @JoinColumn(nullable = false)
     private Model model;
-    private String status;
-    private Long location; // either Outlet or Customer
+    @Enumerated(EnumType.STRING)
+    private CarStatusEnum status;
+    private Long location; // customerId or outletId
     private String plateNumber;
     private String color;
 
@@ -37,7 +41,7 @@ public class Car implements Serializable {
 
     }
 
-    public Car(Long carId, Model model, String status, Long location, String plateNumber, String color) {
+    public Car(Long carId, Model model, CarStatusEnum status, Long location, String plateNumber, String color) {
         this.carId = carId;
         this.model = model;
         this.status = status;
@@ -102,14 +106,14 @@ public class Car implements Serializable {
     /**
      * @return the status
      */
-    public String getStatus() {
+    public CarStatusEnum getStatus() {
         return status;
     }
 
     /**
      * @param status the status to set
      */
-    public void setStatus(String status) {
+    public void setStatus(CarStatusEnum status) {
         this.status = status;
     }
 

@@ -35,7 +35,13 @@ public class Customer implements Serializable {
     @OneToMany (mappedBy = "customer")
     private List<Reservation> reservations;
     @OneToMany(mappedBy = "customer")
-    private CreditCard cc;
+    private CreditCard creditCard;
+    
+    /* login credentials
+    @Column(unique = true)
+    private String username;
+    private String password;
+    */
 
     public Customer(Long customerId, Partner partner, String mobileNumber, String passportNumber, String email, List<Reservation> reservations, CreditCard cc) {
         this.customerId = customerId;
@@ -44,7 +50,7 @@ public class Customer implements Serializable {
         this.passportNumber = passportNumber;
         this.email = email;
         this.reservations = reservations;
-        this.cc = cc;
+        this.creditCard = creditCard;
     }
 
     public Long getCustomerId() {
@@ -141,14 +147,14 @@ public class Customer implements Serializable {
      * @return the cc
      */
     public CreditCard getCc() {
-        return cc;
+        return creditCard;
     }
 
     /**
      * @param cc the cc to set
      */
-    public void setCc(CreditCard cc) {
-        this.cc = cc;
+    public void setCc(CreditCard creditCard) {
+        this.creditCard = creditCard;
     }
     
 }

@@ -29,6 +29,12 @@ public class Partner implements Serializable {
     private String name;
     @OneToMany (mappedBy = "partner")
     private List<Customer> customers;
+    
+    /* login credentials
+    @Column(unique = true)
+    private String username;
+    private String password;
+    */
 
     public Partner() {
     }
