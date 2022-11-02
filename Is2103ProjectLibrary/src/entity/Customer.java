@@ -42,6 +42,10 @@ public class Customer implements Serializable {
     private String username;
     private String password;
     */
+    
+    public Customer() {
+        
+    }
 
     public Customer(Long customerId, Partner partner, String mobileNumber, String passportNumber, String email, List<Reservation> reservations, CreditCard cc) {
         this.customerId = customerId;

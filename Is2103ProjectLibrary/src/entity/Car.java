@@ -43,10 +43,9 @@ public class Car implements Serializable {
     private boolean enabled;
     
     public Car() {
-
     }
 
-    public Car(Long carId, Model model, CarStatusEnum status, Long location, String plateNumber, String color) {
+    public Car(Long carId, Model model, CarStatusEnum status, String location, String plateNumber, String color) {
         this.carId = carId;
         this.model = model;
         this.status = status;
@@ -125,14 +124,14 @@ public class Car implements Serializable {
     /**
      * @return the location
      */
-    public Long getLocation() {
+    public String getLocation() {
         return location;
     }
 
     /**
      * @param location the location to set
      */
-    public void setLocation(Long location) {
+    public void setLocation(String location) {
         this.location = location;
     }
 

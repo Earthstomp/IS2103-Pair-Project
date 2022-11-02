@@ -39,6 +39,10 @@ public class Employee implements Serializable {
     @Column(unique = true)
     private String username;
     private String password;
+    
+    public Employee() {
+        
+    }
 
     public Employee(EmployeeRoleEnum role, String username, String password) {
         this.role = role;

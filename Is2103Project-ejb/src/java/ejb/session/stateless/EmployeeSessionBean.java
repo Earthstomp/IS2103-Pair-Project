@@ -41,13 +41,11 @@ public class EmployeeSessionBean implements EmployeeSessionBeanRemote, EmployeeS
         employee.setOutlet(outlet); 
         outlet.getEmployees().add(employee);
         em.flush();
-
-            Outlet outlet = em.find(Outlet.class, outletId);
-            employee.setOutlet(outlet);
         // not setting outlet to employee cause unidirectional
 
-            em.flush();
-
+        em.flush();
+        // might have some error here. check with dorothy
+        try {
             return employee.getEmployeeId();
         } catch (PersistenceException ex) {
             if(ex.getCause() != null && ex.getCause().getClass().getName().equals("org.eclipse.persistence.exceptions.DatabaseException")) {

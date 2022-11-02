@@ -8,6 +8,7 @@ package ejb.session.stateless;
 import entity.Car;
 import java.util.List;
 import javax.ejb.Remote;
+import util.enumeration.CarStatusEnum;
 import util.exception.CarNotFoundException;
 
 /**
@@ -23,6 +24,6 @@ public interface CarSessionBeanRemote {
 
     public void removeCar(Long reservationId);
 
-    public void updateCarStatusLocation(Car car, String status, String location);
+    public void updateCarStatusLocation(Car car, CarStatusEnum status, String location);
     
 }

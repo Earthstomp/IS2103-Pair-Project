@@ -12,6 +12,8 @@ import entity.Customer;
 import entity.Reservation;
 import java.util.List;
 import java.util.Scanner;
+import util.enumeration.CarStatusEnum;
+import util.exception.CarNotFoundException;
 
 /*
  * To change this license header, choose License Headers in Project Properties.
@@ -74,14 +76,14 @@ public class SalesManagementModule {
                 } else if (response == 3) {
                     doReturnCar();
                 } // else if (response == 4) {
-//                    doCreateNewProduct();
-//                } else if (response == 5) {
-//                    doViewProductDetails();
-//                } else if (response == 6) {
-//                    doViewAllProducts();
-//                } else if (response == 7) {
-//                    break;
-                 else {
+                //                    doCreateNewProduct();
+                //                } else if (response == 5) {
+                //                    doViewProductDetails();
+                //                } else if (response == 6) {
+                //                    doViewAllProducts();
+                //                } else if (response == 7) {
+                //                    break;
+                else {
                     System.out.println("Invalid option, please try again!\n");
                 }
             }
@@ -134,6 +136,8 @@ public class SalesManagementModule {
         Customer customer = customerSessionBeanRemote.retrieveCustomerByMobileNumber(mobileNumber);
         List<Reservation> reservations = customer.getReservations();
         Reservation selectedReservation;
+        // bad styling. need to change
+        Car reservedCar = new Car();
 
         System.out.print("Choose reservation> ");
         for (Reservation r : customer.getReservations()) {
@@ -154,8 +158,14 @@ public class SalesManagementModule {
         if (selectedReservation.getPaymentStatus() == "false") { // convert to boolean?
             // request for payment using credit card classes
         } else { // payment has been made
-            Car reservedCar = carSessionBeanRemote.retrieveCarById(selectedReservation.getCar().getCarId());
-            carSessionBeanRemote.updateCarStatusLocation(reservedCar, "On rental", customer.getMobileNumber()); // using mobile number to uniquely identify customer
+                
+            try {
+                reservedCar = carSessionBeanRemote.retrieveCarById(selectedReservation.getCar().getCarId());
+            } catch (CarNotFoundException ex) {
+                System.out.println(ex.getMessage());
+            }
+            // check car status enum. should be "on rental"
+            carSessionBeanRemote.updateCarStatusLocation(reservedCar, CarStatusEnum.DISABLED, customer.getMobileNumber()); // using mobile number to uniquely identify customer
             System.out.println("Car " + reservedCar.getPlateNumber() + " for Reservation " + selectedReservation.getId() + "has been picked up!\n");
         }
     }
@@ -170,7 +180,10 @@ public class SalesManagementModule {
         Integer mobileNumber = scanner.nextInt();
         Customer customer = customerSessionBeanRemote.retrieveCustomerByMobileNumber(mobileNumber);
         List<Reservation> reservations = customer.getReservations();
-        Reservation selectedReservation;
+        Reservation selectedReservation;// bad styling. need to change
+        Car reservedCar = new Car();
+
+        
 
         System.out.print("Choose reservation> ");
         for (Reservation r : customer.getReservations()) {
@@ -187,9 +200,13 @@ public class SalesManagementModule {
             } else {
                 System.out.println("Invalid option, please try again!\n");
             }
-        }
-        Car reservedCar = carSessionBeanRemote.retrieveCarById(selectedReservation.getCar().getCarId());
-        carSessionBeanRemote.updateCarStatusLocation(reservedCar, "In outlet", selectedReservation.getReturnLocation().toString()); // using mobile number to uniquely identify customer
+        } try {
+        reservedCar = carSessionBeanRemote.retrieveCarById(selectedReservation.getCar().getCarId());
+        } catch (CarNotFoundException ex) {
+                System.out.println(ex.getMessage());
+            }
+// need to check CarStatusEnum. Supposed to be "in outlet"
+        carSessionBeanRemote.updateCarStatusLocation(reservedCar, CarStatusEnum.TRANSIT, selectedReservation.getReturnLocation().toString()); // using mobile number to uniquely identify customer
         System.out.println("Car " + reservedCar.getPlateNumber() + " for Reservation " + selectedReservation.getId() + "has been returned!\n");
 
     }

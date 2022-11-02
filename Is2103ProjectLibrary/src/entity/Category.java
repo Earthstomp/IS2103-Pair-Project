@@ -32,6 +32,10 @@ public class Category implements Serializable {
     private List<Model> models;
     @OneToMany (mappedBy = "category")
     private List<RentalRateRecord> rateRecords;
+    
+    public Category() {
+        
+    }
 
     public Category(Long categoryId, String categoryName, List<Model> models, List<RentalRateRecord> rateRecords) {
         this.categoryId = categoryId;
