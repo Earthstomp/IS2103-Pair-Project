@@ -11,6 +11,7 @@ import java.util.List;
 import javax.ejb.Remote;
 import util.exception.EmployeeExistsException;
 import util.exception.EmployeeNotFoundException;
+import util.exception.InvalidLoginCredentialsException;
 import util.exception.UnknownPersistenceException;
 
 /**
@@ -29,5 +30,7 @@ public interface EmployeeSessionBeanRemote {
     public Employee retrieveEmployeeByUsername(String username) throws EmployeeNotFoundException ;
     
     public Employee retrieveEmployeeByEmployeeId(Long employeeId) throws EmployeeNotFoundException;
+
+    public Employee employeeLogin(String username, String password) throws InvalidLoginCredentialsException;
     
 }

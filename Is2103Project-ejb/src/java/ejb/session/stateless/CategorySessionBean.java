@@ -30,11 +30,20 @@ public class CategorySessionBean implements CategorySessionBeanRemote, CategoryS
 
         return category.getCategoryId();
     }
-    
+
     @Override
     public List<Category> retrieveAllCategories() {
         return em.createQuery("SELECT c FROM Category c").getResultList();
-        
+
+    }
+
+    public Category retrieveCategoryByName(String name) {
+        Category category = (Category) em.createQuery("SELECT c FROM Category c WHERE c.categoryName = :InName")
+                .setParameter("InName", name)
+                .getSingleResult();
+
+        category.getModels();
+        return category;
     }
 
     @Override
@@ -49,15 +58,15 @@ public class CategorySessionBean implements CategorySessionBeanRemote, CategoryS
 
         return model.getModelId();
     }
-    
+
     public Long createNewModelWithExistingCategoryClass(Model model, Category category) { //  need to account for exception
         em.persist(model);
-        
+
         // need to account for exception
         Category managedCategory = (Category) em.createQuery("SELECT c FROM Category c WHERE c = :category")
                 .setParameter("category", category)
                 .getSingleResult();
-        
+
         managedCategory.getModels().add(model);
         model.setCategory(managedCategory);
 
@@ -75,6 +84,10 @@ public class CategorySessionBean implements CategorySessionBeanRemote, CategoryS
         em.flush();
 
         return rateRecord.getId();
+    }
+
+    public void merge(Category category) {
+        em.merge(category);
     }
 
     // Add business logic below. (Right-click in editor and choose
