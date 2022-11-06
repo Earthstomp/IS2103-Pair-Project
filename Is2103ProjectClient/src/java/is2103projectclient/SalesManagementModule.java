@@ -67,7 +67,7 @@ public class SalesManagementModule {
 
     public void menuSalesManagementModule() throws InvalidEmployeeRoleException {
 
-        if (employee.getRole() != EmployeeRoleEnum.SALES_MANAGER || employee.getRole() != EmployeeRoleEnum.ADMINISTRATOR) {
+        if (employee.getRole() != EmployeeRoleEnum.SALES_MANAGER && employee.getRole() != EmployeeRoleEnum.ADMINISTRATOR) {
             throw new InvalidEmployeeRoleException("You don't have SALES MANAGER rights to access the Sales Management module.");
         }
         
