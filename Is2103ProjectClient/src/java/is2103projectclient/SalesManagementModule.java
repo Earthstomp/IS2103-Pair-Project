@@ -468,13 +468,15 @@ public class SalesManagementModule {
         if (selectedReservation.getPaymentStatus() == "false") { // convert to boolean?
             // request for payment using credit card classes
         } else { // payment has been made
+
             try {
-                Car reservedCar = carSessionBeanRemote.retrieveCarById(selectedReservation.getCar().getCarId());
-                carSessionBeanRemote.updateCarStatusLocation(reservedCar, CarStatusEnum.RESERVED, customer.getMobileNumber()); // using mobile number to uniquely identify customer
-                System.out.println("Car " + reservedCar.getPlateNumber() + " for Reservation " + selectedReservation.getId() + "has been picked up!\n");
+                reservedCar = carSessionBeanRemote.retrieveCarById(selectedReservation.getCar().getCarId());
             } catch (CarNotFoundException ex) {
-                System.out.println("Car not found!");
+                System.out.println(ex.getMessage());
             }
+            // check car status enum. should be "on rental"
+            carSessionBeanRemote.updateCarStatusLocation(reservedCar, CarStatusEnum.DISABLED, customer.getMobileNumber()); // using mobile number to uniquely identify customer
+            System.out.println("Car " + reservedCar.getPlateNumber() + " for Reservation " + selectedReservation.getId() + "has been picked up!\n");
         }
     }
 
@@ -516,10 +518,5 @@ public class SalesManagementModule {
         carSessionBeanRemote.updateCarStatusLocation(reservedCar, CarStatusEnum.TRANSIT, selectedReservation.getReturnLocation().toString()); // using mobile number to uniquely identify customer
         System.out.println("Car " + reservedCar.getPlateNumber() + " for Reservation " + selectedReservation.getId() + "has been returned!\n");
 
-            carSessionBeanRemote.updateCarStatusLocation(reservedCar, CarStatusEnum.AVAILABLE, selectedReservation.getReturnLocation().toString()); // using mobile number to uniquely identify customer
-            System.out.println("Car " + reservedCar.getPlateNumber() + " for Reservation " + selectedReservation.getId() + "has been returned!\n");
-        } catch (CarNotFoundException ex) {
-            System.out.println("Car not found!");
-        }
     }
 }
