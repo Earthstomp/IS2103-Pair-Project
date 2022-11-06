@@ -11,6 +11,7 @@ import java.util.List;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import javax.persistence.Query;
 import util.enumeration.CarStatusEnum;
 import util.exception.CarNotFoundException;
 import util.exception.DeleteCarException;
