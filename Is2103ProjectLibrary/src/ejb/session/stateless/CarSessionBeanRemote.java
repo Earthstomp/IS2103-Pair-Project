@@ -10,6 +10,7 @@ import java.util.List;
 import javax.ejb.Remote;
 import util.enumeration.CarStatusEnum;
 import util.exception.CarNotFoundException;
+import util.exception.DeleteCarException;
 
 /**
  *
@@ -25,5 +26,11 @@ public interface CarSessionBeanRemote {
     public void removeCar(Long reservationId);
 
     public void updateCarStatusLocation(Car car, CarStatusEnum status, String location);
+
+    public Car retrieveCarByPlateNumber(String number);
+
+    public void merge(Car car);
+
+    public void deleteCar(Long carId) throws DeleteCarException;
     
 }

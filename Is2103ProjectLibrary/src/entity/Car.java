@@ -43,7 +43,8 @@ public class Car implements Serializable {
     private boolean enabled;
     
     public Car() {
-
+        this.enabled = true;
+        this.status = CarStatusEnum.AVAILABLE;
     }
 
     public Car(Long carId, Model model, CarStatusEnum status, String location, String plateNumber, String color) {

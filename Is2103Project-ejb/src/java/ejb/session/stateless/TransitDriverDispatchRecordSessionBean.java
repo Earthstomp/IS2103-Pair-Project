@@ -14,8 +14,8 @@ import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
-import util.exception.ReservationNotFoundException;
 import util.exception.TransitDriverDispatchRecordNotFoundException;
+import util.exception.TransitDriverDispatchRecordNotFromOutletException;
 
 /**
  *
@@ -23,42 +23,47 @@ import util.exception.TransitDriverDispatchRecordNotFoundException;
  */
 @Stateless
 public class TransitDriverDispatchRecordSessionBean implements TransitDriverDispatchRecordSessionBeanRemote, TransitDriverDispatchRecordSessionBeanLocal {
-    
+
     @PersistenceContext(unitName = "Is2103Project-ejbPU")
     private EntityManager em;
-    
+
     @Override
     public Long createNewTransitDriverDispatchRecord(TransitDriverDispatchRecord transitDriverDispatchRecord) {
         em.persist(transitDriverDispatchRecord);
         em.flush();
-        
+
         return transitDriverDispatchRecord.getId();
     }
-    
+
     @Override
     public List<TransitDriverDispatchRecord> retrieveAllTransitDriverDispatchRecord() {
         Query query = em.createQuery("SELECT t FROM TransitDriverDispatchRecord t");
-        
+
         return query.getResultList();
     }
-    
+
     @Override
-    public TransitDriverDispatchRecord retrieveTransitDriverDispatchRecordById(Long id) throws TransitDriverDispatchRecordNotFoundException {
+    public TransitDriverDispatchRecord retrieveTransitDriverDispatchRecordById(Long id, Outlet outlet) throws TransitDriverDispatchRecordNotFoundException,  TransitDriverDispatchRecordNotFromOutletException{
         TransitDriverDispatchRecord transitDriverDispatchRecord = em.find(TransitDriverDispatchRecord.class, id);
-        
+
         if (transitDriverDispatchRecord != null) {
-            return transitDriverDispatchRecord;
+            if (transitDriverDispatchRecord.getReturnLocation() == outlet) {
+                return transitDriverDispatchRecord;
+            } else {
+                throw new TransitDriverDispatchRecordNotFromOutletException("Transit Record with id " + id + " is not from Outlet " + outlet);
+            }
         } else {
             throw new TransitDriverDispatchRecordNotFoundException("Unable to locate record with id: " + id);
         }
     }
-    
+
     @Override
-    public void removeTransitDriverDispatchRecord(Long id) {
+    public void removeTransitDriverDispatchRecord(Long id
+    ) {
         TransitDriverDispatchRecord transitDriverDispatchRecord = em.find(TransitDriverDispatchRecord.class, id);
         em.remove(transitDriverDispatchRecord);
     }
-    
+
     public List<TransitDriverDispatchRecord> retrieveTransitDriverDispatchRecordForCurrentDay(Date currentDay, Outlet outlet) {
         return em.createQuery(
                 "SELECT t FROM TransitDriverDispatchRecord t "
@@ -67,32 +72,31 @@ public class TransitDriverDispatchRecordSessionBean implements TransitDriverDisp
                 + "AND t.startDateTime.equals(:currentDay)") // not sure how to compare dates
                 .setParameter("currentDay", currentDay)
                 .getResultList();
-        
+
     }
-    
+
     public void assignTransitDriver(Long id, Employee driver) {
         TransitDriverDispatchRecord record = em.find(TransitDriverDispatchRecord.class, id);
-        
+
         Employee managedDriver = (Employee) em.createQuery("SELECT e FROM Employee e"
                 + "WHERE e = :driver")
                 .setParameter("driver", driver)
                 .getSingleResult();
-        
+
         for (TransitDriverDispatchRecord t : managedDriver.getDispatches()) {
             if (t.getStartDateTime().equals(record.getStartDateTime())) { // only compares the day
                 // throw exception
             }
-        }        
+        }
         record.setEmployee(driver);
         managedDriver.getDispatches().add(record);
     }
-    
-    private void updateTransitAsCompleted(Long id) {
+
+    public void updateTransitAsCompleted(Long id) {
         TransitDriverDispatchRecord record = em.find(TransitDriverDispatchRecord.class, id);
         record.setStatus("Completed");
         record.getEmployee().setOutlet(record.getPickupLocation()); // set driver new location to that of transit destination
     }
     // Add business logic below. (Right-click in editor and choose
     // "Insert Code > Add Business Method")
-
 }

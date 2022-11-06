@@ -29,6 +29,10 @@ public class CreditCard implements Serializable {
     @Column(precision = 11, scale = 2)
     private BigDecimal penaltyAmount;
     private Customer customer; 
+    
+    public CreditCard() {
+        
+    }
 
     public CreditCard(Long ccId, String name, BigDecimal penaltyAmount, Customer customer) {
         this.ccId = ccId;

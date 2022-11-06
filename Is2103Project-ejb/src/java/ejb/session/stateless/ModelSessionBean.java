@@ -11,6 +11,7 @@ import java.util.List;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import util.exception.DeleteModelException;
 
 /**
  *
@@ -35,9 +36,26 @@ public class ModelSessionBean implements ModelSessionBeanRemote, ModelSessionBea
     }
 
     public List<Model> viewAllModels() {
-        return em.createQuery("SELECT m FROM Model m"
+        List<Model> models = em.createQuery("SELECT m FROM Model m"
                 + "ORDER BY m.category, m.model")
                 .getResultList();
+
+        for (Model model : models) {
+            model.getCategory();
+            model.getModel();
+        }
+
+        return models;
+    }
+
+    public Model retrieveModelByName(String name) {
+        Model model = (Model) em.createQuery("SELECT m FROM Model m WHERE m.model = :InModelName")
+                .setParameter("InModelName", name)
+                .getSingleResult();
+
+        model.getCategory();
+        model.getCars();
+        return model;
     }
 
     public void updateModel(String newModel, Long modelId) {
@@ -45,20 +63,25 @@ public class ModelSessionBean implements ModelSessionBeanRemote, ModelSessionBea
         model.setModel(newModel);
     }
 
-    public void deleteModel(Long modelId) {
+    public void deleteModel(Long modelId) throws DeleteModelException {
         Model model = em.find(Model.class, modelId);
         String modelName = model.getModel();
 
         List<Car> carsUsed = em.createQuery(
                 "SELECT c FROM Car c WHERE c.model = modelName").getResultList();
-        
+
         if (carsUsed.size() > 0) {
-            System.out.print("There are cars that use this model, model is disabled instead of deleted");
             model.setEnabled(false);
+            em.merge(model);
+            throw new DeleteModelException("Model Name " + modelName + "is associated with existing car(s) and cannot be deleted!\n");
         } else {
             model.getCategory().getModels().remove(model);
             em.remove(model);
         }
+    }
+
+    public void merge(Model model) {
+        em.merge(model);
     }
 
     // Add business logic below. (Right-click in editor and choose

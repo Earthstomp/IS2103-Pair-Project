@@ -22,6 +22,6 @@ public interface ReservationSessionBeanRemote {
     public Reservation retrieveReservationById(Long reservationId) throws ReservationNotFoundException ;
 
     public List<Reservation> retrieveAllReservations();
-    
+
     public Long createNewReservation(Reservation reservation);
 }

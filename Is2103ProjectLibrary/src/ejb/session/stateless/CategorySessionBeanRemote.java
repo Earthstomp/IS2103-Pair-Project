@@ -28,5 +28,9 @@ public interface CategorySessionBeanRemote {
     public List<Category> retrieveAllCategories();
 
     public Long createNewModelWithExistingCategoryClass(Model model, Category category);
+
+    public Category retrieveCategoryByName(String name);
+
+    public void merge(Category category);
     
 }
