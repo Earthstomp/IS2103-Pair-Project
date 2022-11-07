@@ -4,8 +4,10 @@ import ejb.session.stateless.CategorySessionBeanLocal;
 import ejb.session.stateless.EmployeeSessionBeanLocal;
 import ejb.session.stateless.OutletSessionBeanLocal;
 import ejb.session.stateless.PartnerSessionBeanLocal;
+import entity.Category;
 import entity.Employee;
 import entity.Outlet;
+import entity.Partner;
 import java.util.Date;
 import javax.annotation.PostConstruct;
 import javax.ejb.EJB;
@@ -13,9 +15,11 @@ import javax.ejb.Singleton;
 import javax.ejb.LocalBean;
 import javax.ejb.Startup;
 import util.enumeration.EmployeeRoleEnum;
+import util.exception.CategoryExistsException;
 import util.exception.EmployeeExistsException;
 import util.exception.OutletExistsException;
 import util.exception.OutletNotFoundException;
+import util.exception.PartnerExistsException;
 import util.exception.UnknownPersistenceException;
 
 /**
@@ -46,24 +50,37 @@ public class DataInitializationSessionBean {
     @PostConstruct
     public void postConstruct() {
         try {
-            outletSessionBeanLocal.retrieveOutletByLocation("");
+            outletSessionBeanLocal.retrieveOutletById(1l);
         } catch (OutletNotFoundException ex) {
             initializeData();
         }
         /*try
         {
-            employeeSessionBeanLocal.retrieveEmployeeByUsername("administrator");
+            employeeSessionBeanLocal.retrieveEmployeeById(1l);
         }
         catch(EmployeeNotFoundException ex)
         {
             initializeData();
-        }*/
+        }
+        
+        try {
+            partnerSessionBeanLocal.retrievePartnerById(1l);
+        } catch (PartnerNotFoundException ex) {
+            initializeData();
+        }
+
+        try {
+            categorySessionBeanLocal.retrieveCategoryById(1l);
+        } catch (CategoryNotFoundException ex) {
+            initializeData();
+        }
+        */
     }
 
     private void initializeData() {
         try {
-            // STUB time
-            outletSessionBeanLocal.createNewOutlet(new Outlet("location", new Date(), new Date()));
+            // STUB Outlet(address, opening, closing)
+            outletSessionBeanLocal.createNewOutlet(new Outlet("address", new Date(), new Date()));
         } catch (OutletExistsException | UnknownPersistenceException ex) {
             ex.printStackTrace();
         }
@@ -73,6 +90,18 @@ public class DataInitializationSessionBean {
         } catch (EmployeeExistsException | OutletNotFoundException | UnknownPersistenceException ex) {
             ex.printStackTrace();
         }
+
+//        try {
+            partnerSessionBeanLocal.createPartner(new Partner("Holiday.com"));
+//        } catch (PartnerExistsException ex) { //UnknownPersistenceException ex
+//            ex.printStackTrace();
+//        }
+
+//        try {
+            categorySessionBeanLocal.createNewCategory(new Category("CategoryName"));
+//        } catch (CategoryExistsException | UnknownPersistenceException ex) {
+//            ex.printStackTrace();
+//        }
 
     }
 }

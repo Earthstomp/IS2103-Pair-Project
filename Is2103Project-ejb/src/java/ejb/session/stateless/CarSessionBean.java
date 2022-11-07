@@ -7,7 +7,10 @@ package ejb.session.stateless;
 
 import entity.Car;
 import entity.Reservation;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
@@ -53,6 +56,35 @@ public class CarSessionBean implements CarSessionBeanRemote, CarSessionBeanLocal
         } 
             throw new CarNotFoundException("Unable to locate car with id: " + carId);
 
+    }
+    
+    public List<Car> retrieveAvailableCarsOnDate(Date timeStamp) throws CarNotFoundException {
+        List<Car> carsInOutlet = em.createQuery("SELECT c FROM Car c WHERE c.status = :StatusAvailable AND c.")
+                .setParameter("StatusAvailable", CarStatusEnum.AVAILABLE)
+                .getResultList();
+
+        // NOTE: IGNORING CARS IN TRANSIT
+        // Latest time reservation can end for car to be returned in time: timeStamp hours - 2
+        Calendar cal = Calendar.getInstance();
+        cal.set(Calendar.HOUR_OF_DAY, (int) (timeStamp.getTime() - (TimeUnit.HOURS.toMillis(2))));
+//        Date date = cal.getTime();
+//        timeStamp = timeStamp.setTime((date);
+
+        List<Car> carsReturnedInTime = em.createQuery("SELECT c FROM Car c"
+                + "JOIN c.reservation r"
+                + "WHERE c.status = :StatusReserved AND r.endDateTime <= :inTime ")
+                .setParameter("StatusReserved", CarStatusEnum.RESERVED)
+                .setParameter("InTime", timeStamp)
+                .getResultList();
+
+//        boolean ifAddAll = allAvailableCars.addAll(carsInOutlet).addAll(carsReturnedInTime);
+//
+//        if (allAvailableCars != null) {
+//            return allAvailableCars;
+//        } else {
+//            throw new CarNotFoundException("No cars are available");
+//        }
+        return carsReturnedInTime;
     }
     
     public Car retrieveCarByPlateNumber(String number) {

@@ -8,6 +8,7 @@ package ejb.session.stateless;
 import entity.Employee;
 import entity.Outlet;
 import entity.TransitDriverDispatchRecord;
+import java.util.ArrayList;
 import java.util.List;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
@@ -36,15 +37,15 @@ public class EmployeeSessionBean implements EmployeeSessionBeanRemote, EmployeeS
 
     @Override
     public Long createNewEmployeeWithExistingOutlet(Employee employee, Long outletId) throws EmployeeExistsException, UnknownPersistenceException {
+
         em.persist(employee);
 
         Outlet outlet = em.find(Outlet.class, outletId);
+        outlet.setEmployees(new ArrayList<Employee>());
         employee.setOutlet(outlet);
         outlet.getEmployees().add(employee);
         em.flush();
         // not setting outlet to employee cause unidirectional
-
-        em.flush();
         // might have some error here. check with dorothy
         try {
             return employee.getEmployeeId();

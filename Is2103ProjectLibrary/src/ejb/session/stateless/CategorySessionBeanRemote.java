@@ -11,6 +11,7 @@ import entity.Model;
 import entity.RentalRateRecord;
 import java.util.List;
 import javax.ejb.Remote;
+import util.exception.CategoryNotFoundException;
 
 /**
  *
@@ -32,5 +33,7 @@ public interface CategorySessionBeanRemote {
     public Category retrieveCategoryByName(String name);
 
     public void merge(Category category);
+
+    public Category retrieveCategoryById(Long id) throws CategoryNotFoundException;
     
 }

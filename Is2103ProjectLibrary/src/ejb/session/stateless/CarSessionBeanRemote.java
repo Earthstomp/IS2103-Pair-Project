@@ -6,6 +6,7 @@
 package ejb.session.stateless;
 
 import entity.Car;
+import java.util.Date;
 import java.util.List;
 import javax.ejb.Remote;
 import util.enumeration.CarStatusEnum;
@@ -32,5 +33,7 @@ public interface CarSessionBeanRemote {
     public void merge(Car car);
 
     public void deleteCar(Long carId) throws DeleteCarException;
+
+    public List<Car> retrieveAvailableCarsOnDate(Date timeStamp) throws CarNotFoundException;
     
 }

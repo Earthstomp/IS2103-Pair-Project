@@ -139,7 +139,7 @@ public class RentalRateRecord implements Serializable {
     /**
      * @return the enabled
      */
-    public boolean isEnabled() {
+    public boolean getEnabled() {
         return enabled;
     }
 

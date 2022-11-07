@@ -6,6 +6,7 @@
 package entity;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -35,6 +36,12 @@ public class Category implements Serializable {
     
     public Category() {
         
+    }
+    
+    public Category(String categoryName) {
+        this.categoryName = categoryName;
+        this.models = new ArrayList<Model>();
+        this.rateRecords = new ArrayList<RentalRateRecord>();
     }
 
     public Category(Long categoryId, String categoryName, List<Model> models, List<RentalRateRecord> rateRecords) {

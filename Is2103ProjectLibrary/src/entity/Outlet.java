@@ -134,4 +134,18 @@ public class Outlet implements Serializable {
     public void setEmployees(List<Employee> employees) {
         this.employees = employees;
     }
+
+    /**
+     * @return the dispatches
+     */
+    public List<TransitDriverDispatchRecord> getDispatches() {
+        return dispatches;
+    }
+
+    /**
+     * @param dispatches the dispatches to set
+     */
+    public void setDispatches(List<TransitDriverDispatchRecord> dispatches) {
+        this.dispatches = dispatches;
+    }
 }

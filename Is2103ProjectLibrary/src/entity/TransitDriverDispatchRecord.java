@@ -46,6 +46,12 @@ public class TransitDriverDispatchRecord implements Serializable {
     public TransitDriverDispatchRecord() {
     }
 
+    public TransitDriverDispatchRecord(Outlet pickupLocation, Outlet returnLocation, Date startDateTime) {
+        this.pickupLocation = pickupLocation;
+        this.returnLocation = returnLocation;
+        this.startDateTime = startDateTime;
+    }
+    
     public TransitDriverDispatchRecord(Outlet pickupLocation, Outlet returnLocation, Date startDateTime, Date endDateTime, Employee employee) {
         this.pickupLocation = pickupLocation;
         this.returnLocation = returnLocation;

@@ -12,6 +12,7 @@ import java.util.List;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import util.exception.CategoryNotFoundException;
 
 /**
  *
@@ -35,6 +36,17 @@ public class CategorySessionBean implements CategorySessionBeanRemote, CategoryS
     public List<Category> retrieveAllCategories() {
         return em.createQuery("SELECT c FROM Category c").getResultList();
 
+    }
+    
+    @Override
+    public Category retrieveCategoryById(Long id) throws CategoryNotFoundException {
+        Category category = em.find(Category.class, id);
+
+        if (category != null) {
+            return category;
+        } else {
+            throw new CategoryNotFoundException("Unable to locate category with id: " + id);
+        }
     }
 
     public Category retrieveCategoryByName(String name) {
