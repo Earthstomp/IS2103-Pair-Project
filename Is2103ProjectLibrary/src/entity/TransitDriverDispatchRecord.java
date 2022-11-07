@@ -12,6 +12,10 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
 
 /**
  *
@@ -24,28 +28,32 @@ public class TransitDriverDispatchRecord implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    // @OneToOne
-    // @JoinColumn
-    // private Employee employee;
-    @Column(nullable = false, length = 64)
-    private String pickupLocation;
-    @Column(nullable = false, length = 64)
-    private String returnLocation;
-    @Column(nullable = false, length = 32)
+    @ManyToOne
+    @JoinColumn(nullable = false)
+    private Employee employee;
+    @JoinColumn(nullable = false)
+    @ManyToOne
+    private Outlet pickupLocation;
+    @JoinColumn(nullable = false)
+    @ManyToOne
+    private Outlet returnLocation;
+    @Temporal(TemporalType.TIMESTAMP)
     private Date startDateTime;
-    @Column(nullable = false, length = 32)
+    @Temporal(TemporalType.TIMESTAMP)
     private Date endDateTime;
+    private String status;
 
     public TransitDriverDispatchRecord() {
     }
 
-    public TransitDriverDispatchRecord(String pickupLocation, String returnLocation, Date startDate, Date endDate) {
+    public TransitDriverDispatchRecord(Outlet pickupLocation, Outlet returnLocation, Date startDateTime, Date endDateTime, Employee employee) {
         this.pickupLocation = pickupLocation;
         this.returnLocation = returnLocation;
         this.startDateTime = startDateTime;
         this.endDateTime = endDateTime;
+        this.employee = employee;
     }
-   
+
     public Long getId() {
         return id;
     }
@@ -82,28 +90,28 @@ public class TransitDriverDispatchRecord implements Serializable {
     /**
      * @return the pickupLocation
      */
-    public String getPickupLocation() {
+    public Outlet getPickupLocation() {
         return pickupLocation;
     }
 
     /**
      * @param pickupLocation the pickupLocation to set
      */
-    public void setPickupLocation(String pickupLocation) {
+    public void setPickupLocation(Outlet pickupLocation) {
         this.pickupLocation = pickupLocation;
     }
 
     /**
      * @return the returnLocation
      */
-    public String getReturnLocation() {
+    public Outlet getReturnLocation() {
         return returnLocation;
     }
 
     /**
      * @param returnLocation the returnLocation to set
      */
-    public void setReturnLocation(String returnLocation) {
+    public void setReturnLocation(Outlet returnLocation) {
         this.returnLocation = returnLocation;
     }
 
@@ -134,5 +142,33 @@ public class TransitDriverDispatchRecord implements Serializable {
     public void setEndDateTime(Date endDateTime) {
         this.endDateTime = endDateTime;
     }
-    
+
+    /**
+     * @return the employee
+     */
+    public Employee getEmployee() {
+        return employee;
+    }
+
+    /**
+     * @param employee the employee to set
+     */
+    public void setEmployee(Employee employee) {
+        this.employee = employee;
+    }
+
+    /**
+     * @return the status
+     */
+    public String getStatus() {
+        return status;
+    }
+
+    /**
+     * @param status the status to set
+     */
+    public void setStatus(String status) {
+        this.status = status;
+    }
+
 }

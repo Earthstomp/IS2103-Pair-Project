@@ -11,6 +11,7 @@ import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
+import util.exception.PartnerNotFoundException;
 
 /**
  *
@@ -38,15 +39,13 @@ public class PartnerSessionBean implements PartnerSessionBeanRemote, PartnerSess
     }
     
     @Override
-    public Partner retrievePartnerById(Long id) { // throws exception
+    public Partner retrievePartnerById(Long id) throws PartnerNotFoundException {
         Partner partner = em.find(Partner.class, id);
 
         if (partner != null) {
             return partner;
         } else {
-            // throw exception
-            // delete line below
-            return partner;
+            throw new PartnerNotFoundException("Unable to locate partner with id: " + id);
         }
     }
 

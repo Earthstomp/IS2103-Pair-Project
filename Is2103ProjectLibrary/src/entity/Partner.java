@@ -6,11 +6,13 @@
 package entity;
 
 import java.io.Serializable;
+import java.util.List;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.OneToMany;
 
 /**
  *
@@ -25,8 +27,22 @@ public class Partner implements Serializable {
     private Long id;
     @Column(nullable = false, length = 32, unique = true)
     private String name;
+    @OneToMany (mappedBy = "partner")
+    private List<Customer> customers;
+    
+    /* login credentials
+    @Column(unique = true)
+    private String username;
+    private String password;
+    */
 
     public Partner() {
+    }
+
+    public Partner(Long id, String name, List<Customer> customers) {
+        this.id = id;
+        this.name = name;
+        this.customers = customers;
     }
 
     public Partner(String name) {
@@ -71,6 +87,20 @@ public class Partner implements Serializable {
      */
     public String getName() {
         return name;
+    }
+
+    /**
+     * @return the customers
+     */
+    public List<Customer> getCustomers() {
+        return customers;
+    }
+
+    /**
+     * @param customers the customers to set
+     */
+    public void setCustomers(List<Customer> customers) {
+        this.customers = customers;
     }
     
 }

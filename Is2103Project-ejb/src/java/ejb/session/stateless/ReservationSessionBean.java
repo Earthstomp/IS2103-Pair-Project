@@ -11,6 +11,7 @@ import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
+import util.exception.ReservationNotFoundException;
 
 /**
  *
@@ -23,14 +24,6 @@ public class ReservationSessionBean implements ReservationSessionBeanRemote, Res
     private EntityManager em;
 
     @Override
-    public Long createNewReservation(Reservation reservation) {
-        em.persist(reservation);
-        em.flush();
-
-        return reservation.getId();
-    }
-
-    @Override
     public List<Reservation> retrieveAllReservations() {
         Query query = em.createQuery("SELECT r FROM Reservation r");
 
@@ -38,15 +31,13 @@ public class ReservationSessionBean implements ReservationSessionBeanRemote, Res
     }
 
     @Override
-    public Reservation retrieveReservationById(Long reservationId) { // throws exception
+    public Reservation retrieveReservationById(Long reservationId) throws ReservationNotFoundException {
         Reservation reservation = em.find(Reservation.class, reservationId);
 
         if (reservation != null) {
             return reservation;
         } else {
-            // throw exception
-            // delete line below
-            return reservation;
+            throw new ReservationNotFoundException("Unable to locate reservation with id: " + reservationId);
         }
     }
 
@@ -54,6 +45,11 @@ public class ReservationSessionBean implements ReservationSessionBeanRemote, Res
     public void removeReservation(Long reservationId) {
         Reservation reservation = em.find(Reservation.class, reservationId);
         em.remove(reservation);
+    }
+
+    @Override
+    public Long createNewReservation(Reservation reservation) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
 }

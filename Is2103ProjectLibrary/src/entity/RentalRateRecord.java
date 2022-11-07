@@ -6,6 +6,7 @@
 package entity;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
 import javax.persistence.Column;
@@ -13,10 +14,11 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.ManyToOne;
 
 /**
  *
- * @author Keith test
+ * @author Keith
  */
 @Entity
 public class RentalRateRecord implements Serializable {
@@ -27,16 +29,18 @@ public class RentalRateRecord implements Serializable {
     private Long id;
     @Column(nullable = false, length = 64, unique = true)
     private String recordName;
-    // private CarCategory category;
-    @Column(nullable = false, length = 12)
-    private double rate;
+    @ManyToOne
+    private Category category;
+    @Column(precision = 11, scale = 2)
+    private BigDecimal rate;
     @Column(nullable = false, length = 64)
     private List<Date> validityPeriod;
+    private boolean enabled;
 
     public RentalRateRecord() {
     }
 
-    public RentalRateRecord(String recordName, double rate, List<Date> validityPeriod) {
+    public RentalRateRecord(String recordName, BigDecimal rate, List<Date> validityPeriod) {
         this.recordName = recordName;
         this.rate = rate;
         this.validityPeriod = validityPeriod;
@@ -93,14 +97,14 @@ public class RentalRateRecord implements Serializable {
     /**
      * @return the rate
      */
-    public double getRate() {
+    public BigDecimal getRate() {
         return rate;
     }
 
     /**
      * @param rate the rate to set
      */
-    public void setRate(double rate) {
+    public void setRate(BigDecimal rate) {
         this.rate = rate;
     }
 
@@ -116,6 +120,34 @@ public class RentalRateRecord implements Serializable {
      */
     public void setValidityPeriod(List<Date> validityPeriod) {
         this.validityPeriod = validityPeriod;
+    }
+
+    /**
+     * @return the category
+     */
+    public Category getCategory() {
+        return category;
+    }
+
+    /**
+     * @param category the category to set
+     */
+    public void setCategory(Category category) {
+        this.category = category;
+    }
+
+    /**
+     * @return the enabled
+     */
+    public boolean isEnabled() {
+        return enabled;
+    }
+
+    /**
+     * @param enabled the enabled to set
+     */
+    public void setEnabled(boolean enabled) {
+        this.enabled = enabled;
     }
     
 }
