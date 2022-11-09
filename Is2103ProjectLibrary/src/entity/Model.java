@@ -22,11 +22,26 @@ import javax.persistence.OneToMany;
 @Entity
 public class Model implements Serializable {
 
+    /**
+     * @return the make
+     */
+    public String getMake() {
+        return make;
+    }
+
+    /**
+     * @param make the make to set
+     */
+    public void setMake(String make) {
+        this.make = make;
+    }
+
     private static final long serialVersionUID = 1L;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long modelId;
     private String model;
+    private String make;
     @ManyToOne
     @JoinColumn (nullable = false)
     private Category category;    
@@ -37,10 +52,18 @@ public class Model implements Serializable {
     public Model() {
     }
 
+    public Model(String make, String model) {
+        this.make = make;
+        this.model = model;
+        this.enabled = true;
+    }
+    
+    // where is this method being used?
     public Model(Long modelId, String model, List<Car> cars) {
         this.modelId = modelId;
         this.model = model;
         this.cars = cars;
+        this.enabled =  true;
     }
         
     

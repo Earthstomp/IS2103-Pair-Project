@@ -6,7 +6,7 @@
 package entity;
 
 import java.io.Serializable;
-import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import javax.persistence.Column;
@@ -15,6 +15,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
+import util.enumeration.RentalRateEnum;
 
 /**
  *
@@ -27,12 +28,13 @@ public class RentalRateRecord implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @Column(nullable = false, length = 64, unique = true)
+    @Column(nullable = false, length = 64)
     private String recordName;
+    private RentalRateEnum type;
     @ManyToOne
     private Category category;
     @Column(precision = 11, scale = 2)
-    private BigDecimal rate;
+    private Double rate;
     @Column(nullable = false, length = 64)
     private List<Date> validityPeriod;
     private boolean enabled;
@@ -40,7 +42,20 @@ public class RentalRateRecord implements Serializable {
     public RentalRateRecord() {
     }
 
-    public RentalRateRecord(String recordName, BigDecimal rate, List<Date> validityPeriod) {
+    public RentalRateRecord(String recordName, RentalRateEnum type, Double rate, Date startDateTime, Date endDateTime) {
+        this.recordName = recordName;
+        this.type = type;
+        this.rate = rate;
+        ArrayList<Date> validity = new ArrayList<Date>();
+        validity.add(startDateTime);
+        validity.add(endDateTime);
+        this.validityPeriod = validity;
+    }   
+    
+    
+    
+
+    public RentalRateRecord(String recordName, Double rate, List<Date> validityPeriod) {
         this.recordName = recordName;
         this.rate = rate;
         this.validityPeriod = validityPeriod;
@@ -97,14 +112,14 @@ public class RentalRateRecord implements Serializable {
     /**
      * @return the rate
      */
-    public BigDecimal getRate() {
+    public Double getRate() {
         return rate;
     }
 
     /**
      * @param rate the rate to set
      */
-    public void setRate(BigDecimal rate) {
+    public void setRate(Double rate) {
         this.rate = rate;
     }
 
@@ -148,6 +163,20 @@ public class RentalRateRecord implements Serializable {
      */
     public void setEnabled(boolean enabled) {
         this.enabled = enabled;
+    }
+
+    /**
+     * @return the type
+     */
+    public RentalRateEnum getType() {
+        return type;
+    }
+
+    /**
+     * @param type the type to set
+     */
+    public void setType(RentalRateEnum type) {
+        this.type = type;
     }
     
 }

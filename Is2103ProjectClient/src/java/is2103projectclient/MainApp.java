@@ -37,13 +37,14 @@ public class MainApp {
     public MainApp() {
     }
 
-    public MainApp(ModelSessionBeanRemote modelSessionBeanRemote, CarSessionBeanRemote carSessionBeanRemote, TransitDriverDispatchRecordSessionBeanRemote transitDriverDispatchRecordSessionBeanRemote, OutletSessionBeanRemote outletSessionBeanRemote, EmployeeSessionBeanRemote employeeSessionBeanRemote) {
+    public MainApp(ModelSessionBeanRemote modelSessionBeanRemote, CarSessionBeanRemote carSessionBeanRemote, TransitDriverDispatchRecordSessionBeanRemote transitDriverDispatchRecordSessionBeanRemote, OutletSessionBeanRemote outletSessionBeanRemote, EmployeeSessionBeanRemote employeeSessionBeanRemote, CategorySessionBeanRemote categorySessionBeanRemote) {
         this();
         this.modelSessionBeanRemote = modelSessionBeanRemote;
         this.carSessionBeanRemote = carSessionBeanRemote;
         this.transitDriverDispatchRecordSessionBeanRemote = transitDriverDispatchRecordSessionBeanRemote;
         this.outletSessionBeanRemote = outletSessionBeanRemote;
         this.employeeSessionBeanRemote = employeeSessionBeanRemote;
+        this.categorySessionBeanRemote = categorySessionBeanRemote;
     }
 
     public void runApp() {
@@ -66,7 +67,7 @@ public class MainApp {
                     try {
                         doLogin();
                         System.out.println("Login successful!\n");
-                        salesManagementModule = new SalesManagementModule(modelSessionBeanRemote, carSessionBeanRemote,transitDriverDispatchRecordSessionBeanRemote, outletSessionBeanRemote, employeeSessionBeanRemote, employee);
+                        salesManagementModule = new SalesManagementModule(modelSessionBeanRemote, carSessionBeanRemote,transitDriverDispatchRecordSessionBeanRemote, outletSessionBeanRemote, employeeSessionBeanRemote, employee, categorySessionBeanRemote);
                         menuMain();
                     } catch (InvalidLoginCredentialsException ex) {
                         System.out.println("Invalid login credential: " + ex.getMessage() + "\n");

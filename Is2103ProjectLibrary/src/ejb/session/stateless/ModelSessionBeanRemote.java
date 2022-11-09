@@ -22,10 +22,10 @@ public interface ModelSessionBeanRemote {
 
     public List<Model> viewAllModels();
 
-    public Model retrieveModelByName(String name);
+    public Model retrieveModelByName(String model, String make);
 
     public void merge(Model model);
 
     public void deleteModel(Long modelId) throws DeleteModelException;
-    
+        
 }

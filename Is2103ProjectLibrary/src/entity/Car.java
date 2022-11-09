@@ -31,7 +31,7 @@ public class Car implements Serializable {
     private Long carId;
 
     @ManyToOne
-    @JoinColumn(nullable = false)
+//    @JoinColumn(nullable = false)
     private Model model;
     @Enumerated(EnumType.STRING)
     private CarStatusEnum status;
@@ -46,6 +46,14 @@ public class Car implements Serializable {
         this.enabled = true;
         this.status = CarStatusEnum.AVAILABLE;
     }
+
+    public Car(CarStatusEnum status, String location, String plateNumber) {
+        this.status = status;
+        this.location = location;
+        this.plateNumber = plateNumber;
+    }
+    
+    
 
     public Car(Long carId, Model model, CarStatusEnum status, String location, String plateNumber, String color) {
         this.carId = carId;

@@ -43,7 +43,7 @@ public class Main {
     public static void main(String[] args) {
         // TODO code application logic here
 
-        MainApp mainApp = new MainApp(modelSessionBeanRemote, carSessionBeanRemote, transitDriverDispatchRecordSessionBeanRemote, outletSessionBeanRemote, employeeSessionBeanRemote);
+        MainApp mainApp = new MainApp(modelSessionBeanRemote, carSessionBeanRemote, transitDriverDispatchRecordSessionBeanRemote, outletSessionBeanRemote, employeeSessionBeanRemote, categorySessionBeanRemote);
         mainApp.runApp();
     }
 
