@@ -29,6 +29,7 @@ public class ModelSessionBean implements ModelSessionBeanRemote, ModelSessionBea
 
         Model model = em.find(Model.class, modelId);
         model.getCars().add(car);
+        car.setModel(model);
 
         em.flush();
 
@@ -36,44 +37,51 @@ public class ModelSessionBean implements ModelSessionBeanRemote, ModelSessionBea
     }
 
     public List<Model> viewAllModels() {
-        List<Model> models = em.createQuery("SELECT m FROM Model m"
-                + "ORDER BY m.category, m.model")
+        List<Model> models = em.createQuery("SELECT m FROM Model m "
+                + "ORDER BY m.category, m.model, m.make ASC")
                 .getResultList();
 
         for (Model model : models) {
             model.getCategory();
             model.getModel();
+            model.getMake();
         }
 
         return models;
     }
 
-    public Model retrieveModelByName(String name) {
-        Model model = (Model) em.createQuery("SELECT m FROM Model m WHERE m.model = :InModelName")
-                .setParameter("InModelName", name)
+    public Model retrieveModelByName(String make, String model) {
+        Model retrievedModel = (Model) em.createQuery("SELECT m FROM Model m WHERE m.model = :InModelName AND m.make = :InMakeName")
+                .setParameter("InMakeName", make)
+                .setParameter("InModelName", model)
                 .getSingleResult();
 
-        model.getCategory();
-        model.getCars();
-        return model;
+        retrievedModel.getCategory();
+        retrievedModel.getCars().size();
+        return retrievedModel;
     }
 
-    public void updateModel(String newModel, Long modelId) {
+    public void updateModel(String newMake, String newModel, Long modelId) {
         Model model = em.find(Model.class, modelId);
         model.setModel(newModel);
+        model.setMake(newMake);
     }
 
     public void deleteModel(Long modelId) throws DeleteModelException {
         Model model = em.find(Model.class, modelId);
         String modelName = model.getModel();
+        String makeName = model.getMake();
 
         List<Car> carsUsed = em.createQuery(
-                "SELECT c FROM Car c WHERE c.model = modelName").getResultList();
+                "SELECT c FROM Car c JOIN c.model m WHERE m.model = :modelName AND m.make = :makeName")
+                .setParameter("modelName", modelName)
+                .setParameter("makeName", makeName)
+                .getResultList();
 
         if (carsUsed.size() > 0) {
             model.setEnabled(false);
             em.merge(model);
-            throw new DeleteModelException("Model Name " + modelName + "is associated with existing car(s) and cannot be deleted!\n");
+            throw new DeleteModelException("Model " + modelName + " " + makeName + " is associated with existing car(s) and cannot be deleted!\n");
         } else {
             model.getCategory().getModels().remove(model);
             em.remove(model);

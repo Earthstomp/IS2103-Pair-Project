@@ -27,7 +27,7 @@ public class Outlet implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long outletId;
-    private String location;
+    private String name;
     @Temporal(TemporalType.TIMESTAMP)
     private Date openingTime;
     @Temporal(TemporalType.TIMESTAMP)
@@ -41,7 +41,7 @@ public class Outlet implements Serializable {
     }
 
     public Outlet(String location, Date openingTime, Date closingTime) {
-        this.location = location;
+        this.name = location;
         this.openingTime = openingTime;
         this.closingTime = closingTime;
     }
@@ -80,17 +80,17 @@ public class Outlet implements Serializable {
     }
 
     /**
-     * @return the location
+     * @return the name
      */
-    public String getLocation() {
-        return location;
+    public String getName() {
+        return name;
     }
 
     /**
-     * @param location the location to set
+     * @param name the name to set
      */
-    public void setLocation(String location) {
-        this.location = location;
+    public void setName(String name) {
+        this.name = name;
     }
 
     /**
@@ -133,5 +133,19 @@ public class Outlet implements Serializable {
      */
     public void setEmployees(List<Employee> employees) {
         this.employees = employees;
+    }
+
+    /**
+     * @return the dispatches
+     */
+    public List<TransitDriverDispatchRecord> getDispatches() {
+        return dispatches;
+    }
+
+    /**
+     * @param dispatches the dispatches to set
+     */
+    public void setDispatches(List<TransitDriverDispatchRecord> dispatches) {
+        this.dispatches = dispatches;
     }
 }

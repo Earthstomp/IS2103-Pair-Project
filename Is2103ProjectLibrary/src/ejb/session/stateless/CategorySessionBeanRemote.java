@@ -11,6 +11,9 @@ import entity.Model;
 import entity.RentalRateRecord;
 import java.util.List;
 import javax.ejb.Remote;
+import util.exception.CategoryExistsException;
+import util.exception.CategoryNotFoundException;
+import util.exception.UnknownPersistenceException;
 
 /**
  *
@@ -19,7 +22,7 @@ import javax.ejb.Remote;
 @Remote
 public interface CategorySessionBeanRemote {
 
-    public Long createNewCategory(Category category);
+    public Long createNewCategory(Category category) throws CategoryExistsException, UnknownPersistenceException;
 
     public Long createNewModelWithExistingCategory(Model model, Long categoryId);
 
@@ -32,5 +35,7 @@ public interface CategorySessionBeanRemote {
     public Category retrieveCategoryByName(String name);
 
     public void merge(Category category);
+
+    public Category retrieveCategoryById(Long id) throws CategoryNotFoundException;
     
 }

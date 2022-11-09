@@ -8,6 +8,7 @@ package ejb.session.stateless;
 import entity.Employee;
 import entity.Outlet;
 import entity.TransitDriverDispatchRecord;
+import java.util.ArrayList;
 import java.util.List;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
@@ -36,29 +37,29 @@ public class EmployeeSessionBean implements EmployeeSessionBeanRemote, EmployeeS
 
     @Override
     public Long createNewEmployeeWithExistingOutlet(Employee employee, Long outletId) throws EmployeeExistsException, UnknownPersistenceException {
+
         em.persist(employee);
 
         Outlet outlet = em.find(Outlet.class, outletId);
+        outlet.setEmployees(new ArrayList<Employee>());
         employee.setOutlet(outlet);
         outlet.getEmployees().add(employee);
         em.flush();
         // not setting outlet to employee cause unidirectional
-
-        em.flush();
         // might have some error here. check with dorothy
-        try {
+//        try {
             return employee.getEmployeeId();
-        } catch (PersistenceException ex) {
-            if (ex.getCause() != null && ex.getCause().getClass().getName().equals("org.eclipse.persistence.exceptions.DatabaseException")) {
-                if (ex.getCause().getCause() != null && ex.getCause().getCause().getClass().getName().equals("java.sql.SQLIntegrityConstraintViolationException")) {
-                    throw new EmployeeExistsException("Employee already exists!");
-                } else {
-                    throw new UnknownPersistenceException(ex.getMessage());
-                }
-            } else {
-                throw new UnknownPersistenceException(ex.getMessage());
-            }
-        }
+//        } catch (PersistenceException ex) {
+//            if (ex.getCause() != null && ex.getCause().getClass().getName().equals("org.eclipse.persistence.exceptions.DatabaseException")) {
+//                if (ex.getCause().getCause() != null && ex.getCause().getCause().getClass().getName().equals("java.sql.SQLIntegrityConstraintViolationException")) {
+//                    throw new EmployeeExistsException("Employee already exists!");
+//                } else {
+//                    throw new UnknownPersistenceException(ex.getMessage());
+//                }
+//            } else {
+//                throw new UnknownPersistenceException(ex.getMessage());
+//            }
+//        }
     }
 
     @Override

@@ -6,7 +6,6 @@
 package ejb.session.stateless;
 
 import entity.RentalRateRecord;
-import entity.Reservation;
 import java.util.List;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
@@ -25,12 +24,40 @@ public class RentalRateRecordSessionBean implements RentalRateRecordSessionBeanR
     private EntityManager em;
 
     @Override
-    public List<RentalRateRecord> retrieveAllRateRecords() {
-        Query query = em.createQuery("SELECT r FROM RentalRateRecord r");
+    public Long createRentalRateRecord(RentalRateRecord rentalRateRecord) {
+        em.persist(rentalRateRecord);
+        em.flush();
 
+        return rentalRateRecord.getId();
+    }
+
+    @Override
+    public List<RentalRateRecord> retrieveAllRateRecords() {
+        Query query = em.createQuery("SELECT r FROM RentalRateRecord r ORDER BY r.carCategory, r.validityPeriod");
         return query.getResultList();
     }
 
+    
+    @Override
+    public void updateRentalRateRecord(RentalRateRecord rentalRateRecord) throws RentalRateRecordNotFoundException
+    {
+        if(rentalRateRecord != null && rentalRateRecord.getId()!= null)
+        {
+            try {
+                RentalRateRecord updateRentalRateRecord = retrieveRentalRateRecordById(rentalRateRecord.getId());
+                updateRentalRateRecord.setRecordName(rentalRateRecord.getRecordName());
+                updateRentalRateRecord.setRate(rentalRateRecord.getRate());
+                updateRentalRateRecord.setValidityPeriod(rentalRateRecord.getValidityPeriod());
+                updateRentalRateRecord.setCategory(rentalRateRecord.getCategory());
+                updateRentalRateRecord.setEnabled(rentalRateRecord.getEnabled());
+            } catch (RentalRateRecordNotFoundException ex) {
+                throw new RentalRateRecordNotFoundException("Rental Rate Record ID not provided for record to be updated");
+            }
+        } else {
+            throw new RentalRateRecordNotFoundException("Rental Rate Record ID not provided for record to be updated");
+        }
+    }
+    
     @Override
     public RentalRateRecord retrieveRentalRateRecordById(Long id) throws RentalRateRecordNotFoundException{
 

@@ -7,7 +7,10 @@ package ejb.session.stateless;
 
 import entity.Car;
 import entity.Reservation;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
@@ -33,8 +36,8 @@ public class CarSessionBean implements CarSessionBeanRemote, CarSessionBeanLocal
     
     @Override
     public List<Car> retrieveAllCars() {
-        List<Car> cars = em.createQuery("SELECT c FROM Car C"
-                + "JOIN c.model m"
+        List<Car> cars = em.createQuery("SELECT c FROM Car C "
+                + "JOIN c.model m "
                 + "ORDER BY m.category, c.model").getResultList();
         for (Car car:cars) {
             car.getModel().getCategory();
@@ -55,12 +58,42 @@ public class CarSessionBean implements CarSessionBeanRemote, CarSessionBeanLocal
 
     }
     
+    public List<Car> retrieveAvailableCarsOnDate(Date timeStamp) throws CarNotFoundException {
+        List<Car> carsInOutlet = em.createQuery("SELECT c FROM Car c WHERE c.status = :StatusAvailable AND c.")
+                .setParameter("StatusAvailable", CarStatusEnum.AVAILABLE)
+                .getResultList();
+
+        // NOTE: IGNORING CARS IN TRANSIT
+        // Latest time reservation can end for car to be returned in time: timeStamp hours - 2
+        Calendar cal = Calendar.getInstance();
+        cal.set(Calendar.HOUR_OF_DAY, (int) (timeStamp.getTime() - (TimeUnit.HOURS.toMillis(2))));
+//        Date date = cal.getTime();
+//        timeStamp = timeStamp.setTime((date);
+
+        List<Car> carsReturnedInTime = em.createQuery("SELECT c FROM Car c"
+                + "JOIN c.reservation r"
+                + "WHERE c.status = :StatusReserved AND r.endDateTime <= :inTime ")
+                .setParameter("StatusReserved", CarStatusEnum.RESERVED)
+                .setParameter("InTime", timeStamp)
+                .getResultList();
+
+//        boolean ifAddAll = allAvailableCars.addAll(carsInOutlet).addAll(carsReturnedInTime);
+//
+//        if (allAvailableCars != null) {
+//            return allAvailableCars;
+//        } else {
+//            throw new CarNotFoundException("No cars are available");
+//        }
+        return carsReturnedInTime;
+    }
+    
     public Car retrieveCarByPlateNumber(String number) {
         Car car = (Car)em.createQuery("SELECT c FROM Car c WHERE c.plateNumber = :InPlateNumber")
                 .setParameter("InPlateNumber", number)
                 .getSingleResult();
         
         car.getModel().getCategory();
+        car.getModel();
         return car;
     }
 
@@ -93,7 +126,9 @@ public class CarSessionBean implements CarSessionBeanRemote, CarSessionBeanLocal
         Car car = em.find(Car.class, carId);
         String plateNumber = car.getPlateNumber();
         // need to find a way to know if reservation  is still active, check by date? but how
-        List<Reservation> reservationsUsed = em.createQuery("SELECT r FROM Reservation r WHERE r.car = car").getResultList();
+        List<Reservation> reservationsUsed = em.createQuery("SELECT r FROM Reservation r JOIN r.car c WHERE c.plateNumber = :plateNumber")
+                .setParameter("plateNumber", car.getPlateNumber())
+                .getResultList();
 
         if (reservationsUsed.size() > 0) {
             car.setEnabled(false);

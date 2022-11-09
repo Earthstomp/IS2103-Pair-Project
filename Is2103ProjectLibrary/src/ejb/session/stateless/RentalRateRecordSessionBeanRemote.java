@@ -23,4 +23,8 @@ public interface RentalRateRecordSessionBeanRemote {
 
     public List<RentalRateRecord> retrieveAllRateRecords();
 
+    public Long createRentalRateRecord(RentalRateRecord rentalRateRecord);
+
+    public void updateRentalRateRecord(RentalRateRecord rentalRateRecord) throws RentalRateRecordNotFoundException;
+
 }

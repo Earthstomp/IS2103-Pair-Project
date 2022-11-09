@@ -41,7 +41,7 @@ import util.exception.TransitDriverDispatchRecordNotFromOutletException;
  * @author Keith test
  */
 public class SalesManagementModule {
-
+    
     private ModelSessionBeanRemote modelSessionBeanRemote;
     private CarSessionBeanRemote carSessionBeanRemote;
     private TransitDriverDispatchRecordSessionBeanRemote transitDriverDispatchRecordSessionBeanRemote;
@@ -49,13 +49,13 @@ public class SalesManagementModule {
     private CustomerSessionBeanRemote customerSessionBeanRemote;
     private OutletSessionBeanRemote outletSessionBeanRemote;
     private EmployeeSessionBeanRemote employeeSessionBeanRemote;
-
+    
     private Employee employee;
-
+    
     public SalesManagementModule() {
     }
-
-    public SalesManagementModule(ModelSessionBeanRemote modelSessionBeanRemote, CarSessionBeanRemote carSessionBeanRemote, TransitDriverDispatchRecordSessionBeanRemote transitDriverDispatchRecordSessionBeanRemote, OutletSessionBeanRemote outletSessionBeanRemote, EmployeeSessionBeanRemote employeeSessionBeanRemote, Employee employee) {
+    
+    public SalesManagementModule(ModelSessionBeanRemote modelSessionBeanRemote, CarSessionBeanRemote carSessionBeanRemote, TransitDriverDispatchRecordSessionBeanRemote transitDriverDispatchRecordSessionBeanRemote, OutletSessionBeanRemote outletSessionBeanRemote, EmployeeSessionBeanRemote employeeSessionBeanRemote, Employee employee, CategorySessionBeanRemote categorySessionBeanRemote) {
         this();
         this.modelSessionBeanRemote = modelSessionBeanRemote;
         this.carSessionBeanRemote = carSessionBeanRemote;
@@ -63,19 +63,20 @@ public class SalesManagementModule {
         this.outletSessionBeanRemote = outletSessionBeanRemote;
         this.employeeSessionBeanRemote = employeeSessionBeanRemote;
         this.employee = employee;
+        this.categorySessionBeanRemote = categorySessionBeanRemote;
     }
-
+    
     public void menuSalesManagementModule() throws InvalidEmployeeRoleException {
-
+        
         if (employee.getRole() != EmployeeRoleEnum.SALES_MANAGER && employee.getRole() != EmployeeRoleEnum.ADMINISTRATOR) {
             throw new InvalidEmployeeRoleException("You don't have SALES MANAGER rights to access the Sales Management module.");
         }
         
         Scanner scanner = new Scanner(System.in);
         Integer response = 0;
-
+        
         while (true) {
-            System.out.println("*** Management System :: Sales Management :: Operations Manager***\n");
+            System.out.println("\n\n*** Management System :: Sales Management :: Operations Manager***\n");
             System.out.println("1: Create New model");
             System.out.println("2: View All Models");
             System.out.println("3: Update Model;");
@@ -92,12 +93,12 @@ public class SalesManagementModule {
             System.out.println("14: Return Car");
             System.out.println("15: Back\n");
             response = 0;
-
-            while (response < 1 || response > 7) {
+            
+            while (response < 1 || response > 14) {
                 System.out.print("> ");
-
+                
                 response = scanner.nextInt();
-
+                
                 if (response == 1) {
                     doCreateNewModel();
                 } else if (response == 2) {
@@ -126,99 +127,125 @@ public class SalesManagementModule {
                     doPickUpCar();
                 } else if (response == 14) {
                     doReturnCar();
+                } else if (response == 15) {
+                    break;
+                    
                 } else {
                     System.out.println("Invalid option, please try again!\n");
                 }
             }
-
+            
             if (response == 15) {
                 break;
             }
         }
-
+        
     }
-
+    
     public void doCreateNewModel() {
         Scanner scanner = new Scanner(System.in);
         Model model = new Model();
+        boolean categorySet = false;
         int i = 1; //  index of menu
 
         System.out.println("*** Management System :: Sales Management :: Create New Model ***\n");
-        System.out.print("Choose category to create model in> ");
+        System.out.print("Choose category to create model in> \n");
         List<Category> categories = categorySessionBeanRemote.retrieveAllCategories();
         for (Category c : categories) {
             System.out.println(i + ". " + c.getCategoryName());
             i++;
         }
-        while (true) {
+        do {
+            System.out.print("> ");
             Integer categoryChoice = scanner.nextInt();
-
+            
             if (categoryChoice <= categories.size() && categoryChoice > 0) {
                 model.setCategory(categories.get(categoryChoice - 1));
-                break;
+                categorySet = true;
             } else {
                 System.out.println("Invalid option, please try again!\n");
             }
-        }
-        System.out.print("Enter Make and Model> ");
+        } while (!categorySet);
+        
+        scanner.nextLine();
+        System.out.println("Enter Make: ");
+        model.setMake(scanner.nextLine().trim());
+        
+        System.out.println("Enter Model: ");
         model.setModel(scanner.nextLine().trim());
 
 //        try { need to try and catch exception
         Long newModelId = categorySessionBeanRemote.createNewModelWithExistingCategoryClass(model, model.getCategory());
-        System.out.println("New model created successfully!: " + model.getModel() + "\n");
+        System.out.println("New model created successfully!: " + model.getMake() + " " + model.getModel() + "\n");
     }
-
+    
     public void doViewAllModels() {
         List<Model> models = modelSessionBeanRemote.viewAllModels();
-        System.out.printf("\n%3s%12s%14s", "S/N", "Car Category", "Make and Model");
+        System.out.printf("\n%3s%16s%15s%15s", "S/N", "Car Category", "Make", "Model");
         int index = 1;
         for (Model model : models) {
-            System.out.printf("\n%3s%20s%20s", index + ".", model.getCategory(), model.getModel());
+            System.out.printf("\n%3s%16s%15s%15s", index + ".", model.getCategory().getCategoryName(), model.getMake(), model.getModel());
             index++;
         }
+        System.out.println("\n");
     }
-
+    
     public void doUpdateModel() {
         Scanner scanner = new Scanner(System.in);
         int i = 1;
-
+        
         System.out.println("*** Management System :: Sales Management :: Update Model ***\n");
+        System.out.println("Enter Make Name> ");
+        String makeName = scanner.nextLine().trim();
+        
         System.out.println("Enter Model Name> ");
-        Model model = modelSessionBeanRemote.retrieveModelByName(scanner.nextLine().trim());
-        System.out.printf("\n%12s%14s", "Car Category", "Make and Model");
-        System.out.printf("\n%3s%20s%20s", model.getCategory(), model.getModel());
-
-        System.out.println("Enter Model's New Category> ");
+        String modelName = scanner.nextLine().trim();
+        Model model = modelSessionBeanRemote.retrieveModelByName(makeName, modelName);
+        System.out.printf("\n%12s%15s%15s", "Car Category", "Make", "Model");
+        System.out.printf("\n%12s%15s%15s", model.getCategory().getCategoryName(), model.getMake(), model.getModel());
+        
+        System.out.println("\nEnter Model's New Category> ");
+        System.out.print("> ");
         Category category = categorySessionBeanRemote.retrieveCategoryByName(scanner.nextLine().trim());
-
+        
         model.setCategory(category);
-        System.out.println("Enter Model's New Make and Model> ");
+        System.out.println("Enter New Make Name> ");
+        model.setMake(scanner.nextLine().trim());
+        
+        System.out.println("Enter New Model Name> ");
         model.setModel(scanner.nextLine().trim());
+        
         modelSessionBeanRemote.merge(model);
         category.getModels().add(model);
         categorySessionBeanRemote.merge(category);
+        
         System.out.println("Model updated successfully!");
-        System.out.printf("\n%12s%14s", "Car Category", "Make and Model");
-        System.out.printf("\n%3s%20s%20s", model.getCategory(), model.getModel());
+        System.out.printf("\n%20s%15s%15s", "Car Category", "Make", "Model");
+        System.out.printf("\n%20s%15s%15s\n", model.getCategory().getCategoryName(), model.getMake(), model.getModel());
     }
-
+    
     public void doDeleteModel() {
         Scanner scanner = new Scanner(System.in);
         String confirmDelete = "";
-
+        
         System.out.println("*** Management System :: Sales Management :: Delete Model ***\n");
-        System.out.println("Enter Model Name> ");
-        Model model = modelSessionBeanRemote.retrieveModelByName(scanner.nextLine().trim());
-        System.out.printf("\n%12s%14s", "Car Category", "Make and Model");
-        System.out.printf("\n%3s%20s%20s", model.getCategory(), model.getModel());
-
-        System.out.print("Confirm delete this Model? (Enter 'Y' to delete)> ");
+        System.out.println("Enter Make: ");
+        String make = scanner.nextLine().trim();
+        
+        System.out.println("Enter Model: ");
+        String model = scanner.nextLine().trim();
+//        try { need to try and catch exception
+        Model modelToDelete = modelSessionBeanRemote.retrieveModelByName(make, model);
+        System.out.printf("\n%12s%15s%15s", "Car Category", "Make", "Model");
+        System.out.printf("\n%12s%15s%15s", modelToDelete.getCategory().getCategoryName(), modelToDelete.getMake(), modelToDelete.getModel());
+        
+        System.out.print("\nConfirm delete this Model? (Enter 'Y' to delete)> ");
         confirmDelete = scanner.nextLine().trim();
-
+        
         if (confirmDelete.equals("Y")) {
             try {
-                modelSessionBeanRemote.deleteModel(model.getModelId());
-                System.out.println("Model " + model.getModel() + " deleted successfully!");
+                modelSessionBeanRemote.deleteModel(modelToDelete.getModelId());
+                System.out.println("Model " + modelToDelete.getMake() + " " + modelToDelete.getModel() + " deleted successfully!");
             } catch (DeleteModelException ex) {
                 System.out.println("An error has occurred while deleting the model: " + ex.getMessage() + "\n");
             }
@@ -226,97 +253,116 @@ public class SalesManagementModule {
             System.out.println("Delete cancelled!\n");
         }
     }
-
+    
     public void doCreateNewCar() {
         Scanner scanner = new Scanner(System.in);
         Car car = new Car();
-
+        
         System.out.println("*** Management System :: Sales Management :: Create New Car ***\n");
         System.out.println("Enter Car Plate Number> ");
         car.setPlateNumber(scanner.nextLine().trim());
         System.out.println("Enter Car Colour> ");
-        car.setPlateNumber(scanner.nextLine().trim());
+        car.setColor(scanner.nextLine().trim());
+        System.out.println("Enter Car Make> ");
+        String make = scanner.nextLine().trim();
         System.out.println("Enter Car Model> ");
-        Model model = modelSessionBeanRemote.retrieveModelByName(scanner.nextLine().trim());
-        car.setModel(model);
+        String model = scanner.nextLine().trim();
+        
+        Model retrievedModel = modelSessionBeanRemote.retrieveModelByName(make, model);
+        car.setModel(retrievedModel);
         System.out.println("Enter Car Location> ");
         car.setLocation(scanner.nextLine().trim());
-
-        Long carId = modelSessionBeanRemote.createNewCarWithExistingModel(car, model.getModelId());
+        
+        Long carId = modelSessionBeanRemote.createNewCarWithExistingModel(car, retrievedModel.getModelId());
         System.out.println("New Car created successfully!: " + car.getPlateNumber() + "\n");
     }
-
+    
     public void doViewAllCars() {
         List<Car> cars = carSessionBeanRemote.retrieveAllCars();
-        System.out.printf("\n%3s%12s%14s", "S/N", "Car Category", "Make and Model");
+        System.out.printf("\n%3s%20s%14s%14s%14s", "S/N", "Car Category", "Make", "Model", "Plate Number");
         int index = 1;
         for (Car car : cars) {
-            System.out.printf("\n%3s%20s%20s%15s", index + ".", car.getModel().getCategory(), car.getModel(), car.getPlateNumber());
+            System.out.printf("\n%3s%20s%14s%14s%14s", index + ".", car.getModel().getCategory().getCategoryName(), car.getModel().getMake(), car.getModel().getModel(), car.getPlateNumber());
             index++;
         }
     }
-
+    
     public void doViewCarDetails() {
         Scanner scanner = new Scanner(System.in);
         System.out.println("*** Management System :: Sales Management :: View Car Details ***\n");
         System.out.println("Enter Car Plate Number> ");
         Car car = carSessionBeanRemote.retrieveCarByPlateNumber(scanner.nextLine().trim());
-        System.out.printf("\n%12s%14s%20s%15s%20s%10s", "Car Category", "Make and Model", "Plate Number", "Color", "Location", "Enabled Status");
-        System.out.printf("\n%20s%20s%15s%15s%15s", car.getModel().getCategory(), car.getModel(), car.getPlateNumber(),
+        System.out.printf("\n%15s%14s%14s%20s%15s%15s%20s", "Car Category", "Make", "Model", "Plate Number", "Color", "Location", "Enabled Status");
+        System.out.printf("\n%15s%14s%14s%20s%15s%15s%20s", car.getModel().getCategory().getCategoryName(), car.getModel().getMake(), car.getModel().getModel(), car.getPlateNumber(),
                 car.getColor(), car.getLocation(), car.getStatus());
-
+        
     }
-
+    
     public void doUpdateCar() {
         Scanner scanner = new Scanner(System.in);
-
+        
         System.out.println("*** Management System :: Sales Management :: Update Car ***\n");
         System.out.println("Enter Car Plate Number> ");
         Car car = carSessionBeanRemote.retrieveCarByPlateNumber(scanner.nextLine().trim());
-        System.out.printf("\n%12s%14s%20s%15s%20s%10s", "Car Category", "Make and Model", "Plate Number", "Color", "Location", "Enabled Status");
-        System.out.printf("\n%20s%20s%15s%15s%15s", car.getModel().getCategory(), car.getModel(), car.getPlateNumber(),
+        System.out.printf("\n%12s%14s%14s%20s%15s%20s%10s", "Car Category", "Make", "Model", "Plate Number", "Color", "Location", "Enabled Status");
+        System.out.printf("\n%12s%14s%14s%20s%15s%20s%10s", car.getModel().getCategory().getCategoryName(), car.getModel().getMake(), car.getModel().getModel(), car.getPlateNumber(),
                 car.getColor(), car.getLocation(), car.getStatus());
-
-        System.out.println("Enter Car's New Plate Number> ");
+        
+        System.out.println("\nEnter Car's New Plate Number> ");
         car.setPlateNumber(scanner.nextLine().trim());
-        System.out.println("Enter Car's Model> ");
-        Model model = modelSessionBeanRemote.retrieveModelByName(scanner.nextLine().trim());
+        System.out.println("Enter Car Make> ");
+        String make = scanner.nextLine().trim();
+        System.out.println("Enter Car Model> ");
+        String model = scanner.nextLine().trim();
+        
+        Model retrievedModel = modelSessionBeanRemote.retrieveModelByName(make, model);
+        System.out.println("found model");
         // need to set
         Model oldModel = car.getModel(); // finding old model
+        System.out.println("found model from car");
+        
+        oldModel = modelSessionBeanRemote.retrieveModelByName(oldModel.getMake(), oldModel.getModel());
+        
         oldModel.getCars().remove(car);
-        car.setModel(model); //  setting new model
-
+        
+        System.out.println("removed car");
+        
+        car.setModel(retrievedModel); //  setting new model
+        System.out.println("set model");
+        
         System.out.println("Enter Car's New Color> ");
         car.setColor(scanner.nextLine().trim());
         System.out.println("Enter Car's New Location> ");
         car.setLocation(scanner.nextLine().trim());
-        System.out.println("Enter Car's status ");
+        System.out.println("Enter Car's status (true: enabled or false: disabled) ");
         car.setEnabled(scanner.nextBoolean());
 
         // unsure if it is adding managed instance or not
         carSessionBeanRemote.merge(car);
-        model.getCars().add(car);
-        modelSessionBeanRemote.merge(model);
+        System.out.println("merged car ");
+        
+        retrievedModel.getCars().add(carSessionBeanRemote.retrieveCarByPlateNumber(car.getPlateNumber()));
+        modelSessionBeanRemote.merge(retrievedModel);
         System.out.println("Car updated successfully!");
-        System.out.printf("\n%12s%14s%20s%15s%20s%10s", "Car Category", "Make and Model", "Plate Number", "Color", "Location", "Enabled Status");
-        System.out.printf("\n%20s%20s%15s%15s%15s", car.getModel().getCategory(), car.getModel(), car.getPlateNumber(),
+        System.out.printf("\n%12s%14s%14s%20s%15s%20s%10s", "Car Category", "Make", "Model", "Plate Number", "Color", "Location", "Enabled Status");
+        System.out.printf("\n%12s%14s%14s%20s%15s%20s%10s", car.getModel().getCategory(), car.getModel().getMake(), car.getModel().getModel(), car.getPlateNumber(),
                 car.getColor(), car.getLocation(), car.getStatus());
     }
-
+    
     public void doDeleteCar() {
         Scanner scanner = new Scanner(System.in);
         String confirmDelete = "";
-
+        
         System.out.println("*** Management System :: Sales Management :: Delete Car ***\n");
         System.out.println("Enter Car Plate Number> ");
         Car car = carSessionBeanRemote.retrieveCarByPlateNumber(scanner.nextLine().trim());
-        System.out.printf("\n%12s%14s%20s%15s%20s%10s", "Car Category", "Make and Model", "Plate Number", "Color", "Location", "Enabled Status");
-        System.out.printf("\n%20s%20s%15s%15s%15s", car.getModel().getCategory(), car.getModel(), car.getPlateNumber(),
+        System.out.printf("\n%12s%14s%14s%20s%15s%20s%10s", "Car Category", "Make", "Model", "Plate Number", "Color", "Location", "Enabled Status");
+        System.out.printf("\n%12s%14s%14s%20s%15s%20s%10s", car.getModel().getCategory().getCategoryName(), car.getModel().getMake(), car.getModel().getModel(), car.getPlateNumber(),
                 car.getColor(), car.getLocation(), car.getStatus());
-
-        System.out.print("Confirm delete this Car? (Enter 'Y' to delete)> ");
+        
+        System.out.print("\n\nConfirm delete this Car? (Enter 'Y' to delete)> ");
         confirmDelete = scanner.nextLine().trim();
-
+        
         if (confirmDelete.equals("Y")) {
             try {
                 carSessionBeanRemote.deleteCar(car.getCarId());
@@ -328,7 +374,7 @@ public class SalesManagementModule {
             System.out.println("Delete cancelled!\n");
         }
     }
-
+    
     public void doViewTransitDriverDispatchRecordsForCurrentDayReservations() {
         Scanner scanner = new Scanner(System.in);
         // may remove in the future
@@ -336,7 +382,7 @@ public class SalesManagementModule {
         Date currentDate;
         Outlet outlet = new Outlet();
         int index = 1;
-
+        
         try {
             System.out.println("*** Management System :: Sales Management :: View Transit Driver Dispatch Records For Current Day Reservations ***\n");
             // temporary solution: will probably retrieve date from the system in the future. Singleton...?
@@ -347,11 +393,12 @@ public class SalesManagementModule {
             // need to improve error handling here
             try {
                 outlet = outletSessionBeanRemote.retrieveOutletByLocation(scanner.nextLine().trim());
+                //
             } catch (OutletNotFoundException ex) {
                 System.out.println("An error has occurred while finding the Outlet: " + ex.getMessage() + "\n");
             }
             List<TransitDriverDispatchRecord> transits = transitDriverDispatchRecordSessionBeanRemote.retrieveTransitDriverDispatchRecordForCurrentDay(currentDate, outlet);
-
+            
             for (TransitDriverDispatchRecord transit : transits) {
                 System.out.printf("\n%3s%10s%20s%15s%20s%15s%20s$15s", index + ".", transit.getId(),
                         transit.getEmployee(), transit.getStartDateTime(), transit.getPickupLocation(),
@@ -362,7 +409,7 @@ public class SalesManagementModule {
             System.out.println("Invalid date input!\n");
         }
     }
-
+    
     public void doAssignDriver() {
         Scanner scanner = new Scanner(System.in);
         // may remove in the future
@@ -372,7 +419,7 @@ public class SalesManagementModule {
         TransitDriverDispatchRecord transit = new TransitDriverDispatchRecord();
         Employee employee = new Employee();
         int index = 1;
-
+        
         try {
             System.out.println("*** Management System :: Sales Management :: View Transit Driver Dispatch Records For Current Day Reservations ***\n");
             // temporary solution: will probably retrieve date from the system in the future. Singleton...?
@@ -396,25 +443,25 @@ public class SalesManagementModule {
             } catch (TransitDriverDispatchRecordNotFoundException ex) {
                 System.out.println("An error has occurred while finding the Transit Record: " + ex.getMessage() + "\n");
             }
-
+            
             System.out.println("Enter Employee Id> ");
             try {
                 employee = employeeSessionBeanRemote.retrieveEmployeeByEmployeeId(scanner.nextLong());
             } catch (EmployeeNotFoundException ex) {
                 System.out.println("An error has occurred while finding the Employee: " + ex.getMessage() + "\n");
             }
-
+            
             transitDriverDispatchRecordSessionBeanRemote.assignTransitDriver(transit.getId(), employee);
         } catch (ParseException ex) {
             System.out.println("Invalid date input!\n");
         }
     }
-
+    
     public void doUpdateTransitAsCompleted() {
         Scanner scanner = new Scanner(System.in);
         TransitDriverDispatchRecord transit = new TransitDriverDispatchRecord();
         Outlet outlet = new Outlet();
-
+        
         System.out.println("*** Management System :: Sales Management :: Update Transit as Completed ***\n");
         System.out.println("Enter Outlet> ");
         // need to improve error handling here
@@ -431,14 +478,14 @@ public class SalesManagementModule {
         } catch (TransitDriverDispatchRecordNotFoundException ex) {
             System.out.println("An error has occurred while finding the Transit Record: " + ex.getMessage() + "\n");
         }
-
+        
         transitDriverDispatchRecordSessionBeanRemote.updateTransitAsCompleted(transit.getId());
     }
-
+    
     public void doPickUpCar() {
         Scanner scanner = new Scanner(System.in);
         int i = 1;
-
+        
         System.out.println("*** Management System :: Sales Management :: Pickup Car ***\n");
         System.out.println("Enter Customer Mobile Number> ");
         // need exception
@@ -448,7 +495,7 @@ public class SalesManagementModule {
         Reservation selectedReservation;
         // bad styling. need to change
         Car reservedCar = new Car();
-
+        
         System.out.print("Choose reservation> ");
         for (Reservation r : customer.getReservations()) {
             System.out.println(i + ". " + r.getId());
@@ -479,11 +526,11 @@ public class SalesManagementModule {
             System.out.println("Car " + reservedCar.getPlateNumber() + " for Reservation " + selectedReservation.getId() + "has been picked up!\n");
         }
     }
-
+    
     public void doReturnCar() {
         Scanner scanner = new Scanner(System.in);
         int i = 1;
-
+        
         System.out.println("*** Management System :: Sales Management :: Return Car ***\n");
         System.out.println("Enter Customer Mobile Number> ");
         // need exception
@@ -492,7 +539,7 @@ public class SalesManagementModule {
         List<Reservation> reservations = customer.getReservations();
         Reservation selectedReservation;// bad styling. need to change
         Car reservedCar = new Car();
-
+        
         System.out.print("Choose reservation> ");
         for (Reservation r : customer.getReservations()) {
             System.out.println(i + ". " + r.getId());
@@ -517,6 +564,6 @@ public class SalesManagementModule {
 // need to check CarStatusEnum. Supposed to be "in outlet"
         carSessionBeanRemote.updateCarStatusLocation(reservedCar, CarStatusEnum.TRANSIT, selectedReservation.getReturnLocation().toString()); // using mobile number to uniquely identify customer
         System.out.println("Car " + reservedCar.getPlateNumber() + " for Reservation " + selectedReservation.getId() + "has been returned!\n");
-
+        
     }
 }

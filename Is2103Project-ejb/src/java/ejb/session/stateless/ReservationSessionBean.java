@@ -6,6 +6,7 @@
 package ejb.session.stateless;
 
 import entity.Reservation;
+import java.util.Date;
 import java.util.List;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
@@ -40,6 +41,21 @@ public class ReservationSessionBean implements ReservationSessionBeanRemote, Res
             throw new ReservationNotFoundException("Unable to locate reservation with id: " + reservationId);
         }
     }
+    
+    @Override
+    public List<Reservation> retrieveReservationByDate(Date startDateTime) throws ReservationNotFoundException {
+        List<Reservation> reservations = em.createQuery(
+				"SELECT r FROM Reservation r WHERE r.startDateTime LIKE :startDate")
+				.setParameter("startDate", startDateTime)
+				.getResultList();
+
+        if (reservations != null) {
+            return reservations;
+        } else {
+            throw new ReservationNotFoundException("No reservations on date");
+        }
+    }
+    
 
     @Override
     public void removeReservation(Long reservationId) {
