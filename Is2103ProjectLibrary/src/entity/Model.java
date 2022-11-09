@@ -25,16 +25,6 @@ public class Model implements Serializable {
     /**
      * @return the make
      */
-    public String getMake() {
-        return make;
-    }
-
-    /**
-     * @param make the make to set
-     */
-    public void setMake(String make) {
-        this.make = make;
-    }
 
     private static final long serialVersionUID = 1L;
     @Id
@@ -50,6 +40,7 @@ public class Model implements Serializable {
     private Boolean enabled;
     
     public Model() {
+        this.enabled = true;
     }
 
     public Model(String make, String model) {
@@ -156,6 +147,17 @@ public class Model implements Serializable {
         this.enabled = enabled;
     }
     
+    
+    public String getMake() {
+        return make;
+    }
+
+    /**
+     * @param make the make to set
+     */
+    public void setMake(String make) {
+        this.make = make;
+    }
     
     
 }

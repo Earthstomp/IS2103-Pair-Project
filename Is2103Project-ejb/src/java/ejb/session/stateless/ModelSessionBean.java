@@ -52,12 +52,12 @@ public class ModelSessionBean implements ModelSessionBeanRemote, ModelSessionBea
 
     public Model retrieveModelByName(String make, String model) {
         Model retrievedModel = (Model) em.createQuery("SELECT m FROM Model m WHERE m.model = :InModelName AND m.make = :InMakeName")
-                .setParameter("InModelName", model)
                 .setParameter("InMakeName", make)
+                .setParameter("InModelName", model)
                 .getSingleResult();
 
         retrievedModel.getCategory();
-        retrievedModel.getCars();
+        retrievedModel.getCars().size();
         return retrievedModel;
     }
 
@@ -73,12 +73,15 @@ public class ModelSessionBean implements ModelSessionBeanRemote, ModelSessionBea
         String makeName = model.getMake();
 
         List<Car> carsUsed = em.createQuery(
-                "SELECT c FROM Car c JOIN c.model m WHERE m.model = modelName AND m.make = makeName").getResultList();
+                "SELECT c FROM Car c JOIN c.model m WHERE m.model = :modelName AND m.make = :makeName")
+                .setParameter("modelName", modelName)
+                .setParameter("makeName", makeName)
+                .getResultList();
 
         if (carsUsed.size() > 0) {
             model.setEnabled(false);
             em.merge(model);
-            throw new DeleteModelException("Model " + modelName + " " + makeName + "is associated with existing car(s) and cannot be deleted!\n");
+            throw new DeleteModelException("Model " + modelName + " " + makeName + " is associated with existing car(s) and cannot be deleted!\n");
         } else {
             model.getCategory().getModels().remove(model);
             em.remove(model);

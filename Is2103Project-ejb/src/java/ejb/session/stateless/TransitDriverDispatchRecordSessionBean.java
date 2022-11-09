@@ -9,6 +9,7 @@ import entity.Employee;
 import entity.Outlet;
 import entity.TransitDriverDispatchRecord;
 import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.List;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
@@ -65,14 +66,23 @@ public class TransitDriverDispatchRecordSessionBean implements TransitDriverDisp
     }
 
     public List<TransitDriverDispatchRecord> retrieveTransitDriverDispatchRecordForCurrentDay(Date currentDay, Outlet outlet) {
-        return em.createQuery(
-                "SELECT t FROM TransitDriverDispatchRecord t "
-                + "JOIN t.employee e"
-                + "WHERE e.outlet = outlet"
-                + "AND t.startDateTime.equals(:currentDay)") // not sure how to compare dates
-                .setParameter("currentDay", currentDay)
+        List<TransitDriverDispatchRecord> list = em.createQuery(
+                "SELECT t FROM TransitDriverDispatchRecord t JOIN t.employee e JOIN e.outlet o WHERE o.name = :outletName")
+                .setParameter("outletName", outlet.getName())
                 .getResultList();
-
+        
+        GregorianCalendar calendar = new GregorianCalendar();
+        calendar.setTime(currentDay);
+        calendar.add(GregorianCalendar.HOUR_OF_DAY, 22); //  setting end of day as 2200hours
+        Date endOfCurrentDay = calendar.getTime();
+        
+        for (TransitDriverDispatchRecord record : list) {
+            if (record.getStartDateTime().getTime() < currentDay.getTime() && record.getStartDateTime().getTime() > endOfCurrentDay.getTime()) {
+                list.remove(record);
+            }
+        }
+        
+        return list;
     }
 
     public void assignTransitDriver(Long id, Employee driver) {

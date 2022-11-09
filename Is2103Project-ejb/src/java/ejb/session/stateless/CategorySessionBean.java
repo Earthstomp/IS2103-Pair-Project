@@ -69,7 +69,7 @@ public class CategorySessionBean implements CategorySessionBeanRemote, CategoryS
                 .setParameter("InName", name)
                 .getSingleResult();
 
-        category.getModels();
+        category.getModels().size();
         return category;
     }
 
