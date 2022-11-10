@@ -5,6 +5,7 @@
  */
 package ejb.session.stateless;
 
+import entity.Car;
 import entity.Category;
 import entity.Model;
 import entity.RentalRateRecord;
@@ -36,6 +37,8 @@ public interface CategorySessionBeanLocal {
     public Category retrieveCategoryByName(String name);
 
     public void merge(Category category);
+
+    public List<Car> retrieveAllCarsFromCategory(String categoryName);
 
     
 }

@@ -26,6 +26,7 @@ import java.util.List;
 import util.enumeration.CarStatusEnum;
 import util.enumeration.EmployeeRoleEnum;
 import util.enumeration.RentalRateEnum;
+import util.enumeration.ReservationPaymentEnum;
 import util.exception.CarNotFoundException;
 import util.exception.CustomerNotFoundException;
 import util.exception.DeleteCarException;
@@ -419,9 +420,20 @@ public class SalesManagementModule {
         car.setColor(scanner.nextLine().trim());
         System.out.println("Enter Car's New Location> ");
         car.setLocation(scanner.nextLine().trim());
-        System.out.println("Enter Car's status (true: enabled or false: disabled) ");
-        car.setEnabled(scanner.nextBoolean());
+        System.out.println("Enter Car's status (1: enabled or 2: disabled) ");
 
+        boolean statusChosen = false;
+        do {
+            int status = scanner.nextInt();
+            if (status == 1) {
+                car.setStatus(CarStatusEnum.AVAILABLE);
+                statusChosen = true;
+            } else if (status == 2) {
+                car.setStatus(CarStatusEnum.DISABLED);
+                statusChosen = true;
+            } 
+        } while (!statusChosen);
+                
         // unsure if it is adding managed instance or not
         carSessionBeanRemote.merge(car);
         System.out.println("merged car ");
@@ -781,7 +793,7 @@ public class SalesManagementModule {
                     System.out.println("Invalid option, please try again!\n");
                 }
             }
-            if (!selectedReservation.getPaymentStatus()) {
+            if (selectedReservation.getReservationPaymentEnum().equals("ATPICKUP")) {
                 // request for payment using credit card classes
             } else { // payment has been made
 

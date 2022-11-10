@@ -81,7 +81,7 @@ public class TransitDriverDispatchRecordSessionBean implements TransitDriverDisp
                 list.remove(record);
             }
         }
-        
+
         return list;
     }
 

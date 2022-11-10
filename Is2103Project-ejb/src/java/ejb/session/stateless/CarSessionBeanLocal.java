@@ -6,6 +6,7 @@
 package ejb.session.stateless;
 
 import entity.Car;
+import entity.Outlet;
 import java.util.Date;
 import java.util.List;
 import javax.ejb.Local;
@@ -33,5 +34,5 @@ public interface CarSessionBeanLocal {
 
     public void deleteCar(Long carId) throws DeleteCarException;
 
-    public List<Car> retrieveAvailableCarsOnDate(Date timeStamp) throws CarNotFoundException;
+    public List<Car> retrieveAvailableCarsForReservation(Date startDateTime, Date endDateTime, List<String> requirements, Outlet pickUpOutlet, Outlet returnOutlet) throws CarNotFoundException;
 }

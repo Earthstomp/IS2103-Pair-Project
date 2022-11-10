@@ -33,7 +33,5 @@ public interface CarSessionBeanRemote {
     public void merge(Car car);
 
     public void deleteCar(Long carId) throws DeleteCarException;
-
-    public List<Car> retrieveAvailableCarsOnDate(Date timeStamp) throws CarNotFoundException;
     
 }

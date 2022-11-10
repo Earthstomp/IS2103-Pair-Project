@@ -5,6 +5,7 @@
  */
 package ejb.session.stateless;
 
+import entity.Car;
 import entity.Category;
 import entity.Model;
 import entity.RentalRateRecord;
@@ -47,6 +48,13 @@ public class CategorySessionBean implements CategorySessionBeanRemote, CategoryS
         }
     }
 
+    public List<Car> retrieveAllCarsFromCategory(String categoryName) {
+        
+        return em.createQuery("SELECT c FROM Car c JOIN c.model m JOIN m.category cat WHERE cat.categoryName = :categoryName")
+                .setParameter("categoryName", categoryName)
+                .getResultList();
+    }
+
     @Override
     public List<Category> retrieveAllCategories() {
         return em.createQuery("SELECT c FROM Category c").getResultList();
@@ -78,7 +86,7 @@ public class CategorySessionBean implements CategorySessionBeanRemote, CategoryS
         em.persist(model);
 
         Category category = em.find(Category.class,
-                 categoryId);
+                categoryId);
         category.getModels().add(model);
         model.setCategory(category);
 
@@ -107,7 +115,7 @@ public class CategorySessionBean implements CategorySessionBeanRemote, CategoryS
     public Long createRentalRateRecord(RentalRateRecord rateRecord, Long categoryId) {
         em.persist(rateRecord);
         Category category = em.find(Category.class,
-                 categoryId);
+                categoryId);
         category.getRateRecords().add(rateRecord);
         rateRecord.setCategory(category);
         em.flush();

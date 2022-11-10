@@ -5,10 +5,12 @@
  */
 package ejb.session.stateless;
 
+import entity.Car;
 import entity.Reservation;
 import java.util.Date;
 import java.util.List;
 import javax.ejb.Local;
+import util.exception.CarNotFoundException;
 import util.exception.ReservationNotFoundException;
 
 /**
@@ -24,8 +26,8 @@ public interface ReservationSessionBeanLocal {
 
     public List<Reservation> retrieveAllReservations();
 
-    public Long createNewReservation(Reservation reservation);
-
     public List<Reservation> retrieveReservationByDate(Date startDateTime) throws ReservationNotFoundException;
+    
+    public void assignCarToReservation(Reservation reservation, Car car) throws ReservationNotFoundException, CarNotFoundException;
     
 }
