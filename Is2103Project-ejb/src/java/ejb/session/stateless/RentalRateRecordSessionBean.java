@@ -5,6 +5,7 @@
  */
 package ejb.session.stateless;
 
+import entity.Category;
 import entity.RentalRateRecord;
 import java.util.List;
 import javax.ejb.Stateless;
@@ -33,16 +34,18 @@ public class RentalRateRecordSessionBean implements RentalRateRecordSessionBeanR
 
     @Override
     public List<RentalRateRecord> retrieveAllRateRecords() {
-        Query query = em.createQuery("SELECT r FROM RentalRateRecord r ORDER BY r.carCategory, r.validityPeriod");
-        return query.getResultList();
+        List<RentalRateRecord> rentalRateRecords = em.createQuery("SELECT r FROM RentalRateRecord r"
+                + " ORDER BY r.category, r.validityPeriod")
+                .getResultList();
+        for (RentalRateRecord r : rentalRateRecords) {
+            r.getCategory();
+        }
+        return rentalRateRecords;
     }
 
-    
     @Override
-    public void updateRentalRateRecord(RentalRateRecord rentalRateRecord) throws RentalRateRecordNotFoundException
-    {
-        if(rentalRateRecord != null && rentalRateRecord.getId()!= null)
-        {
+    public void updateRentalRateRecord(RentalRateRecord rentalRateRecord) throws RentalRateRecordNotFoundException {
+        if (rentalRateRecord != null && rentalRateRecord.getId() != null) {
             try {
                 RentalRateRecord updateRentalRateRecord = retrieveRentalRateRecordById(rentalRateRecord.getId());
                 updateRentalRateRecord.setRecordName(rentalRateRecord.getRecordName());
@@ -57,16 +60,31 @@ public class RentalRateRecordSessionBean implements RentalRateRecordSessionBeanR
             throw new RentalRateRecordNotFoundException("Rental Rate Record ID not provided for record to be updated");
         }
     }
-    
+
     @Override
-    public RentalRateRecord retrieveRentalRateRecordById(Long id) throws RentalRateRecordNotFoundException{
+    public RentalRateRecord retrieveRentalRateRecordById(Long id) throws RentalRateRecordNotFoundException {
 
         RentalRateRecord rentalRateRecord = em.find(RentalRateRecord.class, id);
-        
+
         if (rentalRateRecord != null) {
             return rentalRateRecord;
         } else {
             throw new RentalRateRecordNotFoundException("Unable to locate record with id: " + id);
+        }
+    }
+
+    // CURRENTLY ONLY BY NAME, NEED BY CATEGORY FOR VIEW RENTAL RATE RECORD?
+    @Override
+    public RentalRateRecord retrieveRentalRateRecordByName(String name) throws RentalRateRecordNotFoundException {
+        try {
+            RentalRateRecord rentalRateRecord = (RentalRateRecord) em.createQuery("SELECT r FROM RentalRateRecord r WHERE r.recordName = :InName")
+                    .setParameter("InName", name)            
+                    .getSingleResult();
+
+            rentalRateRecord.getValidityPeriod().size();
+            return rentalRateRecord;
+        } catch (NullPointerException ex) {
+            throw new RentalRateRecordNotFoundException("Unable to locate record.");
         }
     }
 
@@ -93,7 +111,10 @@ public class RentalRateRecordSessionBean implements RentalRateRecordSessionBeanR
         }
 
     }
-
+    
+    public void merge(RentalRateRecord rentalRateRecord) {
+        em.merge(rentalRateRecord);
+    }
 }
 
 // Add business logic below. (Right-click in editor and choose

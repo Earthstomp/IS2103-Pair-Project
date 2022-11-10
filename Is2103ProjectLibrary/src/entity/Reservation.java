@@ -45,7 +45,7 @@ public class Reservation implements Serializable {
     @ManyToOne
     private Outlet returnLocation;
     @Column(nullable = false, length = 32)
-    private String paymentStatus;
+    private boolean paymentStatus;
     @ManyToOne
     @JoinColumn(nullable = false)
     private Customer customer;
@@ -53,7 +53,7 @@ public class Reservation implements Serializable {
     public Reservation() {
     }
 
-    public Reservation(Date startDateTime, Date endDateTime, Outlet pickUpLocation, Outlet returnLocation, String paymentStatus, Customer customer) {
+    public Reservation(Date startDateTime, Date endDateTime, Outlet pickUpLocation, Outlet returnLocation, boolean paymentStatus, Customer customer) {
         this.startDateTime = startDateTime;
         this.endDateTime = endDateTime;
         this.pickUpLocation = pickUpLocation;
@@ -154,14 +154,14 @@ public class Reservation implements Serializable {
     /**
      * @return the paymentStatus
      */
-    public String getPaymentStatus() {
+    public boolean getPaymentStatus() {
         return paymentStatus;
     }
 
     /**
      * @param paymentStatus the paymentStatus to set
      */
-    public void setPaymentStatus(String paymentStatus) {
+    public void setPaymentStatus(boolean paymentStatus) {
         this.paymentStatus = paymentStatus;
     }
 

@@ -115,7 +115,7 @@ public class DataInitializationSessionBean {
         }
 
         try {
-            // admin role is not part of test data. remove before submitting
+
             employeeSessionBeanLocal.createNewEmployeeWithExistingOutlet(new Employee(EmployeeRoleEnum.ADMINISTRATOR, "admin", "pw"), outletSessionBeanLocal.retrieveOutletByLocation("location").getOutletId());
 
             employeeSessionBeanLocal.createNewEmployeeWithExistingOutlet(new Employee(EmployeeRoleEnum.SALES_MANAGER, "Employee A1", "pw"), outletSessionBeanLocal.retrieveOutletByLocation("Outlet A").getOutletId());

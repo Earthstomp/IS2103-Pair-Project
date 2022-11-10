@@ -35,10 +35,10 @@ public class EjbTimerSessionBean implements EjbTimerSessionBeanLocal, EjbTimerSe
     @EJB
     private OutletSessionBeanLocal outletSessionBeanLocal;
 
-    @Schedule(second = "*/8", info = "currentDayCarAllocationTimer")
-    // For testing purpose, we are allowing the timer to trigger every 8 seconds instead of every day at 8am
-    // To trigger the timer once every day at 8am instead, use the following the @Schedule annotation
-    // @Schedule(dayOfWeek="*", hour = "8", info = "currentDayCarAllocationTransitDriverDispatchRecordGeneratorTimer")    
+    @Schedule(minute = "*/2", info = "currentDayCarAllocationTimer")
+    // For testing purpose, we are allowing the timer to trigger every 2 minutes instead of every day at 2am
+    // To trigger the timer once every day at 2am instead, use the following the @Schedule annotation
+    // @Schedule(dayOfWeek="*", hour = "2", info = "currentDayCarAllocationTransitDriverDispatchRecordGeneratorTimer")    
 
     public void currentDayCarAllocationTimer() {
         Date timeStamp = new Date(); // new SimpleDateFormat("yyyy.MM.dd.HH.mm.ss").format(

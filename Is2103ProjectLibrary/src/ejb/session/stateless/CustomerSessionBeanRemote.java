@@ -8,6 +8,9 @@ package ejb.session.stateless;
 import entity.Customer;
 import entity.Reservation;
 import javax.ejb.Remote;
+import util.exception.CustomerExistsException;
+import util.exception.CustomerNotFoundException;
+import util.exception.InvalidLoginCredentialsException;
 
 /**
  *
@@ -18,8 +21,14 @@ public interface CustomerSessionBeanRemote {
 
     public Long createNewReservation(Reservation reservation, Long customerId);
 
-    public Long createNewCustomer(Customer customer);
+    public Long createNewCustomer(Customer customer) throws CustomerExistsException;
 
-    public Customer retrieveCustomerByMobileNumber(Integer mobileNumber);
-    
+    public Customer retrieveCustomerByMobileNumber(String mobileNumber) throws CustomerNotFoundException;
+
+    public Customer retrieveCustomerByPassportNumber(String passportNumber) throws CustomerNotFoundException;
+
+    public Customer retrieveCustomerByUsername(String username) throws CustomerNotFoundException;
+
+    //public Customer customerLogin(String username, String password) throws InvalidLoginCredentialsException;
+
 }
