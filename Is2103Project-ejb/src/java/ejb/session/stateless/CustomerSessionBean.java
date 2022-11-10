@@ -40,7 +40,7 @@ public class CustomerSessionBean implements CustomerSessionBeanRemote, CustomerS
         return reservation.getId();
     }
 
-    public Customer retrieveCustomerByMobileNumber(Integer mobileNumber) {
+    public Customer retrieveCustomerByMobileNumber(String mobileNumber) {
         return (Customer) em.createQuery("SELECT c FROM Customer c WHERE c.mobileNumber = :mobileNumber")
                 .setParameter("mobileNumber", mobileNumber)
                 .getSingleResult();

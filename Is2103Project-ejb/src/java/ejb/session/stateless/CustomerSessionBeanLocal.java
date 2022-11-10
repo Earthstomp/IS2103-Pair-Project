@@ -15,5 +15,8 @@ import javax.ejb.Local;
  */
 @Local
 public interface CustomerSessionBeanLocal {
-    
+        public Long createNewReservation(Reservation reservation, Long customerId);
+        public Long createNewCustomer(Customer customer);
+        public Customer retrieveCustomerByMobileNumber(String mobileNumber);
+
 }

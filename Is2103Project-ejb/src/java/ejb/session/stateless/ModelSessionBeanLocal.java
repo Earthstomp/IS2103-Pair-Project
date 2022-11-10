@@ -28,5 +28,7 @@ public interface ModelSessionBeanLocal {
     public void merge(Model model);
 
     public void deleteModel(Long modelId) throws DeleteModelException;
+
+    public List<Car> retrieveAllCarsFromModel(String make, String model);
     
 }

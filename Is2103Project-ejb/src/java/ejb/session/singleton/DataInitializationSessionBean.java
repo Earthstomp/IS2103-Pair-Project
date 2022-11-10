@@ -1,17 +1,22 @@
 package ejb.session.singleton;
 
+import ejb.session.stateless.CarSessionBeanLocal;
 import ejb.session.stateless.CategorySessionBeanLocal;
+import ejb.session.stateless.CustomerSessionBeanLocal;
 import ejb.session.stateless.EmployeeSessionBeanLocal;
 import ejb.session.stateless.ModelSessionBeanLocal;
 import ejb.session.stateless.OutletSessionBeanLocal;
 import ejb.session.stateless.PartnerSessionBeanLocal;
+import ejb.session.stateless.ReservationSessionBeanLocal;
 import entity.Car;
 import entity.Category;
+import entity.Customer;
 import entity.Employee;
 import entity.Model;
 import entity.Outlet;
 import entity.Partner;
 import entity.RentalRateRecord;
+import entity.Reservation;
 import java.util.Date;
 import javax.annotation.PostConstruct;
 import javax.ejb.EJB;
@@ -29,6 +34,11 @@ import util.exception.UnknownPersistenceException;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.GregorianCalendar;
+import util.enumeration.ReservationPaymentEnum;
+import util.exception.CarNotFoundException;
+import util.exception.ReservationNotFoundException;
 
 /**
  *
@@ -53,6 +63,15 @@ public class DataInitializationSessionBean {
 
     @EJB
     private ModelSessionBeanLocal modelSessionBeanLocal;
+
+    @EJB
+    private ReservationSessionBeanLocal reservationSessionBeanLocal;
+
+    @EJB
+    private CustomerSessionBeanLocal customerSessionBeanLocal;
+    
+    @EJB 
+    private CarSessionBeanLocal carSessionBeanLocal;
 
     public DataInitializationSessionBean() {
 
@@ -90,6 +109,10 @@ public class DataInitializationSessionBean {
 
     private void initializeData() {
 
+        Long outletAId = 0L;
+        Long outletBId = 0L;
+        Long outletCId = 0L;
+
         Long standardSedanId = 0L;
         Long familySedanId = 0L;
         Long luxurySedanId = 0L;
@@ -102,20 +125,20 @@ public class DataInitializationSessionBean {
         Long bmw5Series = 0L;
         Long audiA6 = 0L;
 
-        // loading Outlet        
         try {
-            // for testing purposes
+            // PERSONAL TEST DATA
             outletSessionBeanLocal.createNewOutlet(new Outlet("location", null, null));
 
-            outletSessionBeanLocal.createNewOutlet(new Outlet("Outlet A", null, null));
-            outletSessionBeanLocal.createNewOutlet(new Outlet("Outlet B", null, null));
-            outletSessionBeanLocal.createNewOutlet(new Outlet("Outlet C", new Date(), new Date())); //  supposed to be String 10:00 and 22:00
+            outletAId = outletSessionBeanLocal.createNewOutlet(new Outlet("Outlet A", null, null));
+            outletBId = outletSessionBeanLocal.createNewOutlet(new Outlet("Outlet B", null, null));
+            outletCId = outletSessionBeanLocal.createNewOutlet(new Outlet("Outlet C", new Date(), new Date())); //  supposed to be String 10:00 and 22:00
+
         } catch (OutletExistsException | UnknownPersistenceException ex) {
             ex.printStackTrace();
         }
 
         try {
-            // admin role is not part of test data. remove before submitting
+            // PERSONAL TEST DATA
             employeeSessionBeanLocal.createNewEmployeeWithExistingOutlet(new Employee(EmployeeRoleEnum.ADMINISTRATOR, "admin", "pw"), outletSessionBeanLocal.retrieveOutletByLocation("location").getOutletId());
 
             employeeSessionBeanLocal.createNewEmployeeWithExistingOutlet(new Employee(EmployeeRoleEnum.SALES_MANAGER, "Employee A1", "pw"), outletSessionBeanLocal.retrieveOutletByLocation("Outlet A").getOutletId());
@@ -156,7 +179,7 @@ public class DataInitializationSessionBean {
         modelSessionBeanLocal.createNewCarWithExistingModel(new Car(CarStatusEnum.AVAILABLE, "Outlet A", "SS00A1TC"), toyotaCorollaId);
         modelSessionBeanLocal.createNewCarWithExistingModel(new Car(CarStatusEnum.AVAILABLE, "Outlet A", "SS00A2TC"), toyotaCorollaId);
         modelSessionBeanLocal.createNewCarWithExistingModel(new Car(CarStatusEnum.AVAILABLE, "Outlet A", "SS00A3TC"), toyotaCorollaId);
-        modelSessionBeanLocal.createNewCarWithExistingModel(new Car(CarStatusEnum.AVAILABLE, "Outlet B", "SS00B1HC"), hondaCividId);
+        Long carId = modelSessionBeanLocal.createNewCarWithExistingModel(new Car(CarStatusEnum.AVAILABLE, "Outlet B", "SS00B1HC"), hondaCividId);
         modelSessionBeanLocal.createNewCarWithExistingModel(new Car(CarStatusEnum.AVAILABLE, "Outlet B", "SS00B2HC"), hondaCividId);
         modelSessionBeanLocal.createNewCarWithExistingModel(new Car(CarStatusEnum.AVAILABLE, "Outlet B", "SS00B3HC"), hondaCividId);
         modelSessionBeanLocal.createNewCarWithExistingModel(new Car(CarStatusEnum.AVAILABLE, "Outlet C", "SS00C1NS"), nissanSunnyId);
@@ -223,6 +246,50 @@ public class DataInitializationSessionBean {
         categorySessionBeanLocal.createRentalRateRecord(new RentalRateRecord("Default", RentalRateEnum.DEFAULT, 400.0, null, null), luxurySedanId);
 
         partnerSessionBeanLocal.createPartner(new Partner("Holiday.com"));
+
+        // PERSONAL TEST DATA
+        GregorianCalendar calendar = new GregorianCalendar();
+        calendar.setTime(new Date());
+
+        Date date1start = calendar.getTime(); // current time
+        calendar.add(GregorianCalendar.HOUR_OF_DAY, 1); // set return 1 hour later
+        Date date1end = calendar.getTime();
+
+        Calendar c = Calendar.getInstance();
+        c.setTime(new Date());
+        c.add(Calendar.DATE, -1); // set date to one day ago
+        Date date2start = c.getTime();
+        c.add(Calendar.HOUR, 2); // reservation of 2 hours
+        Date date2end = c.getTime();
+
+        // PERSONAL TEST DATA
+        Outlet outletA = new Outlet();
+        Outlet outletB = new Outlet();
+        Outlet outletC = new Outlet();
+        Long customerId = customerSessionBeanLocal.createNewCustomer(new Customer("91234567", "test@test.com"));
+        Customer testCustomer = customerSessionBeanLocal.retrieveCustomerByMobileNumber("91234567");
+
+        // PERSONAL TEST DATA
+        try {
+            outletA = outletSessionBeanLocal.retrieveOutletById(outletAId);
+            outletB = outletSessionBeanLocal.retrieveOutletById(outletBId);
+            outletC = outletSessionBeanLocal.retrieveOutletById(outletCId);
+        } catch (OutletNotFoundException ex) {
+            System.out.println(ex.getMessage());
+        }
+        // PERSONAL TEST DATA
+        Long reservationId = customerSessionBeanLocal.createNewReservation(new Reservation(date2start, date1end, outletA, outletB, ReservationPaymentEnum.PAID, testCustomer, "Toyota", "Corolla"), customerId);
+        customerSessionBeanLocal.createNewReservation(new Reservation(date1start, date1end, outletB, outletA, ReservationPaymentEnum.ATPICKUP, testCustomer, "Honda", "Civic"), customerId);
+        customerSessionBeanLocal.createNewReservation(new Reservation(date2start, date2end, outletB, outletC, ReservationPaymentEnum.ATPICKUP, testCustomer, "Honda", "Civic"), customerId);
+
+        try {
+            reservationSessionBeanLocal.assignCarToReservation(reservationSessionBeanLocal.retrieveReservationById(reservationId), carSessionBeanLocal.retrieveCarById(carId));
+            System.out.println("Reservation assigned"); // not printing. not sure why
+        } catch (CarNotFoundException ex) {
+            System.out.println(ex.getMessage());
+        } catch (ReservationNotFoundException ex) {
+            System.out.println(ex.getMessage());
+        }
 
     }
 //        } catch (PartnerExistsException ex) { //UnknownPersistenceException ex

@@ -6,6 +6,7 @@
 package entity;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import javax.persistence.Column;
@@ -14,11 +15,11 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
-import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToOne;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
+import util.enumeration.ReservationPaymentEnum;
 
 /**
  *
@@ -27,6 +28,9 @@ import javax.persistence.TemporalType;
 @Entity
 public class Reservation implements Serializable {
 
+    /**
+     * @return the requirements
+     */
     private static final long serialVersionUID = 1L;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -35,8 +39,7 @@ public class Reservation implements Serializable {
     private Date startDateTime;
     @Temporal(TemporalType.TIMESTAMP)
     private Date endDateTime;
-    @OneToOne
-    @JoinColumn(nullable = false)
+    @ManyToOne
     private Car car;
     @ManyToOne
     @JoinColumn(nullable = false)
@@ -45,21 +48,40 @@ public class Reservation implements Serializable {
     @ManyToOne
     private Outlet returnLocation;
     @Column(nullable = false, length = 32)
-    private String paymentStatus;
+    private ReservationPaymentEnum paymentStatus;
     @ManyToOne
     @JoinColumn(nullable = false)
     private Customer customer;
+    private List<String> requirements;
 
     public Reservation() {
     }
 
-    public Reservation(Date startDateTime, Date endDateTime, Outlet pickUpLocation, Outlet returnLocation, String paymentStatus, Customer customer) {
+    // constructor if make and model is specified
+    public Reservation(Date startDateTime, Date endDateTime, Outlet pickUpLocation, Outlet returnLocation, ReservationPaymentEnum paymentStatus, Customer customer, String make, String model) {
         this.startDateTime = startDateTime;
         this.endDateTime = endDateTime;
         this.pickUpLocation = pickUpLocation;
         this.returnLocation = returnLocation;
         this.paymentStatus = paymentStatus;
         this.customer = customer;
+        ArrayList<String> req = new ArrayList<String>();
+        req.add(make);
+        req.add(model);
+        this.requirements = req;
+    }
+    
+    // constructor if category is specified
+        public Reservation(Date startDateTime, Date endDateTime, Outlet pickUpLocation, Outlet returnLocation, ReservationPaymentEnum paymentStatus, Customer customer, String category) {
+        this.startDateTime = startDateTime;
+        this.endDateTime = endDateTime;
+        this.pickUpLocation = pickUpLocation;
+        this.returnLocation = returnLocation;
+        this.paymentStatus = paymentStatus;
+        this.customer = customer;
+        ArrayList<String> req = new ArrayList<String>();
+        req.add(category);
+        this.requirements = req;
     }
 
     public Long getId() {
@@ -154,25 +176,12 @@ public class Reservation implements Serializable {
     /**
      * @return the paymentStatus
      */
-    public String getPaymentStatus() {
-        return paymentStatus;
-    }
-
-    /**
-     * @param paymentStatus the paymentStatus to set
-     */
-    public void setPaymentStatus(String paymentStatus) {
-        this.paymentStatus = paymentStatus;
-    }
-
     /**
      * @return the rentalRates
      */
-
     /**
      * @param rentalRates the rentalRates to set
      */
-
     /**
      * @return the customer
      */
@@ -199,6 +208,31 @@ public class Reservation implements Serializable {
      */
     public void setCar(Car car) {
         this.car = car;
+    }
+
+    public List<String> getRequirements() {
+        return requirements;
+    }
+
+    /**
+     * @param requirements the requirements to set
+     */
+    public void setRequirements(List<String> requirements) {
+        this.requirements = requirements;
+    }
+
+    /**
+     * @return the reservationEnum
+     */
+    public ReservationPaymentEnum getReservationPaymentEnum() {
+        return paymentStatus;
+    }
+
+    /**
+     * @param reservationEnum the reservationEnum to set
+     */
+    public void setReservationPaymentEnum(ReservationPaymentEnum paymentStatus) {
+        this.paymentStatus = paymentStatus;
     }
 
 }

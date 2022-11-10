@@ -24,7 +24,5 @@ public interface ReservationSessionBeanRemote {
 
     public List<Reservation> retrieveAllReservations();
 
-    public Long createNewReservation(Reservation reservation);
-
     public List<Reservation> retrieveReservationByDate(Date startDateTime) throws ReservationNotFoundException;
 }

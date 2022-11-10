@@ -39,11 +39,9 @@ public class Car implements Serializable {
     private String plateNumber;
     private String color;
     @OneToMany (mappedBy = "car")
-    private List<Reservation> reservation;
-    private boolean enabled;
+    private List<Reservation> reservations;
     
     public Car() {
-        this.enabled = true;
         this.status = CarStatusEnum.AVAILABLE;
     }
 
@@ -174,30 +172,20 @@ public class Car implements Serializable {
     }
 
     /**
-     * @return the reservation
+     * @return the reservations
      */
-    public List<Reservation> getReservation() {
-        return reservation;
+    public List<Reservation> getReservations() {
+        return reservations;
     }
 
     /**
-     * @param reservation the reservation to set
+     * @param reservations the reservations to set
      */
-    public void setReservation(List<Reservation> reservation) {
-        this.reservation = reservation;
+    public void setReservations(List<Reservation> reservations) {
+        this.reservations = reservations;
     }
 
     /**
      * @return the enabled
      */
-    public boolean isEnabled() {
-        return enabled;
-    }
-
-    /**
-     * @param enabled the enabled to set
-     */
-    public void setEnabled(boolean enabled) {
-        this.enabled = enabled;
-    }
 }

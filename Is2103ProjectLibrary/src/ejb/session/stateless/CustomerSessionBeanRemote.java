@@ -20,6 +20,6 @@ public interface CustomerSessionBeanRemote {
 
     public Long createNewCustomer(Customer customer);
 
-    public Customer retrieveCustomerByMobileNumber(Integer mobileNumber);
+    public Customer retrieveCustomerByMobileNumber(String mobileNumber);
     
 }
