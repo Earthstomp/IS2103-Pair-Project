@@ -12,8 +12,8 @@ import ejb.session.stateless.EmployeeSessionBeanRemote;
 import ejb.session.stateless.ModelSessionBeanRemote;
 import ejb.session.stateless.OutletSessionBeanRemote;
 import ejb.session.stateless.RentalRateRecordSessionBeanRemote;
+import ejb.session.stateless.ReservationSessionBeanRemote;
 import ejb.session.stateless.TransitDriverDispatchRecordSessionBeanRemote;
-import entity.Employee;
 import javax.ejb.EJB;
 
 /**
@@ -38,7 +38,8 @@ public class Main {
     private static EmployeeSessionBeanRemote employeeSessionBeanRemote;
     @EJB
     private static RentalRateRecordSessionBeanRemote rentalRateRecordSessionBeanRemote;
-    
+    @EJB    
+    private static ReservationSessionBeanRemote reservationSessionBeanRemote;
 
 
     public static void main(String[] args) {
@@ -46,7 +47,8 @@ public class Main {
 
         MainApp mainApp = new MainApp(modelSessionBeanRemote, carSessionBeanRemote,
                 transitDriverDispatchRecordSessionBeanRemote, outletSessionBeanRemote,
-                employeeSessionBeanRemote, categorySessionBeanRemote, rentalRateRecordSessionBeanRemote);
+                employeeSessionBeanRemote, categorySessionBeanRemote, rentalRateRecordSessionBeanRemote,
+                customerSessionBeanRemote, reservationSessionBeanRemote);
         mainApp.runApp();
     }
 

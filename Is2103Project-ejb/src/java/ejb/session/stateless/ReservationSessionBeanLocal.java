@@ -22,12 +22,14 @@ public interface ReservationSessionBeanLocal {
 
     public void removeReservation(Long reservationId);
 
-    public Reservation retrieveReservationById(Long reservationId) throws ReservationNotFoundException ;
+    public Reservation retrieveReservationById(Long reservationId) throws ReservationNotFoundException;
 
     public List<Reservation> retrieveAllReservations();
 
     public List<Reservation> retrieveReservationByDate(Date startDateTime) throws ReservationNotFoundException;
-    
+
     public void assignCarToReservation(Reservation reservation, Car car) throws ReservationNotFoundException, CarNotFoundException;
-    
+
+    public void merge(Reservation reservation);
+
 }

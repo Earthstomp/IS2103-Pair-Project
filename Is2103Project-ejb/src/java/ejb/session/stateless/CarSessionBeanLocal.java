@@ -7,12 +7,14 @@ package ejb.session.stateless;
 
 import entity.Car;
 import entity.Outlet;
+import entity.Reservation;
 import java.util.Date;
 import java.util.List;
 import javax.ejb.Local;
 import util.enumeration.CarStatusEnum;
 import util.exception.CarNotFoundException;
 import util.exception.DeleteCarException;
+import util.exception.ReservationNotFoundException;
 
 /**
  *
@@ -20,6 +22,7 @@ import util.exception.DeleteCarException;
  */
 @Local
 public interface CarSessionBeanLocal {
+
     public List<Car> retrieveAllCars();
 
     public Car retrieveCarById(Long carId) throws CarNotFoundException;
@@ -34,5 +37,5 @@ public interface CarSessionBeanLocal {
 
     public void deleteCar(Long carId) throws DeleteCarException;
 
-    public List<Car> retrieveAvailableCarsForReservation(Date startDateTime, Date endDateTime, List<String> requirements, Outlet pickUpOutlet, Outlet returnOutlet) throws CarNotFoundException;
+    public void assignCarToReservation(Reservation chosenReservation) throws CarNotFoundException, ReservationNotFoundException;
 }

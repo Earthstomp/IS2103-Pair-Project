@@ -8,6 +8,7 @@ package ejb.session.stateless;
 import entity.Employee;
 import entity.Outlet;
 import entity.TransitDriverDispatchRecord;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
@@ -31,6 +32,8 @@ public class TransitDriverDispatchRecordSessionBean implements TransitDriverDisp
     @Override
     public Long createNewTransitDriverDispatchRecord(TransitDriverDispatchRecord transitDriverDispatchRecord) {
         em.persist(transitDriverDispatchRecord);
+        
+        
         em.flush();
 
         return transitDriverDispatchRecord.getId();
@@ -48,10 +51,11 @@ public class TransitDriverDispatchRecordSessionBean implements TransitDriverDisp
         TransitDriverDispatchRecord transitDriverDispatchRecord = em.find(TransitDriverDispatchRecord.class, id);
 
         if (transitDriverDispatchRecord != null) {
-            if (transitDriverDispatchRecord.getReturnLocation() == outlet) {
+            System.out.println("Dispatch return location is " + transitDriverDispatchRecord.getReturnLocation().getName());
+            if (transitDriverDispatchRecord.getReturnLocation().getName().equals(outlet.getName())) {
                 return transitDriverDispatchRecord;
             } else {
-                throw new TransitDriverDispatchRecordNotFromOutletException("Transit Record with id " + id + " is not from Outlet " + outlet);
+                throw new TransitDriverDispatchRecordNotFromOutletException("Transit Record with id " + id + " is not from " + outlet.getName());
             }
         } else {
             throw new TransitDriverDispatchRecordNotFoundException("Unable to locate record with id: " + id);
@@ -67,19 +71,30 @@ public class TransitDriverDispatchRecordSessionBean implements TransitDriverDisp
 
     public List<TransitDriverDispatchRecord> retrieveTransitDriverDispatchRecordForCurrentDay(Date currentDay, Outlet outlet) {
         List<TransitDriverDispatchRecord> list = em.createQuery(
-                "SELECT t FROM TransitDriverDispatchRecord t JOIN t.employee e JOIN e.outlet o WHERE o.name = :outletName")
+                "SELECT t FROM TransitDriverDispatchRecord t JOIN t.returnLocation o WHERE o.name = :outletName")
                 .setParameter("outletName", outlet.getName())
                 .getResultList();
         
-        GregorianCalendar calendar = new GregorianCalendar();
-        calendar.setTime(currentDay);
-        calendar.add(GregorianCalendar.HOUR_OF_DAY, 22); //  setting end of day as 2200hours
-        Date endOfCurrentDay = calendar.getTime();
+        Calendar c = Calendar.getInstance();
+        // setting time to 2359
+        c.setTime(currentDay);
+        c.set(Calendar.HOUR_OF_DAY, 23);
+        c.set(Calendar.MINUTE, 59);
+
+        currentDay = c.getTime(); //  current day converted to 2359. need to change to 0159
+        c.add(Calendar.DATE, -1);
+        c.add(Calendar.HOUR, -2);
+        Date dayBeforeDateTime = c.getTime(); // previous day converted to 2159
         
-        for (TransitDriverDispatchRecord record : list) {
-            if (record.getStartDateTime().getTime() < currentDay.getTime() && record.getStartDateTime().getTime() > endOfCurrentDay.getTime()) {
+        for (int i = 0; i < list.size(); i++) {
+            TransitDriverDispatchRecord record = list.get(i);
+            if (!(record.getStartDateTime().after(dayBeforeDateTime) && record.getStartDateTime().before(dayBeforeDateTime))) {
                 list.remove(record);
             }
+        }
+        
+        for (TransitDriverDispatchRecord record : list) {
+            
         }
 
         return list;
@@ -88,9 +103,8 @@ public class TransitDriverDispatchRecordSessionBean implements TransitDriverDisp
     public void assignTransitDriver(Long id, Employee driver) {
         TransitDriverDispatchRecord record = em.find(TransitDriverDispatchRecord.class, id);
 
-        Employee managedDriver = (Employee) em.createQuery("SELECT e FROM Employee e"
-                + "WHERE e = :driver")
-                .setParameter("driver", driver)
+        Employee managedDriver = (Employee) em.createQuery("SELECT e FROM Employee e WHERE e.username = :driverUserName")
+                .setParameter("driverUserName", driver.getUsername())
                 .getSingleResult();
 
         for (TransitDriverDispatchRecord t : managedDriver.getDispatches()) {
@@ -107,6 +121,8 @@ public class TransitDriverDispatchRecordSessionBean implements TransitDriverDisp
         record.setStatus("Completed");
         record.getEmployee().setOutlet(record.getPickupLocation()); // set driver new location to that of transit destination
     }
+    
+    
     // Add business logic below. (Right-click in editor and choose
     // "Insert Code > Add Business Method")
 }

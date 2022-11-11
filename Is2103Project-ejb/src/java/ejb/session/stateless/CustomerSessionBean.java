@@ -32,7 +32,7 @@ public class CustomerSessionBean implements CustomerSessionBeanRemote, CustomerS
         try {
             //retrieveCustomerByUsername(customer.getUsername());
             retrieveCustomerByMobileNumber(customer.getMobileNumber());
-            retrieveCustomerByPassportNumber(customer.getPassportNumber());            
+            retrieveCustomerByPassportNumber(customer.getPassportNumber());
             throw new CustomerExistsException("Customer already exists.");
         } catch (CustomerNotFoundException ex) {
             em.persist(customer);
@@ -66,13 +66,17 @@ public class CustomerSessionBean implements CustomerSessionBeanRemote, CustomerS
 
     @Override
     public Customer retrieveCustomerByMobileNumber(String mobileNumber) throws CustomerNotFoundException {
+
+        Customer retrievedCustomer;
         try {
-            return (Customer) em.createQuery("SELECT c FROM Customer c WHERE c.mobileNumber = :mobileNumber")
-                    .setParameter("mobileNumber", mobileNumber)
+            retrievedCustomer = (Customer) em.createQuery("SELECT c FROM Customer c WHERE c.mobileNumber = :InMobileNumber")
+                    .setParameter("InMobileNumber", mobileNumber)
                     .getSingleResult();
         } catch (NoResultException | NonUniqueResultException ex) {
             throw new CustomerNotFoundException("Customer does not exist!");
         }
+        retrievedCustomer.getReservations().size();
+        return retrievedCustomer;
     }
 
     @Override
@@ -100,5 +104,4 @@ public class CustomerSessionBean implements CustomerSessionBeanRemote, CustomerS
             throw new InvalidLoginCredentialsException("Username does not exist or invalid password!");
         }
     }*/
-
 }

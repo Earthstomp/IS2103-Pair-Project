@@ -72,7 +72,7 @@ public class ReservationSessionBean implements ReservationSessionBeanRemote, Res
         List<Reservation> reservationsOnDate = new ArrayList<>();
         
         for (Reservation r : allReservations) {
-            if (r.getStartDateTime().before(currentDateTime) && r.getStartDateTime().after(dayBeforeDateTime)) {
+            if (r.getStartDateTime().before(currentDateTime) && r.getStartDateTime().after(dayBeforeDateTime) && r.getCar() == null) {
                 reservationsOnDate.add(r);
             }
         }
@@ -168,5 +168,10 @@ public class ReservationSessionBean implements ReservationSessionBeanRemote, Res
         }
 
         em.remove(reservation);
+    }
+    
+    public void merge(Reservation reservation) {
+        em.merge(reservation);
+        em.flush();
     }
 }

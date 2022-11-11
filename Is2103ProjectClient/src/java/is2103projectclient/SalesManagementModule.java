@@ -7,6 +7,7 @@ import ejb.session.stateless.EmployeeSessionBeanRemote;
 import ejb.session.stateless.ModelSessionBeanRemote;
 import ejb.session.stateless.OutletSessionBeanRemote;
 import ejb.session.stateless.RentalRateRecordSessionBeanRemote;
+import ejb.session.stateless.ReservationSessionBeanRemote;
 import ejb.session.stateless.TransitDriverDispatchRecordSessionBeanRemote;
 import entity.Car;
 import entity.Model;
@@ -57,6 +58,7 @@ public class SalesManagementModule {
     private OutletSessionBeanRemote outletSessionBeanRemote;
     private EmployeeSessionBeanRemote employeeSessionBeanRemote;
     private RentalRateRecordSessionBeanRemote rentalRateRecordSessionBeanRemote;
+    private ReservationSessionBeanRemote reservationSessionBeanRemote;
 
     private Employee employee;
 
@@ -66,7 +68,7 @@ public class SalesManagementModule {
     public SalesManagementModule(ModelSessionBeanRemote modelSessionBeanRemote, CarSessionBeanRemote carSessionBeanRemote,
             TransitDriverDispatchRecordSessionBeanRemote transitDriverDispatchRecordSessionBeanRemote,
             OutletSessionBeanRemote outletSessionBeanRemote, EmployeeSessionBeanRemote employeeSessionBeanRemote,
-            Employee employee, CategorySessionBeanRemote categorySessionBeanRemote, RentalRateRecordSessionBeanRemote rentalRateRecordSessionBeanRemote) {
+            Employee employee, CategorySessionBeanRemote categorySessionBeanRemote, RentalRateRecordSessionBeanRemote rentalRateRecordSessionBeanRemote, CustomerSessionBeanRemote customerSessionBeanRemote, ReservationSessionBeanRemote reservationSessionBeanRemote) {
         this();
         this.modelSessionBeanRemote = modelSessionBeanRemote;
         this.carSessionBeanRemote = carSessionBeanRemote;
@@ -76,6 +78,8 @@ public class SalesManagementModule {
         this.employee = employee;
         this.categorySessionBeanRemote = categorySessionBeanRemote;
         this.rentalRateRecordSessionBeanRemote = rentalRateRecordSessionBeanRemote;
+        this.customerSessionBeanRemote = customerSessionBeanRemote;
+        this.reservationSessionBeanRemote = reservationSessionBeanRemote;
     }
 
     public void menuSalesManagementModule() throws InvalidEmployeeRoleException {
@@ -431,9 +435,9 @@ public class SalesManagementModule {
             } else if (status == 2) {
                 car.setStatus(CarStatusEnum.DISABLED);
                 statusChosen = true;
-            } 
+            }
         } while (!statusChosen);
-                
+
         // unsure if it is adding managed instance or not
         carSessionBeanRemote.merge(car);
         System.out.println("merged car ");
@@ -496,10 +500,11 @@ public class SalesManagementModule {
             }
             List<TransitDriverDispatchRecord> transits = transitDriverDispatchRecordSessionBeanRemote.retrieveTransitDriverDispatchRecordForCurrentDay(currentDate, outlet);
 
+            System.out.printf("\n%3s%10s%15s%25s%15s%15s%15s", "S/N", "ID", "Employee", "Start", "Pick Up Location", "Destination", "Status");
             for (TransitDriverDispatchRecord transit : transits) {
-                System.out.printf("\n%3s%10s%20s%15s%20s%15s%20s$15s", index + ".", transit.getId(),
-                        transit.getEmployee(), transit.getStartDateTime(), transit.getPickupLocation(),
-                        transit.getEndDateTime(), transit.getReturnLocation(), transit.getStatus());
+                System.out.printf("\n%3s%10s%15s%25s%15s%15s%15s", index + ".", "ID " + transit.getId(),
+                        transit.getEmployee().getUsername(), transit.getStartDateTime(), transit.getPickupLocation(),
+                        transit.getReturnLocation(), transit.getStatus());
                 index++;
             }
         } catch (ParseException ex) {
@@ -523,7 +528,7 @@ public class SalesManagementModule {
             System.out.println("Enter Today's Date (dd/mm/yyyy)> ");
             currentDate = inputDateFormat.parse(scanner.nextLine().trim());
             // unsure if outlet is an input or take from employee 
-            System.out.println("Enter Outlet> ");
+            System.out.println("Enter Outlet which Dispatch is made to> ");
             // need to improve error handling here
             try {
                 outlet = outletSessionBeanRemote.retrieveOutletByLocation(scanner.nextLine().trim());
@@ -534,9 +539,11 @@ public class SalesManagementModule {
             // need check if record is from outlet
             System.out.println("Enter Transit Record Id> ");
             try {
-                transit = transitDriverDispatchRecordSessionBeanRemote.retrieveTransitDriverDispatchRecordById(scanner.nextLong(), outlet);
+                Long input = scanner.nextLong();
+                System.out.println(input);
+                transit = transitDriverDispatchRecordSessionBeanRemote.retrieveTransitDriverDispatchRecordById(input, outlet);
             } catch (TransitDriverDispatchRecordNotFromOutletException ex) {
-                System.out.println("An error has occurred while finding the Transit Record: " + ex.getMessage() + "\n");
+                System.out.println("An error has occurred while finding the Transit Record1: " + ex.getMessage() + "\n");
             } catch (TransitDriverDispatchRecordNotFoundException ex) {
                 System.out.println("An error has occurred while finding the Transit Record: " + ex.getMessage() + "\n");
             }
@@ -549,6 +556,7 @@ public class SalesManagementModule {
             }
 
             transitDriverDispatchRecordSessionBeanRemote.assignTransitDriver(transit.getId(), employee);
+            System.out.println("Employee " + employee.getUsername() + " has been assigned to transit ID " + transit.getId() + " that is picked up from " + transit.getPickupLocation());
         } catch (ParseException ex) {
             System.out.println("Invalid date input!\n");
         }
@@ -570,6 +578,7 @@ public class SalesManagementModule {
         System.out.println("Enter Transit Record Id> ");
         try {
             transit = transitDriverDispatchRecordSessionBeanRemote.retrieveTransitDriverDispatchRecordById(scanner.nextLong(), outlet);
+
         } catch (TransitDriverDispatchRecordNotFromOutletException ex) {
             System.out.println("An error has occurred while finding the Transit Record: " + ex.getMessage() + "\n");
         } catch (TransitDriverDispatchRecordNotFoundException ex) {
@@ -577,6 +586,8 @@ public class SalesManagementModule {
         }
 
         transitDriverDispatchRecordSessionBeanRemote.updateTransitAsCompleted(transit.getId());
+        System.out.println("Transit ID " + transit.getId() + " that is picked up from " + transit.getPickupLocation() + " has been completed!");
+
     }
 
     //SALES MANAGER METHODS
@@ -768,9 +779,12 @@ public class SalesManagementModule {
         System.out.println("*** Management System :: Sales Management :: Pickup Car ***\n");
         System.out.println("Enter Customer Mobile Number> ");
         // need exception
-        String mobileNumber = scanner.nextLine();
+        String mobileNumber = scanner.nextLine().trim();
         try {
+            System.out.println("Trynig to retrive by mobile number");
             Customer customer = customerSessionBeanRemote.retrieveCustomerByMobileNumber(mobileNumber);
+            System.out.println("Trynig to retrive customer's reservations");
+
             List<Reservation> reservations = customer.getReservations();
 
             Reservation selectedReservation;
@@ -778,11 +792,16 @@ public class SalesManagementModule {
             Car reservedCar = new Car();
 
             System.out.print("Choose reservation> ");
+            System.out.printf("\n\n%3s%14s%30s%30s%20s%14s%14s", "S/N", "Car Plate Number", "Start Time", "End Time", "Requirements", "Pick up Location", "Return Location");
+
             for (Reservation r : customer.getReservations()) {
-                System.out.println(i + ". " + r.getId());
+                System.out.printf("\n%3s%14s%30s%30s%20s%14s%14s", i + ". ", r.getCar().getPlateNumber(), r.getStartDateTime().toString(), r.getEndDateTime().toString(),
+                        r.getRequirements().toString(), r.getPickUpLocation().getName(), r.getReturnLocation().getName());
                 i++;
             }
             while (true) {
+                System.out.println("> ");
+
                 Integer reservationChoice = scanner.nextInt();
 
                 // need to check if reservation is still active
@@ -803,8 +822,8 @@ public class SalesManagementModule {
                     System.out.println(ex.getMessage());
                 }
                 // check car status enum. should be "on rental"
-                carSessionBeanRemote.updateCarStatusLocation(reservedCar, CarStatusEnum.DISABLED, customer.getMobileNumber()); // using mobile number to uniquely identify customer
-                System.out.println("Car " + reservedCar.getPlateNumber() + " for Reservation " + selectedReservation.getId() + "has been picked up!\n");
+                carSessionBeanRemote.updateCarStatusLocation(reservedCar, CarStatusEnum.RESERVED, customer.getMobileNumber()); // using mobile number to uniquely identify customer
+                System.out.println("Car " + reservedCar.getPlateNumber() + " for Reservation " + selectedReservation.getId() + " has been picked up!\n");
             }
         } catch (CustomerNotFoundException ex) {
             System.out.println(ex.getMessage());
@@ -826,11 +845,15 @@ public class SalesManagementModule {
             Car reservedCar = new Car();
 
             System.out.print("Choose reservation> ");
+            System.out.printf("\n\n%3s%14s%30s%30s%20s%14s%14s", "S/N", "Car Plate Number", "Start Time", "End Time", "Requirements", "Pick up Location", "Return Location");
+
             for (Reservation r : customer.getReservations()) {
-                System.out.println(i + ". " + r.getId());
+                System.out.printf("\n%3s%14s%30s%30s%20s%14s%14s", i + ". ", r.getCar().getPlateNumber(), r.getStartDateTime().toString(), r.getEndDateTime().toString(),
+                        r.getRequirements().toString(), r.getPickUpLocation().getName(), r.getReturnLocation().getName());
                 i++;
             }
             while (true) {
+                System.out.println("> ");
                 Integer reservationChoice = scanner.nextInt();
 
                 // need to check if reservation is still active and has been picked up
@@ -847,8 +870,11 @@ public class SalesManagementModule {
                 System.out.println(ex.getMessage());
             }
 // need to check CarStatusEnum. Supposed to be "in outlet"
-            carSessionBeanRemote.updateCarStatusLocation(reservedCar, CarStatusEnum.TRANSIT, selectedReservation.getReturnLocation().toString()); // using mobile number to uniquely identify customer
-            System.out.println("Car " + reservedCar.getPlateNumber() + " for Reservation " + selectedReservation.getId() + "has been returned!\n");
+            carSessionBeanRemote.updateCarStatusLocation(reservedCar, CarStatusEnum.AVAILABLE, selectedReservation.getReturnLocation().getName()); // using mobile number to uniquely identify customer
+            selectedReservation.setReservationPaymentEnum(ReservationPaymentEnum.COMPLETED);
+            reservationSessionBeanRemote.merge(selectedReservation);
+            System.out.println("Car " + reservedCar.getPlateNumber() + " for Reservation " + selectedReservation.getId() + " has been returned!\n");
+
         } catch (CustomerNotFoundException ex) {
             System.out.println(ex.getMessage());
         }

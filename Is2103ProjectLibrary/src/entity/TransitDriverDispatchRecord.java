@@ -29,7 +29,6 @@ public class TransitDriverDispatchRecord implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     @ManyToOne
-    @JoinColumn(nullable = false)
     private Employee employee;
     @JoinColumn(nullable = false)
     @ManyToOne
@@ -39,12 +38,23 @@ public class TransitDriverDispatchRecord implements Serializable {
     private Outlet returnLocation;
     @Temporal(TemporalType.TIMESTAMP)
     private Date startDateTime;
-    @Temporal(TemporalType.TIMESTAMP)
-    private Date endDateTime;
     private String status;
+    @ManyToOne
+    private Car car;
 
     public TransitDriverDispatchRecord() {
+        this.status = "Incomplete";
     }
+
+    public TransitDriverDispatchRecord(Outlet pickupLocation, Outlet returnLocation, Date startDateTime, Car car) {
+        this();
+        this.pickupLocation = pickupLocation;
+        this.returnLocation = returnLocation;
+        this.startDateTime = startDateTime;
+        this.car = car;
+    }
+    
+    
 
     public TransitDriverDispatchRecord(Outlet pickupLocation, Outlet returnLocation, Date startDateTime) {
         this.pickupLocation = pickupLocation;
@@ -56,7 +66,6 @@ public class TransitDriverDispatchRecord implements Serializable {
         this.pickupLocation = pickupLocation;
         this.returnLocation = returnLocation;
         this.startDateTime = startDateTime;
-        this.endDateTime = endDateTime;
         this.employee = employee;
     }
 
@@ -138,16 +147,6 @@ public class TransitDriverDispatchRecord implements Serializable {
     /**
      * @return the endDateTime
      */
-    public Date getEndDateTime() {
-        return endDateTime;
-    }
-
-    /**
-     * @param endDateTime the endDateTime to set
-     */
-    public void setEndDateTime(Date endDateTime) {
-        this.endDateTime = endDateTime;
-    }
 
     /**
      * @return the employee
@@ -175,6 +174,20 @@ public class TransitDriverDispatchRecord implements Serializable {
      */
     public void setStatus(String status) {
         this.status = status;
+    }
+
+    /**
+     * @return the car
+     */
+    public Car getCar() {
+        return car;
+    }
+
+    /**
+     * @param car the car to set
+     */
+    public void setCar(Car car) {
+        this.car = car;
     }
 
 }

@@ -182,7 +182,7 @@ public class DataInitializationSessionBean {
         modelSessionBeanLocal.createNewCarWithExistingModel(new Car(CarStatusEnum.AVAILABLE, "Outlet A", "SS00A2TC"), toyotaCorollaId);
         modelSessionBeanLocal.createNewCarWithExistingModel(new Car(CarStatusEnum.AVAILABLE, "Outlet A", "SS00A3TC"), toyotaCorollaId);
         Long carId = modelSessionBeanLocal.createNewCarWithExistingModel(new Car(CarStatusEnum.AVAILABLE, "Outlet B", "SS00B1HC"), hondaCividId);
-        modelSessionBeanLocal.createNewCarWithExistingModel(new Car(CarStatusEnum.AVAILABLE, "Outlet B", "SS00B2HC"), hondaCividId);
+        Long carId2 = modelSessionBeanLocal.createNewCarWithExistingModel(new Car(CarStatusEnum.AVAILABLE, "Outlet B", "SS00B2HC"), hondaCividId);
         modelSessionBeanLocal.createNewCarWithExistingModel(new Car(CarStatusEnum.AVAILABLE, "Outlet B", "SS00B3HC"), hondaCividId);
         modelSessionBeanLocal.createNewCarWithExistingModel(new Car(CarStatusEnum.AVAILABLE, "Outlet C", "SS00C1NS"), nissanSunnyId);
         modelSessionBeanLocal.createNewCarWithExistingModel(new Car(CarStatusEnum.AVAILABLE, "Outlet C", "SS00C2NS"), nissanSunnyId);
@@ -256,6 +256,8 @@ public class DataInitializationSessionBean {
         Date date1start = calendar.getTime(); // current time
         calendar.add(GregorianCalendar.HOUR_OF_DAY, 1); // set return 1 hour later
         Date date1end = calendar.getTime();
+        calendar.add(GregorianCalendar.HOUR_OF_DAY, 1); // set return 1 hour later
+        Date date1end2 = calendar.getTime();
 
         Calendar c = Calendar.getInstance();
         c.setTime(new Date());
@@ -281,12 +283,16 @@ public class DataInitializationSessionBean {
                 System.out.println(ex.getMessage());
             }
             // PERSONAL TEST DATA
-            Long reservationId = customerSessionBeanLocal.createNewReservation(new Reservation(date2start, date1end, outletA, outletB, ReservationPaymentEnum.PAID, testCustomer, "Toyota", "Corolla"), customerId);
-            customerSessionBeanLocal.createNewReservation(new Reservation(date1start, date1end, outletB, outletA, ReservationPaymentEnum.ATPICKUP, testCustomer, "Honda", "Civic"), customerId);
-            customerSessionBeanLocal.createNewReservation(new Reservation(date2start, date2end, outletB, outletC, ReservationPaymentEnum.ATPICKUP, testCustomer, "Honda", "Civic"), customerId);
+            Long reservationId = customerSessionBeanLocal.createNewReservation(new Reservation(date2start, date1end, outletA, outletB, ReservationPaymentEnum.PAID, testCustomer, "Honda", "Civid"), customerId);
+            customerSessionBeanLocal.createNewReservation(new Reservation(date1start, date1end2, outletA, outletB, ReservationPaymentEnum.ATPICKUP, testCustomer, "Honda", "Civic"), customerId);
+            Long reservationId2 = customerSessionBeanLocal.createNewReservation(new Reservation(date1end, date1end2, outletB, outletC, ReservationPaymentEnum.ATPICKUP, testCustomer, "Honda", "Civic"), customerId);
 
             try {
+                // car 4 SS00B1HC reserved by reservation 1
                 reservationSessionBeanLocal.assignCarToReservation(reservationSessionBeanLocal.retrieveReservationById(reservationId), carSessionBeanLocal.retrieveCarById(carId));
+                // car 5 SS00B2HC reserved by reservation 3 
+                reservationSessionBeanLocal.assignCarToReservation(reservationSessionBeanLocal.retrieveReservationById(reservationId2), carSessionBeanLocal.retrieveCarById(carId2));
+
                 System.out.println("Reservation assigned"); // not printing. not sure why
             } catch (CarNotFoundException ex) {
                 System.out.println(ex.getMessage());

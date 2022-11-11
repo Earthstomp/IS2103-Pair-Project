@@ -40,6 +40,8 @@ public class Car implements Serializable {
     private String color;
     @OneToMany (mappedBy = "car")
     private List<Reservation> reservations;
+    @OneToMany (mappedBy = "car")
+    private List<TransitDriverDispatchRecord> transitRecords;
     
     public Car() {
         this.status = CarStatusEnum.AVAILABLE;
@@ -183,6 +185,20 @@ public class Car implements Serializable {
      */
     public void setReservations(List<Reservation> reservations) {
         this.reservations = reservations;
+    }
+
+    /**
+     * @return the transitRecords
+     */
+    public List<TransitDriverDispatchRecord> getTransitRecords() {
+        return transitRecords;
+    }
+
+    /**
+     * @param transitRecords the transitRecords to set
+     */
+    public void setTransitRecords(List<TransitDriverDispatchRecord> transitRecords) {
+        this.transitRecords = transitRecords;
     }
 
     /**
