@@ -96,13 +96,15 @@ public class CarSessionBean implements CarSessionBeanRemote, CarSessionBeanLocal
 
         List<Car> carsAvailableFiltered = carsAvailable; // make a copy of the list
 
-        for (Car c : carsAvailable) {
+        for (int i = 0; i < carsAvailable.size(); i++) {
+            Car c = carsAvailable.get(i);
             System.out.println("Looking at car " + c.getPlateNumber());
-            if (c.getStatus() == CarStatusEnum.DISABLED || c.getStatus() == CarStatusEnum.SERVICING_OR_REPAIR) {
+            if (c.getStatus() == CarStatusEnum.DISABLED || c.getStatus() == CarStatusEnum.SERVICING_OR_REPAIR) { //  error is either here or next line
                 System.out.println("Car is removed cause it is disabled or servicing");
                 carsAvailableFiltered.remove(c);
             } else {
                 // for every reservation the car has
+                System.out.println("test reservation");
                 for (Reservation r : c.getReservations()) {
                     System.out.println(r.getStartDateTime() + " " + r.getEndDateTime());
 
@@ -110,6 +112,7 @@ public class CarSessionBean implements CarSessionBeanRemote, CarSessionBeanLocal
                     calendar.setTime(r.getStartDateTime());
                     calendar.add(Calendar.HOUR, -2);
                     Date rStartTimeForTransit = calendar.getTime();
+                    System.out.println("test 2");
 
                     // filter out ongoing reservations
                     if (r.getReservationPaymentEnum() != ReservationPaymentEnum.COMPLETED || r.getReservationPaymentEnum() != ReservationPaymentEnum.CANCELLED) {
@@ -118,7 +121,8 @@ public class CarSessionBean implements CarSessionBeanRemote, CarSessionBeanLocal
                         if (r.getStartDateTime().before(startDateTime) && r.getEndDateTime().after(startDateTime)) {
                             System.out.println("Car " + c.getPlateNumber() + " is removed cause case 1");
 
-                            carsAvailableFiltered.remove(c);
+                            carsAvailableFiltered.remove(c); // problem is here 
+                    System.out.println("removed ! 1");
 
                             // 2. if there is a reservation on car that returns to another outlet that will prevent car from being returned before reservation time (by accounting for 2hr transit) 
                         } else if (r.getStartDateTime().before(startDateTime) && r.getReturnLocation() != pickUpOutlet && r.getEndDateTime().after(startTimeForTransit)) {
@@ -131,12 +135,14 @@ public class CarSessionBean implements CarSessionBeanRemote, CarSessionBeanLocal
                             System.out.println("Car is removed cause case 3");
 
                             carsAvailableFiltered.remove(c);
- 
+
                             // 4. if there is a future reservation that starts at another outlet at a time less than 2hrs after this reservation end time
                         } else if (r.getPickUpLocation() != pickUpOutlet && endDateTime.after(rStartTimeForTransit)) {
                             System.out.println("Car is removed cause case 4");
 
                             carsAvailableFiltered.remove(c);
+                        } else {
+                            System.out.println("no action");
                         }
                     } // ignore reservations which have been completed or cancelled
                 }
@@ -150,7 +156,7 @@ public class CarSessionBean implements CarSessionBeanRemote, CarSessionBeanLocal
         }
 
         if (carsAvailableFiltered.size() == 0) {
-            throw new CarNotFoundException("There are no cars available for this reservation\n");
+            throw new CarNotFoundException();
         }
 
         return carsAvailableFiltered;

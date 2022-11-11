@@ -57,7 +57,6 @@ public class Reservation implements Serializable {
     public Reservation() {
     }
 
-    // constructor if make and model is specified
     public Reservation(Date startDateTime, Date endDateTime, Outlet pickUpLocation, Outlet returnLocation, ReservationPaymentEnum paymentStatus, Customer customer, String make, String model) {
         this.startDateTime = startDateTime;
         this.endDateTime = endDateTime;

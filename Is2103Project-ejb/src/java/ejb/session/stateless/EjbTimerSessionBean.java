@@ -63,7 +63,7 @@ public class EjbTimerSessionBean implements EjbTimerSessionBeanLocal, EjbTimerSe
             System.out.println(r.getRequirements());
             availableCars = carSessionBeanLocal.retrieveAvailableCarsForReservation(r.getStartDateTime(), r.getEndDateTime(), r.getRequirements(), r.getPickUpLocation(), r.getReturnLocation());
         } catch (CarNotFoundException ex) {
-            System.out.println(ex.getMessage());
+            System.out.println("There are no cars available for this reservation\n");
         }
     }
 
