@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package carmsreservationclient;
+package carmsreservationclient2;
 
 import ejb.session.stateless.CarSessionBeanRemote;
 import ejb.session.stateless.CategorySessionBeanRemote;
@@ -15,9 +15,13 @@ import ejb.session.stateless.RentalRateRecordSessionBeanRemote;
 import ejb.session.stateless.ReservationSessionBeanRemote;
 import ejb.session.stateless.TransitDriverDispatchRecordSessionBeanRemote;
 import entity.Employee;
+import entity.Outlet;
+import java.text.SimpleDateFormat;
 import java.util.Scanner;
-import util.exception.InvalidEmployeeRoleException;
 import util.exception.InvalidLoginCredentialsException;
+import util.exception.OutletNotFoundException;
+import java.text.ParseException;
+import java.util.Date;
 
 /**
  *
@@ -131,14 +135,44 @@ public class MainApp {
             throw new InvalidLoginCredentialsException("Missing login credential!");
         }
     }
-    
+
     public void doSearchCar() {
-        
+        Scanner scanner = new Scanner(System.in);
+
+        try {
+            SimpleDateFormat inputDateFormat = new SimpleDateFormat("dd/MM/yyyy hh:mm a");
+            Date pickUpDate;
+            Date returnDate;
+
+            System.out.println("*** Reservation Client :: Search Car ***\n");
+            System.out.println("Enter Pickup Outlet> ");
+            try {
+                Outlet pickUpOutlet = outletSessionBeanRemote.retrieveOutletByLocation(scanner.nextLine().trim());
+            } catch (OutletNotFoundException ex) {
+                System.out.println(ex.getMessage());
+            }
+
+            System.out.println("Enter Return Outlet> ");
+            try {
+                Outlet returnOutlet = outletSessionBeanRemote.retrieveOutletByLocation(scanner.nextLine().trim());
+            } catch (OutletNotFoundException ex) {
+                System.out.println(ex.getMessage());
+            }
+
+            System.out.println("Enter Pickup Date and Time (dd/mm/yyyy hh:mm a)> ");
+            pickUpDate = inputDateFormat.parse(scanner.nextLine().trim());
+            System.out.println(pickUpDate);
+
+            System.out.println("Enter Return Date and Time (dd/mm/yyyy hh:mm a)> ");
+            returnDate = inputDateFormat.parse(scanner.nextLine().trim());
+            System.out.println(returnDate);
+
+        } catch (ParseException ex) {
+            System.out.println("Invalid date input!\n");
+        }
+
     }
-    
-    
-    
-    
+
 }
 
 //    private void menuMain() {

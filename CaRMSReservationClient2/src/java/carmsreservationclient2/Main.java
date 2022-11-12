@@ -3,9 +3,8 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package is2103projectclient;
+package carmsreservationclient2;
 
-import carmsreservationclient.MainApp;
 import ejb.session.stateless.CarSessionBeanRemote;
 import ejb.session.stateless.CategorySessionBeanRemote;
 import ejb.session.stateless.CustomerSessionBeanRemote;
