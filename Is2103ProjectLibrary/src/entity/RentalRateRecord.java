@@ -40,9 +40,11 @@ public class RentalRateRecord implements Serializable {
     private boolean enabled;
 
     public RentalRateRecord() {
+        this.enabled = true;
     }
 
     public RentalRateRecord(String recordName, RentalRateEnum type, Double rate, Date startDateTime, Date endDateTime) {
+        this();
         this.recordName = recordName;
         this.type = type;
         this.rate = rate;
@@ -56,6 +58,7 @@ public class RentalRateRecord implements Serializable {
     
 
     public RentalRateRecord(String recordName, Double rate, List<Date> validityPeriod) {
+        this();
         this.recordName = recordName;
         this.rate = rate;
         this.validityPeriod = validityPeriod;

@@ -500,11 +500,11 @@ public class SalesManagementModule {
             }
             List<TransitDriverDispatchRecord> transits = transitDriverDispatchRecordSessionBeanRemote.retrieveTransitDriverDispatchRecordForCurrentDay(currentDate, outlet);
 
-            System.out.printf("\n%3s%10s%15s%25s%15s%15s%15s", "S/N", "ID", "Employee", "Start", "Pick Up Location", "Destination", "Status");
+            System.out.printf("\n%3s%10s%15s%35s%15s%15s%15s", "S/N", "ID", "Employee", "Start", "Pick Up Location", "Destination", "Status");
             for (TransitDriverDispatchRecord transit : transits) {
-                System.out.printf("\n%3s%10s%15s%25s%15s%15s%15s", index + ".", "ID " + transit.getId(),
-                        transit.getEmployee().getUsername(), transit.getStartDateTime(), transit.getPickupLocation(),
-                        transit.getReturnLocation(), transit.getStatus());
+                System.out.printf("\n%3s%10s%15s%35s%15s%15s%15s", index + ".", "ID " + transit.getId(),
+                        transit.getEmployee().getUsername(), transit.getStartDateTime(), transit.getPickupLocation().getName(),
+                        transit.getReturnLocation().getName(), transit.getStatus());
                 index++;
             }
         } catch (ParseException ex) {
@@ -523,7 +523,7 @@ public class SalesManagementModule {
         int index = 1;
 
         try {
-            System.out.println("*** Management System :: Sales Management :: View Transit Driver Dispatch Records For Current Day Reservations ***\n");
+            System.out.println("*** Management System :: Sales Management :: Assign Driver ***\n");
             // temporary solution: will probably retrieve date from the system in the future. Singleton...?
             System.out.println("Enter Today's Date (dd/mm/yyyy)> ");
             currentDate = inputDateFormat.parse(scanner.nextLine().trim());
@@ -556,7 +556,7 @@ public class SalesManagementModule {
             }
 
             transitDriverDispatchRecordSessionBeanRemote.assignTransitDriver(transit.getId(), employee);
-            System.out.println("Employee " + employee.getUsername() + " has been assigned to transit ID " + transit.getId() + " that is picked up from " + transit.getPickupLocation());
+            System.out.println("Employee " + employee.getUsername() + " has been assigned to transit ID " + transit.getId() + " that is picked up from " + transit.getPickupLocation().getName());
         } catch (ParseException ex) {
             System.out.println("Invalid date input!\n");
         }
@@ -586,7 +586,7 @@ public class SalesManagementModule {
         }
 
         transitDriverDispatchRecordSessionBeanRemote.updateTransitAsCompleted(transit.getId());
-        System.out.println("Transit ID " + transit.getId() + " that is picked up from " + transit.getPickupLocation() + " has been completed!");
+        System.out.println("Transit ID " + transit.getId() + " that is picked up from " + transit.getPickupLocation().getName() + " has been completed!");
 
     }
 

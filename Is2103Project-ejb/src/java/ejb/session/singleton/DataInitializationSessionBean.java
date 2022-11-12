@@ -293,7 +293,7 @@ public class DataInitializationSessionBean {
                 // car 5 SS00B2HC reserved by reservation 3 
                 reservationSessionBeanLocal.assignCarToReservation(reservationSessionBeanLocal.retrieveReservationById(reservationId2), carSessionBeanLocal.retrieveCarById(carId2));
 
-                System.out.println("Reservation assigned"); // not printing. not sure why
+                System.out.println("Reservation assigned");
             } catch (CarNotFoundException ex) {
                 System.out.println(ex.getMessage());
             } catch (ReservationNotFoundException ex) {

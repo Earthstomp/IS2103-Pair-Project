@@ -55,7 +55,7 @@ public class ReservationSessionBean implements ReservationSessionBeanRemote, Res
     public List<Reservation> retrieveReservationByDate(Date currentDateTime) throws ReservationNotFoundException {
         // get all reservations
         List<Reservation> allReservations = em.createQuery(
-                "SELECT r FROM Reservation r")
+                "SELECT r FROM Reservation r ORDER BY r.id ASC") // to ensure a similar sequence is achieved as when checking for availabilities
                 .getResultList();
         
         Calendar c = Calendar.getInstance();

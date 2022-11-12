@@ -71,8 +71,8 @@ public class TransitDriverDispatchRecordSessionBean implements TransitDriverDisp
 
     public List<TransitDriverDispatchRecord> retrieveTransitDriverDispatchRecordForCurrentDay(Date currentDay, Outlet outlet) {
         List<TransitDriverDispatchRecord> list = em.createQuery(
-                "SELECT t FROM TransitDriverDispatchRecord t JOIN t.returnLocation o WHERE o.name = :outletName")
-                .setParameter("outletName", outlet.getName())
+                "SELECT t FROM TransitDriverDispatchRecord t") // JOIN t.returnLocation o WHERE o.name = :outletName"
+//                .setParameter("outletName", outlet.getName())
                 .getResultList();
         
         Calendar c = Calendar.getInstance();
@@ -80,23 +80,24 @@ public class TransitDriverDispatchRecordSessionBean implements TransitDriverDisp
         c.setTime(currentDay);
         c.set(Calendar.HOUR_OF_DAY, 23);
         c.set(Calendar.MINUTE, 59);
-
         currentDay = c.getTime(); //  current day converted to 2359. need to change to 0159
+        
+        System.out.println("Current day is " + currentDay);
         c.add(Calendar.DATE, -1);
         c.add(Calendar.HOUR, -2);
         Date dayBeforeDateTime = c.getTime(); // previous day converted to 2159
         
+        for (TransitDriverDispatchRecord r : list) {
+            System.out.println(r.getId() + " " + r.getStartDateTime());
+        }
+        
         for (int i = 0; i < list.size(); i++) {
             TransitDriverDispatchRecord record = list.get(i);
-            if (!(record.getStartDateTime().after(dayBeforeDateTime) && record.getStartDateTime().before(dayBeforeDateTime))) {
+            if (!(record.getStartDateTime().after(dayBeforeDateTime) && record.getStartDateTime().before(currentDay))) {
                 list.remove(record);
             }
         }
         
-        for (TransitDriverDispatchRecord record : list) {
-            
-        }
-
         return list;
     }
 
