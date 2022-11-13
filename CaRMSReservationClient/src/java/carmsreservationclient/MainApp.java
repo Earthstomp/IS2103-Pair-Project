@@ -29,8 +29,10 @@ import entity.CreditCard;
 import entity.Customer;
 import entity.RentalRateRecord;
 import entity.Reservation;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.InputMismatchException;
 import util.enumeration.CarStatusEnum;
 import util.enumeration.ReservationPaymentEnum;
 import util.exception.CarNotFoundException;
@@ -97,13 +99,9 @@ public class MainApp {
                 response = scanner.nextInt();
 
                 if (response == 1) {
-                    try {
-                        doLogin();
-                        System.out.println("Login successful!\n");
-                        menuMain();
-                    } catch (InvalidLoginCredentialsException ex) {
-                        System.out.println("Invalid login credential: " + ex.getMessage() + "\n");
-                    }
+                    doLogin();
+                    System.out.println("Login successful!\n");
+                    menuMain();
                 } else if (response == 2) {
                     doRegistration();
                 } else if (response == 3) {
@@ -121,7 +119,7 @@ public class MainApp {
         }
     }
 
-    private void doLogin() throws InvalidLoginCredentialsException {
+    private void doLogin() {
         Scanner scanner = new Scanner(System.in);
         String username = "";
         String password = "";
@@ -132,10 +130,10 @@ public class MainApp {
         System.out.print("Enter password> ");
         password = scanner.nextLine().trim();
 
-        if (username.length() > 0 && password.length() > 0) {
+        try {
             customer = customerSessionBeanRemote.customerLogin(username, password);
-        } else {
-            throw new InvalidLoginCredentialsException("Missing login credential!");
+        } catch (InvalidLoginCredentialsException | InputMismatchException ex) {
+            System.out.println(ex.getMessage());
         }
     }
 
@@ -155,7 +153,7 @@ public class MainApp {
 
         System.out.print("Enter email> ");
         String email = scanner.nextLine().trim();
-        
+
         System.out.print("Credit card number>");
         String num = scanner.nextLine().trim();
 
@@ -264,7 +262,12 @@ public class MainApp {
             Scanner scanner = new Scanner(System.in);
             System.out.println("\nSelect Reservation to cancel by S/N > ");
             Long reservationId = reservations.get(scanner.nextInt() - 1).getId();
-            reservationSessionBeanRemote.removeReservation(reservationId);
+            System.out.println("\nEnter \'Y' to confirm cancellation> ");
+            if (scanner.nextLine().trim().equalsIgnoreCase("Y")) {
+                reservationSessionBeanRemote.removeReservation(reservationId);
+            } else {
+                System.out.println("Cancellation revoked.");
+            }
         } catch (ReservationNotFoundException ex) {
             System.out.println(ex.getMessage());
         }
@@ -276,11 +279,12 @@ public class MainApp {
 
         try {
             List<Reservation> reservations = reservationSessionBeanRemote.retrieveAllReservationsForCustomer(customer);
-            Long reservationId = reservations.get(scanner.nextInt() - 1).getId();
+            int sn = scanner.nextInt();
+            Long reservationId = reservations.get(sn - 1).getId();
             Reservation reservation = reservationSessionBeanRemote.retrieveReservationById(reservationId);
 
-            System.out.printf("\n%35s%20s%35s%20s%15s%15s%15s", "Start Date", "Pick Up Location", "End Date", "Return Location", "Payment Status", "Make", "Model");
-            System.out.printf("\n%35s%20s%35s%20s%15s%15s%15s", reservation.getStartDateTime(), reservation.getPickUpLocation().getName(), reservation.getEndDateTime(), reservation.getReturnLocation().getName(), reservation.getReservationPaymentEnum(), reservation.getRequirements().get(0), reservation.getRequirements().get(1));
+            System.out.printf("\n%3s%35s%20s%35s%20s%15s%15s%15s", "S/N", "Start Date", "Pick Up Location", "End Date", "Return Location", "Payment Status", "Make", "Model");
+            System.out.printf("\n%3s%35s%20s%35s%20s%15s%15s%15s", sn + ".", reservation.getStartDateTime(), reservation.getPickUpLocation().getName(), reservation.getEndDateTime(), reservation.getReturnLocation().getName(), reservation.getReservationPaymentEnum(), reservation.getRequirements().get(0), reservation.getRequirements().get(1));
 
             System.out.println("\n");
         } catch (ReservationNotFoundException ex) {
@@ -313,7 +317,7 @@ public class MainApp {
         for (Category category : categories) {
             // was an error here need to check
             boolean availability = assignReservationByCategory(category, pickUpOutlet, returnOutlet, pickUpDate, returnDate);
-            Double rentalFee = calculateRentalFee(category, pickUpDate, returnDate);
+            BigDecimal rentalFee = calculateRentalFee(category, pickUpDate, returnDate);
             System.out.printf("\n%3s%16s%15s%15s", category.getCategoryId(), category.getCategoryName(), availability, rentalFee);
             categoryAvailabilities.add(availability);
 
@@ -351,7 +355,7 @@ public class MainApp {
 
     // assign any unassigned reservations to update current system. should be successful for all
     private void assignReservations() {
-        System.out.println("Starting assigning reservations");
+        //System.out.println("Starting assigning reservations");
         List<Reservation> reservations = new ArrayList<>();
         // retrieve all reservations on todays date
         try {
@@ -364,7 +368,7 @@ public class MainApp {
         for (Reservation reservation : reservations) {
             reservationsToUnassign.add(reservation);
             // car has not been assigned to reservation yet, so car is null
-            System.out.println("Added reservation id " + reservation.getId() + " to unassign");
+            //System.out.println("Added reservation id " + reservation.getId() + " to unassign");
         }
 
         for (Reservation chosenReservation : reservations) {
@@ -383,14 +387,13 @@ public class MainApp {
                 carsAvailable = modelSessionBeanRemote.retrieveAllCarsFromModel(requirements.get(0), requirements.get(1));
             }
 
-            for (Car car : carsAvailable) {
+            /*for (Car car : carsAvailable) {
                 System.out.println(car.getPlateNumber() + " " + car.getModel().getMake() + " " + car.getModel().getModel());
                 System.out.println("Reservations");
                 for (Reservation r : car.getReservations()) {
                     System.out.println("Reservation " + r.getId());
                 }
-            }
-
+            }*/
             Calendar calendar = Calendar.getInstance();
             // setting time if transit is possible
             calendar.setTime(startDateTime);
@@ -402,7 +405,7 @@ public class MainApp {
             // setting a date for initial comparison
             calendar.add(Calendar.DAY_OF_YEAR, -300);
             Date latestReservationTiming = calendar.getTime();
-            System.out.println("The latest reservation timing now is " + latestReservationTiming);
+            //System.out.println("The latest reservation timing now is " + latestReservationTiming);
             // keeping the latest reservation
             Reservation latestReservation = new Reservation();
             // to track if the latestReservation was updated
@@ -419,71 +422,71 @@ public class MainApp {
 
             for (int i = 0; i < carsAvailable.size(); i++) {
                 Car c = carsAvailable.get(i);
-                System.out.println("Looking at car " + c.getPlateNumber());
+                //System.out.println("Looking at car " + c.getPlateNumber());
                 if (c.getStatus() == CarStatusEnum.DISABLED || c.getStatus() == CarStatusEnum.SERVICING_OR_REPAIR) { //  error is either here or next line
-                    System.out.println("Car is removed cause it is disabled or servicing");
+                    //System.out.println("Car is removed cause it is disabled or servicing");
                     carsAvailableFiltered.remove(c);
                 } else {
                     // for every reservation the car has
-                    System.out.println("test reservation");
+                    //System.out.println("test reservation");
 
                     for (Reservation r : c.getReservations()) {
                         reservationRemovedCar = false;
-                        System.out.println(r.getStartDateTime() + " " + r.getEndDateTime());
+                        //System.out.println(r.getStartDateTime() + " " + r.getEndDateTime());
 
                         // finding the time for transit for case 4
                         calendar.setTime(r.getStartDateTime());
                         calendar.add(Calendar.HOUR, -2);
                         Date rStartTimeForTransit = calendar.getTime();
-                        System.out.println("test 2");
+                        //System.out.println("test 2");
 
                         // filter out ongoing reservations
                         if (r.getReservationPaymentEnum() != ReservationPaymentEnum.COMPLETED || r.getReservationPaymentEnum() != ReservationPaymentEnum.CANCELLED) {
 
                             // 1. if there is a reservation on car that will prevent car from being returned before reservation time
                             if (r.getStartDateTime().before(startDateTime) && r.getEndDateTime().after(startDateTime)) {
-                                System.out.println("Car " + c.getPlateNumber() + " is removed cause case 1");
+                                //System.out.println("Car " + c.getPlateNumber() + " is removed cause case 1");
 
                                 carsAvailableFiltered.remove(c); // problem is here 
                                 reservationRemovedCar = true;
-                                System.out.println("removed ! 1");
+                                //System.out.println("removed ! 1");
 
                                 // 2. if there is a reservation on car that returns to another outlet that will prevent car from being returned before reservation time (by accounting for 2hr transit) 
                             } else if (r.getStartDateTime().before(startDateTime) && r.getReturnLocation() != pickUpOutlet && r.getEndDateTime().after(startTimeForTransit)) {
-                                System.out.println("Car is removed cause case 2");
+                                //System.out.println("Car is removed cause case 2");
 
                                 carsAvailableFiltered.remove(c);
                                 reservationRemovedCar = true;
 
                                 // 3. if there is a reservation that starts between the startDateTime and endDateTime of this reservation
                             } else if (r.getStartDateTime().after(startDateTime) && r.getStartDateTime().before(endDateTime)) {
-                                System.out.println("Car is removed cause case 3");
+                                // System.out.println("Car is removed cause case 3");
 
                                 carsAvailableFiltered.remove(c);
                                 reservationRemovedCar = true;
 
                                 // 4. if there is a future reservation that starts at another outlet at a time less than 2hrs after this reservation end time
                             } else if (r.getPickUpLocation() != pickUpOutlet && endDateTime.after(rStartTimeForTransit) && (r.getStartDateTime().after(endDateTime))) {
-                                System.out.println("Car is removed cause case 4");
+                                //System.out.println("Car is removed cause case 4");
 
                                 carsAvailableFiltered.remove(c);
                                 reservationRemovedCar = true;
 
                             } else {
-                                System.out.println("this reservation " + r.getId() + " has no conflicts with the current reservation");
+                                //System.out.println("this reservation " + r.getId() + " has no conflicts with the current reservation");
                             }
                         } // ignore reservations which have been completed or cancelled
                         // if this reservation did not remove the car, and its end time is the latest so far while still before the incoming reservation's start time
                         if (reservationRemovedCar = false && r.getEndDateTime().after(latestReservationTiming) && r.getEndDateTime().before(startDateTime)) {
                             latestReservation = r;
                             updatedLatestReservation = true;
-                            System.out.println("updatedLatestReservation");
+                            //System.out.println("updatedLatestReservation");
                         }
                     }
                     if (c.getReservations().size() == 0) {
                         // if the car has no reservations and is at outlet, assign 
                         if (c.getLocation().toString() == pickUpOutlet.getName().toString()) {
-                            System.out.println("Car " + c.getPlateNumber() + "has no reservations and is assigned to reservation " + chosenReservation.getId());
+                            //System.out.println("Car " + c.getPlateNumber() + "has no reservations and is assigned to reservation " + chosenReservation.getId());
                             try {
                                 reservationSessionBeanRemote.assignCarToReservation(chosenReservation, c);
                             } catch (CarNotFoundException | ReservationNotFoundException ex) {
@@ -491,18 +494,17 @@ public class MainApp {
                             }
                             assigned = true;
                         } else { // if car has no reservations but not at outlet, consider for transit
-                            System.out.println("Car that has no reservations can be assigned with transit " + c.getPlateNumber());
+                            //System.out.println("Car that has no reservations can be assigned with transit " + c.getPlateNumber());
                             carForAssignmentWithTransit = c;
                         }
                     }
 
-                    System.out.println("Done iterating through all reservations for car " + c.getPlateNumber());
-
+                    //System.out.println("Done iterating through all reservations for car " + c.getPlateNumber());
                     // if there is a 
                     if (updatedLatestReservation) {
                         // assign car if the it will be at the outlet already
                         if (latestReservation.getReturnLocation() == pickUpOutlet) {
-                            System.out.println("Reservation is being assigned to car " + c.getPlateNumber());
+                            //System.out.println("Reservation is being assigned to car " + c.getPlateNumber());
 
                             try {
                                 reservationSessionBeanRemote.assignCarToReservation(chosenReservation, c);
@@ -511,40 +513,23 @@ public class MainApp {
                             }
                             assigned = true;
                         } else { // car will not be at the outlet and can be considered for transit
-                            System.out.println("Car that can be assigned with transit " + c.getPlateNumber());
+                            //System.out.println("Car that can be assigned with transit " + c.getPlateNumber());
 
                             carForAssignmentWithTransit = c;
                         }
                     }
                 }
             }
-            System.out.println("iterated through all cars");
+            //System.out.println("iterated through all cars");
             if (!assigned && carsAvailableFiltered.size() != 0) {
 
                 // create transit Dispatch record
                 calendar.setTime(chosenReservation.getStartDateTime());
                 calendar.add(Calendar.HOUR, -2);
                 Date transitTime = calendar.getTime();
-                // if car for transit has no reservations 
-//                    System.out.println("about to create new transit record");
-//
-//                    if (carForAssignmentWithTransit.getReservations().size() == 0) {
-//                        try {
-//                            System.out.println("create new transit record for car without reservations");
-//
-//                            generateTransitRecord(carForAssignmentWithTransit, chosenReservation.getPickUpLocation(), outletSessionBeanLocal.retrieveOutletByLocation(carForAssignmentWithTransit.getLocation()), transitTime);
-//                        } catch (OutletNotFoundException ex) {
-//                            System.out.println(ex.getMessage());
-//                        }
-//                    } else {
-//                        System.out.println("create new transit record for car with reservations");
-//
-//                        generateTransitRecord(carForAssignmentWithTransit, chosenReservation.getPickUpLocation(), latestReservation.getReturnLocation(), transitTime);
-//                    }
-                // car with transit option assigned
 
                 try {
-                    System.out.println("assigning car " + carForAssignmentWithTransit.getPlateNumber());
+                    //System.out.println("assigning car " + carForAssignmentWithTransit.getPlateNumber());
                     reservationSessionBeanRemote.assignCarToReservation(chosenReservation, carForAssignmentWithTransit);
                 } catch (CarNotFoundException | ReservationNotFoundException ex) {
                     System.out.println(ex.getMessage());
@@ -552,23 +537,22 @@ public class MainApp {
 
             }
 
-            System.out.println("Printing cars available filtered");
-
-            for (Car car : carsAvailableFiltered) {
-                System.out.println(car.getPlateNumber() + " " + car.getModel().getMake() + " " + car.getModel().getModel());
-            }
-            if (carsAvailableFiltered.size() == 0) {
-                System.out.println("No cars found");
-            }
+//            System.out.println("Printing cars available filtered");
+//
+//            for (Car car : carsAvailableFiltered) {
+//                System.out.println(car.getPlateNumber() + " " + car.getModel().getMake() + " " + car.getModel().getModel());
+//            }
+//            if (carsAvailableFiltered.size() == 0) {
+//                System.out.println("No cars found");
+//            }
         }
 
-        System.out.println("Finished assigning reservations");
-
+        //System.out.println("Finished assigning reservations");
         // iterated through all reservations and all were able to be assigned
     }
 
     private boolean assignReservationByCategory(Category category, Outlet pickUpOutlet, Outlet returnOutlet, Date startDateTime, Date endDateTime) {
-        System.out.println("assigning cars of category " + category.getCategoryName());
+        //System.out.println("assigning cars of category " + category.getCategoryName());
         String categoryName = category.getCategoryName();
         List<Car> carsAvailable = new ArrayList<Car>();
 
@@ -593,7 +577,7 @@ public class MainApp {
         // setting a date for initial comparison
         calendar.add(Calendar.DAY_OF_YEAR, -300);
         Date latestReservationTiming = calendar.getTime();
-        System.out.println("The latest reservation timing now is " + latestReservationTiming);
+        //System.out.println("The latest reservation timing now is " + latestReservationTiming);
         // keeping the latest reservation
         Reservation latestReservation = new Reservation();
         // to track if the latestReservation was updated
@@ -610,78 +594,78 @@ public class MainApp {
 
         for (int i = 0; i < carsAvailable.size(); i++) {
             Car c = carsAvailable.get(i);
-            System.out.println("Looking at car " + c.getPlateNumber());
+            //System.out.println("Looking at car " + c.getPlateNumber());
             // filter out unavailable cars, disabled cars, cars that cannot be returned on time
 
             if (c.getStatus() == CarStatusEnum.DISABLED || c.getStatus() == CarStatusEnum.SERVICING_OR_REPAIR) { //  error is either here or next line
-                System.out.println("Car is removed cause it is disabled or servicing");
+                //System.out.println("Car is removed cause it is disabled or servicing");
                 carsAvailableFiltered.remove(c);
             } else {
                 // for every reservation the car has
-                System.out.println("test reservation");
+                //System.out.println("test reservation");
 
                 for (Reservation r : c.getReservations()) {
                     reservationRemovedCar = false;
-                    System.out.println(r.getStartDateTime() + " " + r.getEndDateTime());
+                    //System.out.println(r.getStartDateTime() + " " + r.getEndDateTime());
 
                     // finding the time for transit for case 4
                     calendar.setTime(r.getStartDateTime());
                     calendar.add(Calendar.HOUR, -2);
                     Date rStartTimeForTransit = calendar.getTime();
-                    System.out.println("test 2");
+                    //System.out.println("test 2");
 
                     // filter out ongoing reservations
                     if (r.getReservationPaymentEnum() != ReservationPaymentEnum.COMPLETED || r.getReservationPaymentEnum() != ReservationPaymentEnum.CANCELLED) {
 
                         // 1. if there is a reservation on car that will prevent car from being returned before reservation time
                         if (r.getStartDateTime().before(startDateTime) && r.getEndDateTime().after(startDateTime)) {
-                            System.out.println("Car " + c.getPlateNumber() + " is removed cause case 1");
+                            //System.out.println("Car " + c.getPlateNumber() + " is removed cause case 1");
 
                             carsAvailableFiltered.remove(c); // problem is here 
                             reservationRemovedCar = true;
-                            System.out.println("removed ! 1");
+                            //System.out.println("removed ! 1");
 
                             // 2. if there is a reservation on car that returns to another outlet that will prevent car from being returned before reservation time (by accounting for 2hr transit) 
                         } else if (r.getStartDateTime().before(startDateTime) && r.getReturnLocation() != pickUpOutlet && r.getEndDateTime().after(startTimeForTransit)) {
-                            System.out.println("Car is removed cause case 2");
+                            //System.out.println("Car is removed cause case 2");
 
                             carsAvailableFiltered.remove(c);
                             reservationRemovedCar = true;
 
                             // 3. if there is a reservation that starts between the startDateTime and endDateTime of this reservation
                         } else if (r.getStartDateTime().after(startDateTime) && r.getStartDateTime().before(endDateTime)) {
-                            System.out.println("Car is removed cause case 3");
+                            //System.out.println("Car is removed cause case 3");
 
                             carsAvailableFiltered.remove(c);
                             reservationRemovedCar = true;
 
                             // 4. if there is a future reservation that starts at another outlet at a time less than 2hrs after this reservation end time
                         } else if (r.getPickUpLocation() != pickUpOutlet && endDateTime.after(rStartTimeForTransit) && (r.getStartDateTime().after(endDateTime))) {
-                            System.out.println("Car is removed cause case 4");
+                            //System.out.println("Car is removed cause case 4");
 
                             carsAvailableFiltered.remove(c);
                             reservationRemovedCar = true;
 
                         } else {
-                            System.out.println("this reservation " + r.getId() + " has no conflicts with the current reservation");
+                            //System.out.println("this reservation " + r.getId() + " has no conflicts with the current reservation");
                         }
                     } // ignore reservations which have been completed or cancelled
                     // if this reservation did not remove the car, and its end time is the latest so far while still before the incoming reservation's start time
                     if (reservationRemovedCar = false && r.getEndDateTime().after(latestReservationTiming) && r.getEndDateTime().before(startDateTime)) {
                         latestReservation = r;
                         updatedLatestReservation = true;
-                        System.out.println("updatedLatestReservation");
+                        //System.out.println("updatedLatestReservation");
                     }
                 }
                 if (c.getReservations().size() == 0) {
                     // if the car has no reservations and is at outlet, assign 
                     if (c.getLocation().toString() == pickUpOutlet.getName().toString()) {
-                        System.out.println("Car " + c.getPlateNumber() + "has no reservations and can be assigned to reservation");
+                        //System.out.println("Car " + c.getPlateNumber() + "has no reservations and can be assigned to reservation");
                         // reservationSessionBeanRemote.assignCarToReservation(chosenReservation, c);
                         assigned = true;
                         return true;
                     } else { // if car has no reservations but not at outlet, consider for transit
-                        System.out.println("Car that has no reservations can be assigned with transit " + c.getPlateNumber());
+                        //System.out.println("Car that has no reservations can be assigned with transit " + c.getPlateNumber());
                         carForAssignmentWithTransit = c;
                     }
                 }
@@ -692,55 +676,31 @@ public class MainApp {
                 if (updatedLatestReservation) {
                     // assign car if the it will be at the outlet already
                     if (latestReservation.getReturnLocation() == pickUpOutlet) {
-                        System.out.println("Reservation is being assigned to car " + c.getPlateNumber());
+                        //System.out.println("Reservation is being assigned to car " + c.getPlateNumber());
 
 //                        reservationSessionBeanRemote.assignCarToReservation(chosenReservation, c); // !!!!
                         assigned = true;
 
                         return true;
                     } else { // car will not be at the outlet and can be considered for transit
-                        System.out.println("Car that can be assigned with transit " + c.getPlateNumber());
+                        //System.out.println("Car that can be assigned with transit " + c.getPlateNumber());
 
                         carForAssignmentWithTransit = c;
                     }
                 }
             }
         }
-        System.out.println("iterated through all cars");
+        //System.out.println("iterated through all cars");
         if (!assigned && carsAvailableFiltered.size() != 0) {
-
-            // create transit Dispatch record
-//            calendar.setTime(chosenReservation.getStartDateTime());
-//            calendar.add(Calendar.HOUR, -2);
-//            Date transitTime = calendar.getTime();
-            // if car for transit has no reservations 
-//                    System.out.println("about to create new transit record");
-//
-//                    if (carForAssignmentWithTransit.getReservations().size() == 0) {
-//                        try {
-//                            System.out.println("create new transit record for car without reservations");
-//
-//                            generateTransitRecord(carForAssignmentWithTransit, chosenReservation.getPickUpLocation(), outletSessionBeanLocal.retrieveOutletByLocation(carForAssignmentWithTransit.getLocation()), transitTime);
-//                        } catch (OutletNotFoundException ex) {
-//                            System.out.println(ex.getMessage());
-//                        }
-//                    } else {
-//                        System.out.println("create new transit record for car with reservations");
-//
-//                        generateTransitRecord(carForAssignmentWithTransit, chosenReservation.getPickUpLocation(), latestReservation.getReturnLocation(), transitTime);
-//                    }
-            // car with transit option assigned
-//            reservationSessionBeanRemote.assignCarToReservation(chosenReservation, carForAssignmentWithTransit);
             return true;
         }
 
-        System.out.println("Printing cars available filtered");
-
+        //System.out.println("Printing cars available filtered");
         for (Car car : carsAvailableFiltered) {
-            System.out.println(car.getPlateNumber() + " " + car.getModel().getMake() + " " + car.getModel().getModel());
+            //System.out.println(car.getPlateNumber() + " " + car.getModel().getMake() + " " + car.getModel().getModel());
         }
         if (carsAvailableFiltered.size() == 0) {
-            System.out.println("No cars found for this timing and outlet");
+            //System.out.println("No cars found for this timing and outlet");
             return false;
         }
 
@@ -756,15 +716,15 @@ public class MainApp {
         }
     }
 
-    public double calculateRentalFee(Category category, Date pickUpDate, Date returnDate) {
+    public BigDecimal calculateRentalFee(Category category, Date pickUpDate, Date returnDate) {
         Date rentalDate = pickUpDate;
         double rentalFee = 0.0;
         Calendar c = Calendar.getInstance();
-        System.out.println("Calculating fee for category " + category.getCategoryName());
+        //System.out.println("Calculating fee for category " + category.getCategoryName());
 
         // loop while date of rental calculation fee is before return date
         while (rentalDate.before(returnDate)) {
-            System.out.println("Rental fee is " + rentalFee);
+            //System.out.println("Rental fee is " + rentalFee);
 
             List<RentalRateRecord> ratesAvailableOnDate = rentalRateRecordSessionBeanRemote.retrieveAllRateRecordsByDatebyCategory(rentalDate, category);
             if (category.getRateRecords().size() > 0) { // need more errors here to check if record is enabled
@@ -774,6 +734,6 @@ public class MainApp {
             c.add(Calendar.DATE, 1);
             rentalDate = c.getTime();
         }
-        return rentalFee;
+        return new BigDecimal(rentalFee);
     }
 }

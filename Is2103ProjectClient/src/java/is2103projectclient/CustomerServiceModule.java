@@ -99,7 +99,7 @@ public class CustomerServiceModule {
                 }
             }
         } else {
-            throw new InvalidEmployeeRoleException("You don't have EMPLOYEE rights to access the Sales Management module.");
+            throw new InvalidEmployeeRoleException("You don't have EMPLOYEE rights to access the Customer Service module.");
         }
     }
 

@@ -7,6 +7,7 @@ package ejb.session.stateless;
 
 import entity.Car;
 import entity.Customer;
+import entity.RentalRateRecord;
 import entity.Reservation;
 import java.util.Date;
 import java.util.List;
@@ -36,5 +37,7 @@ public interface ReservationSessionBeanRemote {
     public void unassignReservationFromCar(Reservation reservation);
 
     public List<Reservation> retrieveAllReservationsForCustomer(Customer customer) throws ReservationNotFoundException;
+
+    public boolean checkIfRentalRateUsed(RentalRateRecord rentalRateRecord);
 
 }

@@ -7,6 +7,7 @@ package ejb.session.stateless;
 
 import entity.Car;
 import entity.Customer;
+import entity.RentalRateRecord;
 import entity.Reservation;
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -18,6 +19,7 @@ import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
+import util.enumeration.ReservationPaymentEnum;
 import util.exception.CarNotFoundException;
 import util.exception.ReservationNotFoundException;
 
@@ -57,7 +59,7 @@ public class ReservationSessionBean implements ReservationSessionBeanRemote, Res
             throw new ReservationNotFoundException("Unable to locate reservation with id: " + reservationId);
         }
     }
-    
+
     @Override
     public List<Reservation> retrieveReservationByDate(Date currentDateTime) throws ReservationNotFoundException {
         // get all reservations
@@ -71,7 +73,7 @@ public class ReservationSessionBean implements ReservationSessionBeanRemote, Res
         c.add(Calendar.DATE, 1);
         c.set(Calendar.HOUR_OF_DAY, 1);
         c.set(Calendar.MINUTE, 59);
-        
+
         currentDateTime = c.getTime(); //  current day converted to 2359. need to change to 0159
         c.add(Calendar.DATE, -1);
         Date dayBeforeDateTime = c.getTime(); // previous day converted to 2359
@@ -95,11 +97,6 @@ public class ReservationSessionBean implements ReservationSessionBeanRemote, Res
         } else {
             throw new ReservationNotFoundException("Null / No reservations on date");
         }
-//        if (allReservations != null) {
-//            return allReservations;
-//        } else {
-//            throw new ReservationNotFoundException("No reservations on date");
-//        }
     }
 
     @Override
@@ -205,5 +202,17 @@ public class ReservationSessionBean implements ReservationSessionBeanRemote, Res
     public void merge(Reservation reservation) {
         em.merge(reservation);
         em.flush();
+    }
+
+    public boolean checkIfRentalRateUsed(RentalRateRecord rentalRateRecord) {
+        List<Reservation> reservations = retrieveAllReservations();
+        boolean isUsed = false;
+        for (Reservation r : reservations) {
+            r.getCar().getModel().getCategory().getRateRecords().size();
+            if (r.getReservationPaymentEnum().equals(ReservationPaymentEnum.ATPICKUP) && r.getCar().getModel().getCategory().getRateRecords().equals(rentalRateRecord)) {
+                isUsed = true;
+            }
+        }
+        return isUsed;
     }
 }

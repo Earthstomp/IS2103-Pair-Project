@@ -12,7 +12,6 @@ import ejb.session.stateless.TransitDriverDispatchRecordSessionBeanRemote;
 import entity.Car;
 import entity.Model;
 import entity.Category;
-import entity.Customer;
 import entity.Employee;
 import entity.Outlet;
 import entity.RentalRateRecord;
@@ -28,13 +27,11 @@ import java.util.List;
 import util.enumeration.CarStatusEnum;
 import util.enumeration.EmployeeRoleEnum;
 import util.enumeration.RentalRateEnum;
-import util.enumeration.ReservationPaymentEnum;
-import util.exception.CarNotFoundException;
 import util.exception.CategoryNotFoundException;
-import util.exception.CustomerNotFoundException;
 import util.exception.DeleteCarException;
 import util.exception.DeleteModelException;
 import util.exception.EmployeeNotFoundException;
+import util.exception.InvalidDateInputException;
 import util.exception.InvalidEmployeeRoleException;
 import util.exception.OutletNotFoundException;
 import util.exception.RentalRateRecordNotFoundException;
@@ -93,7 +90,7 @@ public class SalesManagementModule {
 
             while (true) {
                 System.out.println("\n\n*** Management System :: Sales Management :: Operations Manager***\n");
-                System.out.println("1: Create New model");
+                System.out.println("1: Create New Model");
                 System.out.println("2: View All Models");
                 System.out.println("3: Update Model");
                 System.out.println("4: Delete Model");
@@ -539,10 +536,8 @@ public class SalesManagementModule {
         System.out.println("Enter Transit Record Id> ");
         try {
             transit = transitDriverDispatchRecordSessionBeanRemote.retrieveTransitDriverDispatchRecordById(scanner.nextLong(), outlet);
-
-        } catch (TransitDriverDispatchRecordNotFromOutletException ex) {
-            System.out.println("An error has occurred while finding the Transit Record: " + ex.getMessage() + "\n");
-        } catch (TransitDriverDispatchRecordNotFoundException ex) {
+           
+        } catch (TransitDriverDispatchRecordNotFoundException | TransitDriverDispatchRecordNotFromOutletException ex) {
             System.out.println("An error has occurred while finding the Transit Record: " + ex.getMessage() + "\n");
         }
 
@@ -627,24 +622,26 @@ public class SalesManagementModule {
         Date startDate = new Date();
         SimpleDateFormat dateF = new SimpleDateFormat("d/M/y h:m");
         try {
-            startDate = dateF.parse(startDateString);
-            System.out.println("Entered Start Date is: " + startDate.toString());
+            try {
+                startDate = dateF.parse(startDateString);
+                System.out.println("Entered Start Date is: " + startDate.toString());
 
-            Date endDate = new Date();
-            endDate = dateF.parse(endDateString);
-            System.out.println("Entered End Date is: " + endDate.toString());
+                Date endDate = new Date();
+                endDate = dateF.parse(endDateString);
+                System.out.println("Entered End Date is: " + endDate.toString());
 
-            List<Date> validityPeriod = Arrays.asList(startDate, endDate);
-            rentalRate.setValidityPeriod(validityPeriod);
+                List<Date> validityPeriod = Arrays.asList(startDate, endDate);
+                rentalRate.setValidityPeriod(validityPeriod);
+            } catch (ParseException ex) {
+                throw new InvalidDateInputException("Invalid Date Input");
+            }
 
             Long rentalRateRecordId = rentalRateRecordSessionBeanRemote.createRentalRateRecord(rentalRate);
-                System.out.println("New Rental Rate Record created successfully!: " + rentalRateRecordSessionBeanRemote.retrieveRentalRateRecordById(rentalRateRecordId).getRecordName() + "\n");
-            } catch (RentalRateRecordNotFoundException | ParseException ex) {
-                System.out.println(ex.getMessage());
-            }
+            System.out.println("New Rental Rate Record created successfully!: " + rentalRateRecordSessionBeanRemote.retrieveRentalRateRecordById(rentalRateRecordId).getRecordName() + "\n");
+        } catch (RentalRateRecordNotFoundException | InvalidDateInputException ex) {
+            System.out.println(ex.getMessage());
         }
-
-    
+    }
 
     public void doViewAllRentalRates() {
         List<RentalRateRecord> rentalRateRecords = rentalRateRecordSessionBeanRemote.retrieveAllRateRecords();
@@ -660,13 +657,18 @@ public class SalesManagementModule {
         Scanner scanner = new Scanner(System.in);
         System.out.println("*** Management System :: Sales Management :: View Rental Rate Details ***\n");
         System.out.println("Enter Rental Rate Name > ");
+        String entry = scanner.nextLine().trim();
         try {
-            List<RentalRateRecord> rentalRateRecords = rentalRateRecordSessionBeanRemote.retrieveRentalRateRecordByName(scanner.nextLine().trim());
-            System.out.printf("\n%3s%20s%14s%14s%20s%35s%35s", "S/N", "Record Name", "Rate", "Type", "Category", "Start", "End");
-            int index = 1;
-            for (RentalRateRecord r : rentalRateRecords) {
-                System.out.printf("\n%3s%20s%14s%14s%20s%35s%35s", index + ".", r.getRecordName(), r.getRate(), r.getType().toString(), r.getCategory().getCategoryName(), r.getValidityPeriod().get(0), r.getValidityPeriod().get(1));
-                index++;
+            List<RentalRateRecord> rentalRateRecords = rentalRateRecordSessionBeanRemote.retrieveRentalRateRecordByName(entry);
+            if (rentalRateRecords.size() > 0) {
+                System.out.printf("\n%3s%20s%14s%14s%20s%35s%35s", "S/N", "Record Name", "Rate", "Type", "Category", "Start", "End");
+                int index = 1;
+                for (RentalRateRecord r : rentalRateRecords) {
+                    System.out.printf("\n%3s%20s%14s%14s%20s%35s%35s", index + ".", r.getRecordName(), r.getRate(), r.getType().toString(), r.getCategory().getCategoryName(), r.getValidityPeriod().get(0), r.getValidityPeriod().get(1));
+                    index++;
+                }
+            } else {
+                throw new RentalRateRecordNotFoundException("No Rental Rate Records with name " + entry + " found.");
             }
         } catch (RentalRateRecordNotFoundException ex) {
             System.out.println(ex.getMessage());
@@ -780,10 +782,11 @@ public class SalesManagementModule {
 
             RentalRateRecord updatedR = new RentalRateRecord(recordName, type, category, rate, startDate, endDate, enabled);
             rentalRateRecordSessionBeanRemote.updateRentalRateRecord(r, updatedR);
+            r = rentalRateRecordSessionBeanRemote.retrieveRentalRateRecordById(r.getId());
 
             System.out.println("Rental Rate Record updated successfully!");
             System.out.printf("\n%20s%14s%14s%20s%35s%35s", "Record Name", "Rate", "Type", "Category", "Start", "End");
-            System.out.printf("\n%20s%14s%14s%20s%35s%35s", r.getRecordName(), r.getRate(), r.getType().toString(), r.getCategory(), r.getValidityPeriod().get(0), r.getValidityPeriod().get(1));
+            System.out.printf("\n%20s%14s%14s%20s%35s%35s", r.getRecordName(), r.getRate(), r.getType().toString(), r.getCategory().getCategoryName(), r.getValidityPeriod().get(0), r.getValidityPeriod().get(1));
 
         } catch (RentalRateRecordNotFoundException | CategoryNotFoundException | ParseException ex) {
             System.out.println(ex.getMessage());
@@ -806,7 +809,7 @@ public class SalesManagementModule {
                 index++;
             }
 
-            System.out.println("Select Rental Rate Record by S/N > ");
+            System.out.println("\nSelect Rental Rate Record by S/N > ");
             Long rentalRateRecordId = rentalRateRecords.get(scanner.nextInt() - 1).getId();
             RentalRateRecord rentalRateRecord = rentalRateRecordSessionBeanRemote.retrieveRentalRateRecordById(rentalRateRecordId);
             scanner.nextLine();
@@ -814,8 +817,9 @@ public class SalesManagementModule {
             confirmDelete = scanner.nextLine().trim();
 
             if (confirmDelete.equalsIgnoreCase("Y")) {
-                // try { add DeleteRecordException
-                rentalRateRecordSessionBeanRemote.removeRentalRateRecord(rentalRateRecord.getId());
+                boolean isUsed = reservationSessionBeanRemote.checkIfRentalRateUsed(rentalRateRecord);
+                
+                rentalRateRecordSessionBeanRemote.removeRentalRateRecord(rentalRateRecord.getId(), isUsed);
                 System.out.println("Rental Rate Record " + rentalRateRecord.getRecordName() + " deleted successfully!");
             } else {
                 System.out.println("Delete cancelled!\n");

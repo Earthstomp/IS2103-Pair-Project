@@ -5,7 +5,6 @@
  */
 package ejb.session.stateless;
 
-import entity.Category;
 import entity.RentalRateRecord;
 import java.util.List;
 import javax.ejb.Local;
@@ -18,18 +17,18 @@ import util.exception.RentalRateRecordNotFoundException;
 @Local
 public interface RentalRateRecordSessionBeanLocal {
 
-    public void removeRentalRateRecord(Long id);
-
     public RentalRateRecord retrieveRentalRateRecordById(Long id) throws RentalRateRecordNotFoundException;
 
     public List<RentalRateRecord> retrieveAllRateRecords();
 
     public Long createRentalRateRecord(RentalRateRecord rentalRateRecord);
 
-    public void updateRentalRateRecord(RentalRateRecord rentalRateRecord,  RentalRateRecord newRentalRateRecord) throws RentalRateRecordNotFoundException;
+    public void updateRentalRateRecord(RentalRateRecord rentalRateRecord, RentalRateRecord newRentalRateRecord) throws RentalRateRecordNotFoundException;
 
     public List<RentalRateRecord> retrieveRentalRateRecordByName(String name) throws RentalRateRecordNotFoundException;
 
     public void merge(RentalRateRecord rentalRateRecord);
+
+    public void removeRentalRateRecord(Long id, boolean isUsed);
 
 }

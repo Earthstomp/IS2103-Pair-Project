@@ -19,6 +19,7 @@ import entity.Employee;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.InputMismatchException;
 import java.util.Scanner;
 import util.exception.InvalidEmployeeRoleException;
 import util.exception.InvalidLoginCredentialsException;
@@ -94,7 +95,7 @@ public class MainApp {
                                 employee, categorySessionBeanRemote, rentalRateRecordSessionBeanRemote, customerSessionBeanRemote, reservationSessionBeanRemote);
                         
                         menuMain();
-                    } catch (InvalidLoginCredentialsException ex) {
+                    } catch (InvalidLoginCredentialsException | InputMismatchException ex) {
                         System.out.println("Invalid login credential: " + ex.getMessage() + "\n");
                     }
                 } else if (response == 2) {

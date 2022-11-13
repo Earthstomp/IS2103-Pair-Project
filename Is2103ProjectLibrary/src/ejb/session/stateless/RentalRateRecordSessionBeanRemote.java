@@ -10,6 +10,7 @@ import entity.RentalRateRecord;
 import java.util.Date;
 import java.util.List;
 import javax.ejb.Remote;
+import util.exception.RemovalException;
 import util.exception.RentalRateRecordNotFoundException;
 
 /**
@@ -18,8 +19,6 @@ import util.exception.RentalRateRecordNotFoundException;
  */
 @Remote
 public interface RentalRateRecordSessionBeanRemote {
-
-    public void removeRentalRateRecord(Long id);
 
     public RentalRateRecord retrieveRentalRateRecordById(Long id) throws RentalRateRecordNotFoundException;
 
@@ -36,5 +35,7 @@ public interface RentalRateRecordSessionBeanRemote {
     public List<RentalRateRecord> retrieveAllRateRecordsByDatebyCategory(Date date, Category category);
 
     public RentalRateRecord chooseRateRecord(List<RentalRateRecord> rates);
+
+    public void removeRentalRateRecord(Long id, boolean isUsed);
 
 }
