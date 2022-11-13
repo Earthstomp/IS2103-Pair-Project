@@ -134,7 +134,6 @@ public class DataInitializationSessionBean {
 
         try {
             // PERSONAL TEST DATA
-            outletSessionBeanLocal.createNewOutlet(new Outlet("location", null, null));
 
             outletAId = outletSessionBeanLocal.createNewOutlet(new Outlet("Outlet A", null, null));
             outletBId = outletSessionBeanLocal.createNewOutlet(new Outlet("Outlet B", null, null));
@@ -146,8 +145,6 @@ public class DataInitializationSessionBean {
 
         try {
             // PERSONAL TEST DATA
-            employeeSessionBeanLocal.createNewEmployeeWithExistingOutlet(new Employee(EmployeeRoleEnum.ADMINISTRATOR, "admin", "pw"), outletSessionBeanLocal.retrieveOutletByLocation("location").getOutletId());
-
             employeeSessionBeanLocal.createNewEmployeeWithExistingOutlet(new Employee(EmployeeRoleEnum.SALES_MANAGER, "Employee A1", "pw"), outletSessionBeanLocal.retrieveOutletByLocation("Outlet A").getOutletId());
             employeeSessionBeanLocal.createNewEmployeeWithExistingOutlet(new Employee(EmployeeRoleEnum.OPERATIONS_MANAGER, "Employee A2", "pw"), outletSessionBeanLocal.retrieveOutletByLocation("Outlet A").getOutletId());
             employeeSessionBeanLocal.createNewEmployeeWithExistingOutlet(new Employee(EmployeeRoleEnum.CUSTOMER_SERVICE_EXECUTIVE, "Employee A3", "pw"), outletSessionBeanLocal.retrieveOutletByLocation("Outlet A").getOutletId());
@@ -288,66 +285,66 @@ public class DataInitializationSessionBean {
         partnerSessionBeanLocal.createPartner(new Partner("Holiday.com"));
 
         // PERSONAL TEST DATA
-        GregorianCalendar calendar = new GregorianCalendar();
-        calendar.setTime(new Date());
-
-        Date date1start = calendar.getTime(); // current time
-        calendar.add(GregorianCalendar.HOUR_OF_DAY, 1); // set return 1 hour later
-        Date date1end = calendar.getTime();
-        calendar.add(GregorianCalendar.HOUR_OF_DAY, 1); // set return 1 hour later
-        Date date1end2 = calendar.getTime();
-
-        Calendar c = Calendar.getInstance();
-        c.setTime(new Date());
-        c.add(Calendar.DATE, -1); // set date to one day ago
-        Date date2start = c.getTime();
-        c.add(Calendar.HOUR, 2); // reservation of 2 hours
-        Date date2end = c.getTime();
-
-        // PERSONAL TEST DATA
-        Outlet outletA = new Outlet();
-        Outlet outletB = new Outlet();
-        Outlet outletC = new Outlet();
-        try {
-            Long cardId = creditCardSessionBeanLocal.createNewCard(new CreditCard("123456"));
-            CreditCard card = creditCardSessionBeanLocal.retrieveCardById(cardId);
-            Customer customer = new Customer("91234567", "12345678", "test@test.com", "user", "pw");
-            Long customerId = customerSessionBeanLocal.createNewCustomer(new Customer("91234567", "12345678", "test@test.com", "user", "pw"), card);
-            Customer testCustomer = customerSessionBeanLocal.retrieveCustomerByMobileNumber("91234567");
-
-            // PERSONAL TEST DATA
-            try {
-                outletA = outletSessionBeanLocal.retrieveOutletById(outletAId);
-                outletB = outletSessionBeanLocal.retrieveOutletById(outletBId);
-                outletC = outletSessionBeanLocal.retrieveOutletById(outletCId);
-            } catch (OutletNotFoundException ex) {
-                System.out.println(ex.getMessage());
-            }
+//        GregorianCalendar calendar = new GregorianCalendar();
+//        calendar.setTime(new Date());
+//
+//        Date date1start = calendar.getTime(); // current time
+//        calendar.add(GregorianCalendar.HOUR_OF_DAY, 1); // set return 1 hour later
+//        Date date1end = calendar.getTime();
+//        calendar.add(GregorianCalendar.HOUR_OF_DAY, 1); // set return 1 hour later
+//        Date date1end2 = calendar.getTime();
+//
+//        Calendar c = Calendar.getInstance();
+//        c.setTime(new Date());
+//        c.add(Calendar.DATE, -1); // set date to one day ago
+//        Date date2start = c.getTime();
+//        c.add(Calendar.HOUR, 2); // reservation of 2 hours
+//        Date date2end = c.getTime();
+//
+//        // PERSONAL TEST DATA
+//        Outlet outletA = new Outlet();
+//        Outlet outletB = new Outlet();
+//        Outlet outletC = new Outlet();
+//        try {
+//            Long cardId = creditCardSessionBeanLocal.createNewCard(new CreditCard("123456"));
+//            CreditCard card = creditCardSessionBeanLocal.retrieveCardById(cardId);
+//            Customer customer = new Customer("91234567", "12345678", "test@test.com", "user", "pw");
+//            Long customerId = customerSessionBeanLocal.createNewCustomer(new Customer("91234567", "12345678", "test@test.com", "user", "pw"), card);
+//            Customer testCustomer = customerSessionBeanLocal.retrieveCustomerByMobileNumber("91234567");
+//
+//            // PERSONAL TEST DATA
+//            try {
+//                outletA = outletSessionBeanLocal.retrieveOutletById(outletAId);
+//                outletB = outletSessionBeanLocal.retrieveOutletById(outletBId);
+//                outletC = outletSessionBeanLocal.retrieveOutletById(outletCId);
+//            } catch (OutletNotFoundException ex) {
+//                System.out.println(ex.getMessage());
+//            }
             // PERSONAL TEST DATA
 //            Long reservationId = customerSessionBeanLocal.createNewReservation(new Reservation(date2start, date1end, outletA, outletB, ReservationPaymentEnum.PAID, testCustomer, "Honda", "Civic"), customerId);
 //            Long reservationId3 = customerSessionBeanLocal.createNewReservation(new Reservation(date1start, date1end2, outletA, outletB, ReservationPaymentEnum.ATPICKUP, testCustomer, "Honda", "Civic"), customerId);
 //            Long reservationId2 = customerSessionBeanLocal.createNewReservation(new Reservation(date1end, date1end2, outletA, outletB, ReservationPaymentEnum.ATPICKUP, testCustomer, "Honda", "Civic"), customerId);
 
-            Long reservationId = customerSessionBeanLocal.createNewReservation(new Reservation(date2start, date1end, outletA, outletB, ReservationPaymentEnum.PAID, testCustomer, "Mercedes", "E Class"), customerId);
-            Long reservationId2 = customerSessionBeanLocal.createNewReservation(new Reservation(date1end, date1end2, outletB, outletB, ReservationPaymentEnum.ATPICKUP, testCustomer, "BMW", "5 Series"), customerId);
-            Long reservationId3 = customerSessionBeanLocal.createNewReservation(new Reservation(date1start, date1end2, outletC, outletB, ReservationPaymentEnum.ATPICKUP, testCustomer, "Audi", "A6"), customerId);
+//            Long reservationId = customerSessionBeanLocal.createNewReservation(new Reservation(date2start, date1end, outletA, outletB, ReservationPaymentEnum.PAID, testCustomer, "Mercedes", "E Class"), customerId);
+//            Long reservationId2 = customerSessionBeanLocal.createNewReservation(new Reservation(date1end, date1end2, outletB, outletB, ReservationPaymentEnum.ATPICKUP, testCustomer, "BMW", "5 Series"), customerId);
+//            Long reservationId3 = customerSessionBeanLocal.createNewReservation(new Reservation(date1start, date1end2, outletC, outletB, ReservationPaymentEnum.ATPICKUP, testCustomer, "Audi", "A6"), customerId);
 
-            try {
-                // car 4 SS00B1HC reserved by reservation 1
-                reservationSessionBeanLocal.assignCarToReservation(reservationSessionBeanLocal.retrieveReservationById(reservationId), carSessionBeanLocal.retrieveCarById(carId));
-                // car 5 SS00B2HC reserved by reservation 2
-                reservationSessionBeanLocal.assignCarToReservation(reservationSessionBeanLocal.retrieveReservationById(reservationId2), carSessionBeanLocal.retrieveCarById(carId2));
-                // car 6 SS00B3HC reserved by reservation 3
-//                reservationSessionBeanLocal.assignCarToReservation(reservationSessionBeanLocal.retrieveReservationById(reservationId3), carSessionBeanLocal.retrieveCarById(carId3));
-
-                System.out.println("Reservation assigned");
-            } catch (CarNotFoundException ex) {
-                System.out.println(ex.getMessage());
-            } catch (ReservationNotFoundException ex) {
-                System.out.println(ex.getMessage());
-            }
-        } catch (CustomerExistsException | CustomerNotFoundException ex) {
-        }
+//            try {
+//                // car 4 SS00B1HC reserved by reservation 1
+//                reservationSessionBeanLocal.assignCarToReservation(reservationSessionBeanLocal.retrieveReservationById(reservationId), carSessionBeanLocal.retrieveCarById(carId));
+//                // car 5 SS00B2HC reserved by reservation 2
+//                reservationSessionBeanLocal.assignCarToReservation(reservationSessionBeanLocal.retrieveReservationById(reservationId2), carSessionBeanLocal.retrieveCarById(carId2));
+//                // car 6 SS00B3HC reserved by reservation 3
+////                reservationSessionBeanLocal.assignCarToReservation(reservationSessionBeanLocal.retrieveReservationById(reservationId3), carSessionBeanLocal.retrieveCarById(carId3));
+//
+//                System.out.println("Reservation assigned");
+//            } catch (CarNotFoundException ex) {
+//                System.out.println(ex.getMessage());
+//            } catch (ReservationNotFoundException ex) {
+//                System.out.println(ex.getMessage());
+//            }
+//        } catch (CustomerExistsException | CustomerNotFoundException ex) {
+//        }
 
     }
 //        } catch (PartnerExistsException ex) { //UnknownPersistenceException ex
