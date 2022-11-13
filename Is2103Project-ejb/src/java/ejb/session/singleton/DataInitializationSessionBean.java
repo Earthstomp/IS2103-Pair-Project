@@ -2,7 +2,6 @@ package ejb.session.singleton;
 
 import ejb.session.stateless.CarSessionBeanLocal;
 import ejb.session.stateless.CategorySessionBeanLocal;
-import ejb.session.stateless.CreditCardSessionBean;
 import ejb.session.stateless.CreditCardSessionBeanLocal;
 import ejb.session.stateless.CustomerSessionBeanLocal;
 import ejb.session.stateless.EmployeeSessionBeanLocal;
@@ -77,7 +76,7 @@ public class DataInitializationSessionBean {
 
     @EJB
     private CarSessionBeanLocal carSessionBeanLocal;
-    
+
     @EJB
     private CreditCardSessionBeanLocal creditCardSessionBeanLocal;
 
@@ -241,19 +240,19 @@ public class DataInitializationSessionBean {
             c.set(Calendar.HOUR_OF_DAY, 0);
             c.set(Calendar.MINUTE, 0);
             rate6start = c.getTime();
-            
+
             rate6end = inputDateFormat.parse("06/12/2022");
             c.setTime(rate6end);
             c.set(Calendar.HOUR_OF_DAY, 23);
             c.set(Calendar.MINUTE, 59);
             rate6end = c.getTime();
-        
+
             rate7start = inputDateFormat.parse("07/12/2022");
             c.setTime(rate7start);
             c.set(Calendar.HOUR_OF_DAY, 0);
             c.set(Calendar.MINUTE, 0);
             rate7start = c.getTime();
-            
+
             rate7end = inputDateFormat.parse("07/12/2022");
             c.setTime(rate7end);
             c.set(Calendar.HOUR_OF_DAY, 23);
@@ -265,14 +264,12 @@ public class DataInitializationSessionBean {
             c.set(Calendar.HOUR_OF_DAY, 12);
             c.set(Calendar.MINUTE, 0);
             rate8start = c.getTime();
-            
+
             rate8end = inputDateFormat.parse("08/12/2022");
             c.setTime(rate8end);
             c.set(Calendar.HOUR_OF_DAY, 12);
             c.set(Calendar.MINUTE, 0);
             rate8end = c.getTime();
-            
-            
 
         } catch (ParseException ex) {
             System.out.println("Invalid date input!\n");
@@ -314,7 +311,8 @@ public class DataInitializationSessionBean {
         try {
             Long cardId = creditCardSessionBeanLocal.createNewCard(new CreditCard("123456"));
             CreditCard card = creditCardSessionBeanLocal.retrieveCardById(cardId);
-            Long customerId = customerSessionBeanLocal.createNewCustomer(new Customer("91234567", "12345678", "test@test.com", card, "user", "pw"));
+            Customer customer = new Customer("91234567", "12345678", "test@test.com", "user", "pw");
+            Long customerId = customerSessionBeanLocal.createNewCustomer(new Customer("91234567", "12345678", "test@test.com", "user", "pw"), card);
             Customer testCustomer = customerSessionBeanLocal.retrieveCustomerByMobileNumber("91234567");
 
             // PERSONAL TEST DATA

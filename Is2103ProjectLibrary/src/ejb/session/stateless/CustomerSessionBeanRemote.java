@@ -5,6 +5,7 @@
  */
 package ejb.session.stateless;
 
+import entity.CreditCard;
 import entity.Customer;
 import entity.Reservation;
 import javax.ejb.Remote;
@@ -21,7 +22,7 @@ public interface CustomerSessionBeanRemote {
 
     public Long createNewReservation(Reservation reservation, Long customerId);
 
-    public Long createNewCustomer(Customer customer) throws CustomerExistsException;
+    public Long createNewCustomer(Customer customer, CreditCard card) throws CustomerExistsException;
 
     public Customer retrieveCustomerByMobileNumber(String mobileNumber) throws CustomerNotFoundException;
 

@@ -5,6 +5,7 @@
  */
 package ejb.session.stateless;
 
+import entity.CreditCard;
 import entity.Customer;
 import entity.Reservation;
 import javax.ejb.Stateless;
@@ -28,7 +29,7 @@ public class CustomerSessionBean implements CustomerSessionBeanRemote, CustomerS
     private EntityManager em;
 
     @Override
-    public Long createNewCustomer(Customer customer) throws CustomerExistsException {
+    public Long createNewCustomer(Customer customer, CreditCard card) throws CustomerExistsException {
         try {
             retrieveCustomerByUsername(customer.getUsername());
             retrieveCustomerByMobileNumber(customer.getMobileNumber());
@@ -36,6 +37,7 @@ public class CustomerSessionBean implements CustomerSessionBeanRemote, CustomerS
             throw new CustomerExistsException("Customer already exists.");
         } catch (CustomerNotFoundException ex) {
             em.persist(customer);
+            customer.setCreditCard(card);
             em.flush();
         }
 
@@ -96,6 +98,8 @@ public class CustomerSessionBean implements CustomerSessionBeanRemote, CustomerS
             Customer customer = retrieveCustomerByUsername(username);
 
             if (customer.getPassword().equals(password)) {
+                customer.getCreditCard();
+                customer.getReservations();
                 return customer;
             } else {
                 throw new InvalidLoginCredentialsException("Username does not exist or invalid password!");
