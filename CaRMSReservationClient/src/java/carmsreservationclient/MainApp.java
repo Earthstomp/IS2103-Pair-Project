@@ -25,6 +25,7 @@ import java.text.ParseException;
 import java.util.Date;
 import java.util.List;
 import entity.Category;
+import entity.RentalRateRecord;
 import entity.Reservation;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -82,7 +83,7 @@ public class MainApp {
             System.out.println("1: Login");
             System.out.println("2: Register as Customer");
             System.out.println("3: Search Car");
-            System.out.println("4: Reserv Car");
+            System.out.println("4: Reserve Car");
             System.out.println("5: Cancel Reservation");
             System.out.println("6: View Reservation Details");
             System.out.println("7: View All My Reservations");
@@ -197,9 +198,12 @@ public class MainApp {
         assignReservations();
         System.out.printf("\n%3s%16s%15s%15s", "ID", "Car Category", "Available?", "Rental Fee");
         for (Category category : categories) {
-            boolean availability = assignReservationByCategory(category, pickUpOutlet, returnOutlet, returnDate, returnDate);
-            System.out.printf("\n%3s%16s%15s%15s", category.getCategoryId(), category.getCategoryName(), availability, "???");
+            // was an error here need to check
+            boolean availability = assignReservationByCategory(category, pickUpOutlet, returnOutlet, pickUpDate, returnDate);
+            Double rentalFee = calculateRentalFee(category, pickUpDate, returnDate);
+            System.out.printf("\n%3s%16s%15s%15s", category.getCategoryId(), category.getCategoryName(), availability, rentalFee);
             categoryAvailabilities.add(availability);
+
         }
         unassignReservations();
         Scanner scanner = new Scanner(System.in);
@@ -218,7 +222,6 @@ public class MainApp {
 
                     //doReserveCar();
                     // need more code here
-
                 } else if (response == 2) {
                     // register as customer method
                     break;
@@ -639,47 +642,25 @@ public class MainApp {
 
         }
     }
-}
 
-//    private void menuMain() {
-//        Scanner scanner = new Scanner(System.in);
-//        Integer response = 0;
-//
-//        while (true) {
-//            System.out.println("*** CaRMS Management Client ***\n");
-//            System.out.println("You are login as " + employee.getUsername() + " with " + employee.getRole().toString() + " rights\n");
-//            System.out.println("1: Sales Management Module");
-//            System.out.println("2: Customer Management Module");
-//            System.out.println("3: Logout\n");
-//            response = 0;
-//
-//            while (response < 1 || response > 3) {
-//                System.out.print("> ");
-//
-//                response = scanner.nextInt();
-//
-//                if (response == 1) {
-//                    try {
-//                        salesManagementModule.menuSalesManagementModule();
-//                    } catch (InvalidEmployeeRoleException ex) {
-//                        System.out.println("Invalid option, please try again!: " + ex.getMessage() + "\n");
-//                    }
-//                } else if (response == 2) {
-////                    try {
-////                        systemAdministrationModule.menuSystemAdministration();
-////                    } catch (InvalidAccessRightException ex) {
-////                        System.out.println("Invalid option, please try again!: " + ex.getMessage() + "\n");
-////                    }
-//                } else if (response == 3) {
-//                    break;
-//                } else {
-//                    System.out.println("Invalid option, please try again!\n");
-//                }
-//            }
-//
-//            if (response == 3) {
-//                break;
-//            }
-//        }
-//    }
-//}
+    public double calculateRentalFee(Category category, Date pickUpDate, Date returnDate) {
+        Date rentalDate = pickUpDate;
+        double rentalFee = 0.0;
+        Calendar c = Calendar.getInstance();
+        System.out.println("Calculating fee for category " + category.getCategoryName());
+
+        // loop while date of rental calculation fee is before return date
+        while (rentalDate.before(returnDate)) {
+            System.out.println("Rental fee is " + rentalFee);
+
+            List<RentalRateRecord> ratesAvailableOnDate = rentalRateRecordSessionBeanRemote.retrieveAllRateRecordsByDatebyCategory(rentalDate, category);
+            if (category.getRateRecords().size() > 0) { // need more errors here to check if record is enabled
+                rentalFee += rentalRateRecordSessionBeanRemote.chooseRateRecord(ratesAvailableOnDate).getRate();
+            }
+            c.setTime(rentalDate);
+            c.add(Calendar.DATE, 1);
+            rentalDate = c.getTime();
+        }
+        return rentalFee;
+    }
+}

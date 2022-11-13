@@ -4,7 +4,6 @@
     <jta-data-source>jdbc/is2103Project</jta-data-source>
     <class>entity.Car</class>
     <class>entity.Category</class>
-    <class>entity.CreditCard</class>
     <class>entity.Customer</class>
     <class>entity.Employee</class>
     <class>entity.Model</class>
@@ -13,6 +12,7 @@
     <class>entity.Reservation</class>
     <class>entity.TransitDriverDispatchRecord</class>
     <class>entity.RentalRateRecord</class>
+    <class>entity.CreditCard</class>
     <exclude-unlisted-classes>true</exclude-unlisted-classes>
     <properties>
       <property name="javax.persistence.schema-generation.database.action" value="create"/>

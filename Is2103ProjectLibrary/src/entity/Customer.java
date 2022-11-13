@@ -14,6 +14,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
 
 /**
  *
@@ -34,30 +35,27 @@ public class Customer implements Serializable {
     private String email;
     @OneToMany (mappedBy = "customer")
     private List<Reservation> reservations;
-    /*@OneToMany(mappedBy = "customer")
+    @OneToOne
     private CreditCard creditCard;
     
-    @Column(unique = true)
-    private String username;
-    private String password;*/
     
     public Customer() {
         
     }
     
-    public Customer(String mobileNumber, String email) {
+    public Customer(String mobileNumber, String email, CreditCard creditCard) {
         this.mobileNumber = mobileNumber;
         this.email = email;
+        this.creditCard = creditCard;
     }
 
-    public Customer(Long customerId, Partner partner, String mobileNumber, String passportNumber, String email, List<Reservation> reservations, CreditCard cc) {
+    public Customer(Long customerId, Partner partner, String mobileNumber, String passportNumber, String email, List<Reservation> reservations) {
         this.customerId = customerId;
         this.partner = partner;
         this.mobileNumber = mobileNumber;
         this.passportNumber = passportNumber;
         this.email = email;
         this.reservations = reservations;
-//        this.creditCard = creditCard;
     }
 
     public Long getCustomerId() {
@@ -158,28 +156,23 @@ public class Customer implements Serializable {
         this.partner = partner;
     }
 
-    /*public CreditCard getCreditCard() {
+    /**
+     * @return the creditCard
+     */
+    public CreditCard getCreditCard() {
         return creditCard;
     }
 
+    /**
+     * @param creditCard the creditCard to set
+     */
     public void setCreditCard(CreditCard creditCard) {
         this.creditCard = creditCard;
     }
 
-    public String getUsername() {
-        return username;
-    }
+    /**
+     * @return the creditCards
+     */
 
-    public void setUsername(String username) {
-        this.username = username;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
-    }*/
     
 }

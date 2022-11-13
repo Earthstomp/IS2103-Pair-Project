@@ -7,11 +7,13 @@ package ejb.session.stateless;
 
 import entity.Category;
 import entity.RentalRateRecord;
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
-import javax.persistence.Query;
+import util.enumeration.RentalRateEnum;
 import util.exception.RentalRateRecordNotFoundException;
 
 /**
@@ -41,6 +43,80 @@ public class RentalRateRecordSessionBean implements RentalRateRecordSessionBeanR
             r.getCategory();
         }
         return rentalRateRecords;
+    }
+
+    public List<RentalRateRecord> retrieveAllRateRecordsByDatebyCategory(Date date, Category category) {
+        List<RentalRateRecord> rentalRateRecords = em.createQuery("SELECT r FROM RentalRateRecord r WHERE r.category.categoryName = :categoryName")
+                .setParameter("categoryName", category.getCategoryName())
+                .getResultList();
+
+        List<RentalRateRecord> ratesAvailableOnDate = new ArrayList<RentalRateRecord>();
+        for (RentalRateRecord r : rentalRateRecords) {
+            List<Date> validityPeriod = r.getValidityPeriod();
+//            r.getValidityPeriod();
+            System.out.println("Rental rate record is ID " + r.getId() + " name is " + r.getRecordName());
+            Date rateStartTime = validityPeriod.get(0);
+            System.out.println("rate start time is " + rateStartTime);
+            Date rateEndTime = validityPeriod.get(1);
+            System.out.println("rate end time is " + rateEndTime);
+
+            // if the rentalDate is within the rate period
+            if (rateStartTime == null) {
+                                ratesAvailableOnDate.add(r);
+            } else if (date.after(rateStartTime) && date.before(rateEndTime)) {
+                ratesAvailableOnDate.add(r);
+            } else {
+                
+            }
+        }
+        return ratesAvailableOnDate;
+    }
+
+    public RentalRateRecord chooseRateRecord(List<RentalRateRecord> rates) {
+
+        List<RentalRateRecord> promotionRates = new ArrayList<RentalRateRecord>();
+        List<RentalRateRecord> peakRates = new ArrayList<RentalRateRecord>();
+        List<RentalRateRecord> defaultRates = new ArrayList<RentalRateRecord>();
+
+        for (RentalRateRecord r : rates) {
+            if (r.getType() == (RentalRateEnum.PROMOTION)) {
+                promotionRates.add(r);
+            } else if (r.getType() == (RentalRateEnum.PEAK)) {
+                peakRates.add(r);
+            } else { //  default
+                defaultRates.add(r);
+            }
+        }
+        
+        System.out.println(promotionRates.size() + " " +  peakRates.size() + " " + defaultRates.size());
+
+        if (promotionRates.size() > 0) {
+            RentalRateRecord lowestRate = promotionRates.get(0);
+            for (RentalRateRecord promotionRate : promotionRates) {
+                if (promotionRate.getRate() < lowestRate.getRate()) {
+                    lowestRate = promotionRate;
+                }
+            }
+
+            return lowestRate;
+        } else if (peakRates.size() > 0) {
+            RentalRateRecord lowestRate = peakRates.get(0);
+            for (RentalRateRecord peakRate : peakRates) {
+                if (peakRate.getRate() < lowestRate.getRate()) {
+                    lowestRate = peakRate;
+                }
+            }
+            return lowestRate;
+        } else { // for default rates
+            RentalRateRecord lowestRate = defaultRates.get(0);
+            for (RentalRateRecord defaultRate : defaultRates) {
+                if (defaultRate.getRate() < lowestRate.getRate()) {
+                    lowestRate = defaultRate;
+                }
+            }
+            return lowestRate;
+        }
+
     }
 
     @Override
@@ -78,7 +154,7 @@ public class RentalRateRecordSessionBean implements RentalRateRecordSessionBeanR
     public RentalRateRecord retrieveRentalRateRecordByName(String name) throws RentalRateRecordNotFoundException {
         try {
             RentalRateRecord rentalRateRecord = (RentalRateRecord) em.createQuery("SELECT r FROM RentalRateRecord r WHERE r.recordName = :InName")
-                    .setParameter("InName", name)            
+                    .setParameter("InName", name)
                     .getSingleResult();
 
             rentalRateRecord.getValidityPeriod().size();
@@ -111,7 +187,7 @@ public class RentalRateRecordSessionBean implements RentalRateRecordSessionBeanR
         }
 
     }
-    
+
     public void merge(RentalRateRecord rentalRateRecord) {
         em.merge(rentalRateRecord);
     }
