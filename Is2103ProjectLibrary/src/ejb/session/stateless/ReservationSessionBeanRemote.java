@@ -5,10 +5,12 @@
  */
 package ejb.session.stateless;
 
+import entity.Car;
 import entity.Reservation;
 import java.util.Date;
 import java.util.List;
 import javax.ejb.Remote;
+import util.exception.CarNotFoundException;
 import util.exception.ReservationNotFoundException;
 
 /**
@@ -27,5 +29,9 @@ public interface ReservationSessionBeanRemote {
     public List<Reservation> retrieveReservationByDate(Date startDateTime) throws ReservationNotFoundException;
 
     public void merge(Reservation reservation);
+
+    public void assignCarToReservation(Reservation reservation, Car car) throws ReservationNotFoundException, CarNotFoundException;
+
+    public void unassignReservationFromCar(Reservation reservation);
 
 }

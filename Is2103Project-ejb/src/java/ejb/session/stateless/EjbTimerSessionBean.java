@@ -41,7 +41,8 @@ public class EjbTimerSessionBean implements EjbTimerSessionBeanLocal, EjbTimerSe
     // For testing purpose, we are allowing the timer to trigger every 8 seconds instead of every day at 8am
     // To trigger the timer once every day at 8am instead, use the following the @Schedule annotation
     // @Schedule(dayOfWeek="*", hour = "8", info = "currentDayCarAllocationTransitDriverDispatchRecordGeneratorTimer")    
-    @Schedule(hour = "*", minute = "*", second = "*/30", info = "currentDayCarAllocationTimer")
+//    @Schedule(hour = "2", minute = "0", second = "0", info = "currentDayCarAllocationTimer")
+    @Schedule(hour = "*", minute = "*/8", info = "currentDayCarAllocationTimer")
     public void currentDayCarAllocationTimer() {
         Date timeStamp = new Date(); // new SimpleDateFormat("yyyy.MM.dd.HH.mm.ss").format(
         System.out.println("********** EjbTimerSessionBean.currentDayCarAllocationTimer(): Timeout at " + timeStamp);
@@ -54,7 +55,7 @@ public class EjbTimerSessionBean implements EjbTimerSessionBeanLocal, EjbTimerSe
             System.out.println("********** there is a total of " + reservations.size() + " on " + timeStamp);
 
             System.out.printf("\n%20s%20s%20s%20s%14s%14s", "Customer email", "Start Time", "End Time", "Requirements", "Pick up Location", "Return Location");
-            
+
             for (Reservation reservation : reservations) {
                 System.out.printf("\n%20s%20s%20s%20s%14s%14s", reservation.getCustomer().getEmail(), reservation.getStartDateTime().toString(), reservation.getEndDateTime().toString(),
                         reservation.getRequirements().toString(), reservation.getPickUpLocation().getName(), reservation.getReturnLocation().getName());
@@ -63,7 +64,35 @@ public class EjbTimerSessionBean implements EjbTimerSessionBeanLocal, EjbTimerSe
             System.out.println("There are no reservations today!");
         }
 
-        // iterate through all reservations and assign cars
+//         iterate through all reservations and assign cars
+        for (Reservation r : reservations)
+            try {
+            System.out.println(r.getRequirements());
+            allocateCarToReservation(r);
+        } catch (CarNotFoundException | ReservationNotFoundException ex) {
+            System.out.println(ex.getMessage());
+        }
+    }
+
+    public void allocateCarsManual(Date date) {
+        List<Reservation> reservations = new ArrayList<Reservation>();
+        List<Car> availableCars = new ArrayList<Car>();
+
+        try {
+            // need to check if assigned?
+            reservations = reservationSessionBeanLocal.retrieveReservationByDate(date);
+
+            System.out.printf("\n%20s%20s%20s%20s%14s%14s", "Customer email", "Start Time", "End Time", "Requirements", "Pick up Location", "Return Location");
+
+            for (Reservation reservation : reservations) {
+                System.out.printf("\n%20s%20s%20s%20s%14s%14s", reservation.getCustomer().getEmail(), reservation.getStartDateTime().toString(), reservation.getEndDateTime().toString(),
+                        reservation.getRequirements().toString(), reservation.getPickUpLocation().getName(), reservation.getReturnLocation().getName());
+            }
+        } catch (ReservationNotFoundException ex) {
+            System.out.println("There are no reservations today!");
+        }
+
+        //         iterate through all reservations and assign cars
         for (Reservation r : reservations)
             try {
             System.out.println(r.getRequirements());

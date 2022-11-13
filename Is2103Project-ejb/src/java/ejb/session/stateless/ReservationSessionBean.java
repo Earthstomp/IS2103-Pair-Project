@@ -27,24 +27,31 @@ import util.exception.ReservationNotFoundException;
  */
 @Stateless
 public class ReservationSessionBean implements ReservationSessionBeanRemote, ReservationSessionBeanLocal {
-    
+
     @PersistenceContext(unitName = "Is2103Project-ejbPU")
     private EntityManager em;
     @EJB
     private CarSessionBeanLocal carSessionBeanLocal;
-    
+
     @Override
     public List<Reservation> retrieveAllReservations() {
         Query query = em.createQuery("SELECT r FROM Reservation r");
-        
+
         return query.getResultList();
     }
-    
+
     @Override
     public Reservation retrieveReservationById(Long reservationId) throws ReservationNotFoundException {
         Reservation reservation = em.find(Reservation.class, reservationId);
-        
+
         if (reservation != null) {
+            reservation.getCar();
+            reservation.getCustomer();
+            reservation.getStartDateTime();
+            reservation.getEndDateTime();
+            reservation.getReturnLocation();
+            reservation.getPickUpLocation();
+            reservation.getRequirements();
             return reservation;
         } else {
             throw new ReservationNotFoundException("Unable to locate reservation with id: " + reservationId);
@@ -57,29 +64,36 @@ public class ReservationSessionBean implements ReservationSessionBeanRemote, Res
         List<Reservation> allReservations = em.createQuery(
                 "SELECT r FROM Reservation r ORDER BY r.id ASC") // to ensure a similar sequence is achieved as when checking for availabilities
                 .getResultList();
-        
+
         Calendar c = Calendar.getInstance();
         // setting time to 2359
         c.setTime(currentDateTime);
-        c.set(Calendar.HOUR_OF_DAY, 23);
+        c.add(Calendar.DATE, 1);
+        c.set(Calendar.HOUR_OF_DAY, 1);
         c.set(Calendar.MINUTE, 59);
-
+        
         currentDateTime = c.getTime(); //  current day converted to 2359. need to change to 0159
         c.add(Calendar.DATE, -1);
         Date dayBeforeDateTime = c.getTime(); // previous day converted to 2359
         System.out.println("New current time is " + currentDateTime);
         System.out.println("Day before time is " + dayBeforeDateTime);
         List<Reservation> reservationsOnDate = new ArrayList<>();
-        
+
+        // only returns reservations on date that has NOT been assigned
         for (Reservation r : allReservations) {
             if (r.getStartDateTime().before(currentDateTime) && r.getStartDateTime().after(dayBeforeDateTime) && r.getCar() == null) {
+                r.getCar();
+                r.getStartDateTime();
+                r.getEndDateTime();
+                r.getPickUpLocation();
+                r.getReturnLocation();
                 reservationsOnDate.add(r);
             }
         }
         if (reservationsOnDate != null) {
             return reservationsOnDate;
         } else {
-            throw new ReservationNotFoundException("No reservations on date");
+            throw new ReservationNotFoundException("Null / No reservations on date");
         }
 //        if (allReservations != null) {
 //            return allReservations;
@@ -101,7 +115,6 @@ public class ReservationSessionBean implements ReservationSessionBeanRemote, Res
         }
     }
 
-    
     @Override
     public void assignCarToReservation(Reservation reservation, Car car) throws ReservationNotFoundException, CarNotFoundException {
         try {
@@ -109,19 +122,37 @@ public class ReservationSessionBean implements ReservationSessionBeanRemote, Res
         } catch (ReservationNotFoundException ex) {
             System.err.println(ex.getMessage());
         }
-        
+
         car = carSessionBeanLocal.retrieveCarById(car.getCarId());
-        
+
         // will probably need more error checking here
         System.out.println("Assigning Car " + car.getPlateNumber() + " to Reservation" + reservation.getId());
-        
+
         reservation.setCar(car);
         car.getReservations().add(reservation);
-        
+
         em.merge(car);
         em.merge(reservation);
     }
-    
+
+    public void unassignReservationFromCar(Reservation reservation) {
+
+        Car car = new Car();
+        try {
+            reservation = retrieveReservationById(reservation.getId());
+        } catch (ReservationNotFoundException ex) {
+            System.err.println(ex.getMessage());
+        }
+        try {
+            car = carSessionBeanLocal.retrieveCarById(reservation.getCar().getCarId());
+        } catch (CarNotFoundException ex) {
+            System.out.println(ex.getMessage());
+        }
+        reservation.setCar(null);
+        car.getReservations().remove(reservation);
+        em.flush();
+    }
+
     @Override
     public void removeReservation(Long reservationId
     ) {
@@ -169,7 +200,7 @@ public class ReservationSessionBean implements ReservationSessionBeanRemote, Res
 
         em.remove(reservation);
     }
-    
+
     public void merge(Reservation reservation) {
         em.merge(reservation);
         em.flush();

@@ -37,5 +37,7 @@ public interface CategorySessionBeanRemote {
     public void merge(Category category);
 
     public Category retrieveCategoryById(Long id) throws CategoryNotFoundException;
-    
-}
+
+    public List<Car> retrieveAllCarsFromCategory(String categoryName);
+
+    }

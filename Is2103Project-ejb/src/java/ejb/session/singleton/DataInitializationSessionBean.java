@@ -181,15 +181,15 @@ public class DataInitializationSessionBean {
         modelSessionBeanLocal.createNewCarWithExistingModel(new Car(CarStatusEnum.AVAILABLE, "Outlet A", "SS00A1TC"), toyotaCorollaId);
         modelSessionBeanLocal.createNewCarWithExistingModel(new Car(CarStatusEnum.AVAILABLE, "Outlet A", "SS00A2TC"), toyotaCorollaId);
         modelSessionBeanLocal.createNewCarWithExistingModel(new Car(CarStatusEnum.AVAILABLE, "Outlet A", "SS00A3TC"), toyotaCorollaId);
-        Long carId = modelSessionBeanLocal.createNewCarWithExistingModel(new Car(CarStatusEnum.AVAILABLE, "Outlet B", "SS00B1HC"), hondaCividId);
-        Long carId2 = modelSessionBeanLocal.createNewCarWithExistingModel(new Car(CarStatusEnum.AVAILABLE, "Outlet B", "SS00B2HC"), hondaCividId);
+        modelSessionBeanLocal.createNewCarWithExistingModel(new Car(CarStatusEnum.AVAILABLE, "Outlet B", "SS00B1HC"), hondaCividId);
+        modelSessionBeanLocal.createNewCarWithExistingModel(new Car(CarStatusEnum.AVAILABLE, "Outlet B", "SS00B2HC"), hondaCividId);
         modelSessionBeanLocal.createNewCarWithExistingModel(new Car(CarStatusEnum.AVAILABLE, "Outlet B", "SS00B3HC"), hondaCividId);
         modelSessionBeanLocal.createNewCarWithExistingModel(new Car(CarStatusEnum.AVAILABLE, "Outlet C", "SS00C1NS"), nissanSunnyId);
         modelSessionBeanLocal.createNewCarWithExistingModel(new Car(CarStatusEnum.AVAILABLE, "Outlet C", "SS00C2NS"), nissanSunnyId);
         modelSessionBeanLocal.createNewCarWithExistingModel(new Car(CarStatusEnum.SERVICING_OR_REPAIR, "Outlet C", "SS00C3NS"), nissanSunnyId);
-        modelSessionBeanLocal.createNewCarWithExistingModel(new Car(CarStatusEnum.AVAILABLE, "Outlet A", "LS00A4ME"), mercedesEClass);
-        modelSessionBeanLocal.createNewCarWithExistingModel(new Car(CarStatusEnum.AVAILABLE, "Outlet B", "LS00B4B5"), bmw5Series);
-        modelSessionBeanLocal.createNewCarWithExistingModel(new Car(CarStatusEnum.AVAILABLE, "Outlet C", "LS00C4A6"), audiA6);
+        Long carId = modelSessionBeanLocal.createNewCarWithExistingModel(new Car(CarStatusEnum.AVAILABLE, "Outlet A", "LS00A4ME"), mercedesEClass);
+        Long carId2 = modelSessionBeanLocal.createNewCarWithExistingModel(new Car(CarStatusEnum.AVAILABLE, "Outlet B", "LS00B4B5"), bmw5Series);
+        Long carId3 = modelSessionBeanLocal.createNewCarWithExistingModel(new Car(CarStatusEnum.AVAILABLE, "Outlet C", "LS00C4A6"), audiA6);
 
         SimpleDateFormat inputDateFormat = new SimpleDateFormat("d/M/y");
         Date rate2start = new Date();
@@ -204,34 +204,69 @@ public class DataInitializationSessionBean {
         Date rate8end = new Date();
 
         try {
+            Calendar c = Calendar.getInstance();
+
             rate2start = inputDateFormat.parse("09/12/2022");
-            rate2start.setHours(12);
+            c.setTime(rate2start);
+            c.set(Calendar.HOUR_OF_DAY, 12);
+            c.set(Calendar.MINUTE, 0);
+            rate2start = c.getTime();
+
             rate2end = inputDateFormat.parse("11/12/2022");
-            rate2end.setHours(0);
+            c.setTime(rate2end);
+            c.set(Calendar.HOUR_OF_DAY, 0);
+            c.set(Calendar.MINUTE, 0);
+            rate2end = c.getTime();
 
             rate5start = inputDateFormat.parse("05/12/2022");
-            rate5start.setHours(0);
+            c.setTime(rate5start);
+            c.set(Calendar.HOUR_OF_DAY, 0);
+            c.set(Calendar.MINUTE, 0);
+            rate5start = c.getTime();
+
             rate5end = inputDateFormat.parse("05/12/2022");
-            rate5end.setHours(23);
-            rate5end.setMinutes(59);
+            c.setTime(rate5end);
+            c.set(Calendar.HOUR_OF_DAY, 23);
+            c.set(Calendar.MINUTE, 59);
+            rate5end = c.getTime();
 
             rate6start = inputDateFormat.parse("06/12/2022");
-            rate6start.setHours(0);
+            c.setTime(rate6start);
+            c.set(Calendar.HOUR_OF_DAY, 0);
+            c.set(Calendar.MINUTE, 0);
+            rate6start = c.getTime();
+            
             rate6end = inputDateFormat.parse("06/12/2022");
-            rate6end.setHours(23);
-            rate6end.setMinutes(59);
-
+            c.setTime(rate6end);
+            c.set(Calendar.HOUR_OF_DAY, 23);
+            c.set(Calendar.MINUTE, 59);
+            rate6end = c.getTime();
+        
             rate7start = inputDateFormat.parse("07/12/2022");
-            rate7start.setHours(0);
+            c.setTime(rate7start);
+            c.set(Calendar.HOUR_OF_DAY, 0);
+            c.set(Calendar.MINUTE, 0);
+            rate7start = c.getTime();
+            
             rate7end = inputDateFormat.parse("07/12/2022");
-            rate7end.setHours(23);
-            rate7end.setMinutes(59);
+            c.setTime(rate7end);
+            c.set(Calendar.HOUR_OF_DAY, 23);
+            c.set(Calendar.MINUTE, 59);
+            rate7end = c.getTime();
 
             rate8start = inputDateFormat.parse("07/12/2022");
-            rate8start.setHours(12);
+            c.setTime(rate8start);
+            c.set(Calendar.HOUR_OF_DAY, 12);
+            c.set(Calendar.MINUTE, 0);
+            rate8start = c.getTime();
+            
             rate8end = inputDateFormat.parse("08/12/2022");
-            rate8end.setHours(12);
-            rate8end.setMinutes(59);
+            c.setTime(rate8end);
+            c.set(Calendar.HOUR_OF_DAY, 12);
+            c.set(Calendar.MINUTE, 0);
+            rate8end = c.getTime();
+            
+            
 
         } catch (ParseException ex) {
             System.out.println("Invalid date input!\n");
@@ -283,15 +318,21 @@ public class DataInitializationSessionBean {
                 System.out.println(ex.getMessage());
             }
             // PERSONAL TEST DATA
-            Long reservationId = customerSessionBeanLocal.createNewReservation(new Reservation(date2start, date1end, outletA, outletB, ReservationPaymentEnum.PAID, testCustomer, "Honda", "Civid"), customerId);
-            customerSessionBeanLocal.createNewReservation(new Reservation(date1start, date1end2, outletA, outletB, ReservationPaymentEnum.ATPICKUP, testCustomer, "Honda", "Civic"), customerId);
-            Long reservationId2 = customerSessionBeanLocal.createNewReservation(new Reservation(date1end, date1end2, outletB, outletC, ReservationPaymentEnum.ATPICKUP, testCustomer, "Honda", "Civic"), customerId);
+//            Long reservationId = customerSessionBeanLocal.createNewReservation(new Reservation(date2start, date1end, outletA, outletB, ReservationPaymentEnum.PAID, testCustomer, "Honda", "Civic"), customerId);
+//            Long reservationId3 = customerSessionBeanLocal.createNewReservation(new Reservation(date1start, date1end2, outletA, outletB, ReservationPaymentEnum.ATPICKUP, testCustomer, "Honda", "Civic"), customerId);
+//            Long reservationId2 = customerSessionBeanLocal.createNewReservation(new Reservation(date1end, date1end2, outletA, outletB, ReservationPaymentEnum.ATPICKUP, testCustomer, "Honda", "Civic"), customerId);
+
+            Long reservationId = customerSessionBeanLocal.createNewReservation(new Reservation(date2start, date1end, outletA, outletB, ReservationPaymentEnum.PAID, testCustomer, "Mercedes", "E Class"), customerId);
+            Long reservationId2 = customerSessionBeanLocal.createNewReservation(new Reservation(date1end, date1end2, outletB, outletB, ReservationPaymentEnum.ATPICKUP, testCustomer, "BMW", "5 Series"), customerId);
+            Long reservationId3 = customerSessionBeanLocal.createNewReservation(new Reservation(date1start, date1end2, outletC, outletB, ReservationPaymentEnum.ATPICKUP, testCustomer, "Audi", "A6"), customerId);
 
             try {
                 // car 4 SS00B1HC reserved by reservation 1
                 reservationSessionBeanLocal.assignCarToReservation(reservationSessionBeanLocal.retrieveReservationById(reservationId), carSessionBeanLocal.retrieveCarById(carId));
-                // car 5 SS00B2HC reserved by reservation 3 
+                // car 5 SS00B2HC reserved by reservation 2
                 reservationSessionBeanLocal.assignCarToReservation(reservationSessionBeanLocal.retrieveReservationById(reservationId2), carSessionBeanLocal.retrieveCarById(carId2));
+                // car 6 SS00B3HC reserved by reservation 3
+//                reservationSessionBeanLocal.assignCarToReservation(reservationSessionBeanLocal.retrieveReservationById(reservationId3), carSessionBeanLocal.retrieveCarById(carId3));
 
                 System.out.println("Reservation assigned");
             } catch (CarNotFoundException ex) {

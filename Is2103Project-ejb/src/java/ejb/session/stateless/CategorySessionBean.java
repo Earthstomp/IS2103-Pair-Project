@@ -50,9 +50,17 @@ public class CategorySessionBean implements CategorySessionBeanRemote, CategoryS
 
     public List<Car> retrieveAllCarsFromCategory(String categoryName) {
         
-        return em.createQuery("SELECT c FROM Car c JOIN c.model m JOIN m.category cat WHERE cat.categoryName = :categoryName")
+        List<Car> cars = em.createQuery("SELECT c FROM Car c JOIN c.model m JOIN m.category cat WHERE cat.categoryName = :categoryName")
                 .setParameter("categoryName", categoryName)
                 .getResultList();
+        
+        for (Car car: cars) {
+            car.getReservations().size();
+            car.getModel();
+            car.getTransitRecords().size();
+        }
+        
+        return cars;
     }
 
     @Override

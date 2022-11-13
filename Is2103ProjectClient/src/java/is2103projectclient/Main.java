@@ -8,6 +8,7 @@ package is2103projectclient;
 import ejb.session.stateless.CarSessionBeanRemote;
 import ejb.session.stateless.CategorySessionBeanRemote;
 import ejb.session.stateless.CustomerSessionBeanRemote;
+import ejb.session.stateless.EjbTimerSessionBeanRemote;
 import ejb.session.stateless.EmployeeSessionBeanRemote;
 import ejb.session.stateless.ModelSessionBeanRemote;
 import ejb.session.stateless.OutletSessionBeanRemote;
@@ -40,6 +41,8 @@ public class Main {
     private static RentalRateRecordSessionBeanRemote rentalRateRecordSessionBeanRemote;
     @EJB    
     private static ReservationSessionBeanRemote reservationSessionBeanRemote;
+    @EJB
+    private static EjbTimerSessionBeanRemote ejbTimerSessionBeanRemote;
 
 
     public static void main(String[] args) {
@@ -48,7 +51,7 @@ public class Main {
         MainApp mainApp = new MainApp(modelSessionBeanRemote, carSessionBeanRemote,
                 transitDriverDispatchRecordSessionBeanRemote, outletSessionBeanRemote,
                 employeeSessionBeanRemote, categorySessionBeanRemote, rentalRateRecordSessionBeanRemote,
-                customerSessionBeanRemote, reservationSessionBeanRemote);
+                customerSessionBeanRemote, reservationSessionBeanRemote, ejbTimerSessionBeanRemote);
         mainApp.runApp();
     }
 

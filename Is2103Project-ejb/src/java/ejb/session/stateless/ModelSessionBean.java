@@ -38,11 +38,19 @@ public class ModelSessionBean implements ModelSessionBeanRemote, ModelSessionBea
     
     public List<Car> retrieveAllCarsFromModel(String make, String model) {
         System.out.println("Finding cars from model");
-        return em.createQuery("SELECT c FROM Car c"
+        List<Car> cars = em.createQuery("SELECT c FROM Car c"
                 + " JOIN c.model m WHERE m.make = :make AND m.model = :model")
                 .setParameter("make", make)
                 .setParameter("model", model)
                 .getResultList();
+        
+        for (Car car : cars) {
+            car.getModel();
+            car.getReservations().size();
+            car.getTransitRecords().size();
+        }
+        
+        return cars;
     }
 
     public List<Model> viewAllModels() {
