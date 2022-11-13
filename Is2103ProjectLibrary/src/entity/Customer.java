@@ -35,30 +35,25 @@ public class Customer implements Serializable {
     @OneToMany (mappedBy = "customer")
     private List<Reservation> reservations;
     /*@OneToMany(mappedBy = "customer")
-    private CreditCard creditCard;
+    private CreditCard creditCard; */
     
     @Column(unique = true)
     private String username;
-    private String password;*/
+    private String password;
     
     public Customer() {
         
     }
-    
-    public Customer(String mobileNumber, String email) {
-        this.mobileNumber = mobileNumber;
-        this.email = email;
-    }
 
-    public Customer(Long customerId, Partner partner, String mobileNumber, String passportNumber, String email, List<Reservation> reservations, CreditCard cc) {
-        this.customerId = customerId;
-        this.partner = partner;
+    public Customer(String mobileNumber, String passportNumber, String email, String username, String password) {
         this.mobileNumber = mobileNumber;
         this.passportNumber = passportNumber;
         this.email = email;
-        this.reservations = reservations;
-//        this.creditCard = creditCard;
+        this.username = username;
+        this.password = password;
     }
+    
+    
 
     public Long getCustomerId() {
         return customerId;
@@ -164,7 +159,7 @@ public class Customer implements Serializable {
 
     public void setCreditCard(CreditCard creditCard) {
         this.creditCard = creditCard;
-    }
+    } */
 
     public String getUsername() {
         return username;
@@ -180,6 +175,6 @@ public class Customer implements Serializable {
 
     public void setPassword(String password) {
         this.password = password;
-    }*/
+    }
     
 }

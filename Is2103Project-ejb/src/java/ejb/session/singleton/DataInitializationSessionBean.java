@@ -306,7 +306,7 @@ public class DataInitializationSessionBean {
         Outlet outletB = new Outlet();
         Outlet outletC = new Outlet();
         try {
-            Long customerId = customerSessionBeanLocal.createNewCustomer(new Customer("91234567", "test@test.com"));
+            Long customerId = customerSessionBeanLocal.createNewCustomer(new Customer("91234567", "E1234567A", "test@test.com", "user", "pw"));
             Customer testCustomer = customerSessionBeanLocal.retrieveCustomerByMobileNumber("91234567");
 
             // PERSONAL TEST DATA

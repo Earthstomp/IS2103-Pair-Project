@@ -134,7 +134,4 @@ public class CategorySessionBean implements CategorySessionBeanRemote, CategoryS
     public void merge(Category category) {
         em.merge(category);
     }
-
-    // Add business logic below. (Right-click in editor and choose
-    // "Insert Code > Add Business Method")
 }

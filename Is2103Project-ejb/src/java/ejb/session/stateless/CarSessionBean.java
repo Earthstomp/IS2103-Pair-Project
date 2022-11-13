@@ -239,6 +239,7 @@ public class CarSessionBean implements CarSessionBeanRemote, CarSessionBeanLocal
         }               
     }
 
+    @Override
     public Car retrieveCarByPlateNumber(String number) {
         Car car = (Car) em.createQuery("SELECT c FROM Car c WHERE c.plateNumber = :InPlateNumber")
                 .setParameter("InPlateNumber", number)
@@ -268,6 +269,7 @@ public class CarSessionBean implements CarSessionBeanRemote, CarSessionBeanLocal
 
     }
 
+    @Override
     public void updateCarStatusLocation(Car car, CarStatusEnum status, String location) {
         Car updatedCar = em.find(Car.class,
                 car.getCarId());
@@ -275,6 +277,7 @@ public class CarSessionBean implements CarSessionBeanRemote, CarSessionBeanLocal
         updatedCar.setLocation(location);
     }
 
+    @Override
     public void deleteCar(Long carId) throws DeleteCarException {
         Car car = em.find(Car.class,
                 carId);
@@ -295,6 +298,7 @@ public class CarSessionBean implements CarSessionBeanRemote, CarSessionBeanLocal
         }
     }
 
+    @Override
     public void merge(Car car) {
         em.merge(car);
     }

@@ -57,7 +57,7 @@ public class ReservationSessionBean implements ReservationSessionBeanRemote, Res
             throw new ReservationNotFoundException("Unable to locate reservation with id: " + reservationId);
         }
     }
-
+    
     @Override
     public List<Reservation> retrieveReservationByDate(Date currentDateTime) throws ReservationNotFoundException {
         // get all reservations
@@ -102,6 +102,7 @@ public class ReservationSessionBean implements ReservationSessionBeanRemote, Res
 //        }
     }
 
+    @Override
     public List<Reservation> retrieveAllReservationsForCustomer(Customer customer) throws ReservationNotFoundException {
         List<Reservation> reservations = em.createQuery(
                 "SELECT r FROM Reservation r WHERE r.customer = :InCustomer")
@@ -111,7 +112,7 @@ public class ReservationSessionBean implements ReservationSessionBeanRemote, Res
         if (reservations != null) {
             return reservations;
         } else {
-            throw new ReservationNotFoundException("No reservations on date");
+            throw new ReservationNotFoundException("No reservations found for customer");
         }
     }
 

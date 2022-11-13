@@ -40,6 +40,7 @@ public class MainApp {
     private ReservationSessionBeanRemote reservationSessionBeanRemote;
 
     private SalesManagementModule salesManagementModule;
+    private CustomerServiceModule customerServiceModule;
     private Employee employee;
     private EjbTimerSessionBeanRemote ejbTimerSessionBeanRemote;
 
@@ -71,7 +72,6 @@ public class MainApp {
         while (true) {
             System.out.println("*** Welcome to CaRMS Management Client ***\n");
             System.out.println("1: Login");
-            // need logout??
             System.out.println("2: Exit\n");
             response = 0;
 
@@ -84,9 +84,15 @@ public class MainApp {
                     try {
                         doLogin();
                         System.out.println("Login successful!\n");
+                        
                         salesManagementModule = new SalesManagementModule(modelSessionBeanRemote, carSessionBeanRemote,
                                 transitDriverDispatchRecordSessionBeanRemote, outletSessionBeanRemote, employeeSessionBeanRemote,
                                 employee, categorySessionBeanRemote, rentalRateRecordSessionBeanRemote, customerSessionBeanRemote, reservationSessionBeanRemote);
+                        
+                        customerServiceModule = new CustomerServiceModule(modelSessionBeanRemote, carSessionBeanRemote,
+                                transitDriverDispatchRecordSessionBeanRemote, outletSessionBeanRemote, employeeSessionBeanRemote,
+                                employee, categorySessionBeanRemote, rentalRateRecordSessionBeanRemote, customerSessionBeanRemote, reservationSessionBeanRemote);
+                        
                         menuMain();
                     } catch (InvalidLoginCredentialsException ex) {
                         System.out.println("Invalid login credential: " + ex.getMessage() + "\n");
@@ -128,7 +134,7 @@ public class MainApp {
 
         while (true) {
             System.out.println("*** CaRMS Management Client ***\n");
-            System.out.println("You are login as " + employee.getUsername() + " with " + employee.getRole().toString() + " rights\n");
+            System.out.println("You are logged in as " + employee.getUsername() + " with " + employee.getRole().toString() + " rights\n");
             System.out.println("1: Sales Management Module");
             System.out.println("2: Customer Management Module");
             System.out.println("3: Trigger Car Allocation");
@@ -147,11 +153,11 @@ public class MainApp {
                         System.out.println("Invalid option, please try again!: " + ex.getMessage() + "\n");
                     }
                 } else if (response == 2) {
-//                    try {
-//                        systemAdministrationModule.menuSystemAdministration();
-//                    } catch (InvalidAccessRightException ex) {
-//                        System.out.println("Invalid option, please try again!: " + ex.getMessage() + "\n");
-//                    }
+                    try {
+                        customerServiceModule.menuCustomerServiceModule();
+                    } catch (InvalidEmployeeRoleException ex) {
+                        System.out.println("Invalid option, please try again!: " + ex.getMessage() + "\n");
+                    }
                 } else if (response == 3) {
 
                     try {

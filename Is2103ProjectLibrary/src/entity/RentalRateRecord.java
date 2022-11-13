@@ -43,8 +43,20 @@ public class RentalRateRecord implements Serializable {
         this.enabled = true;
     }
 
-    public RentalRateRecord(String recordName, RentalRateEnum type, Double rate, Date startDateTime, Date endDateTime) {
+    public RentalRateRecord(String recordName, RentalRateEnum type, Category category, Double rate, Date startDateTime, Date endDateTime, boolean enabled) {
         this();
+        this.recordName = recordName;
+        this.type = type;
+        this.rate = rate;
+        this.category = category;
+        ArrayList<Date> validity = new ArrayList<Date>();
+        validity.add(startDateTime);
+        validity.add(endDateTime);
+        this.validityPeriod = validity;
+        this.enabled = enabled;
+    }   
+
+    public RentalRateRecord(String recordName, RentalRateEnum type, Double rate, Date startDateTime, Date endDateTime) {
         this.recordName = recordName;
         this.type = type;
         this.rate = rate;
@@ -52,11 +64,8 @@ public class RentalRateRecord implements Serializable {
         validity.add(startDateTime);
         validity.add(endDateTime);
         this.validityPeriod = validity;
-    }   
+    }
     
-    
-    
-
     public RentalRateRecord(String recordName, Double rate, List<Date> validityPeriod) {
         this();
         this.recordName = recordName;

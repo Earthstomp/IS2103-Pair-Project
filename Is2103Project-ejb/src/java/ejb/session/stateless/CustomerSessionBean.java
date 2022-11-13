@@ -30,7 +30,7 @@ public class CustomerSessionBean implements CustomerSessionBeanRemote, CustomerS
     @Override
     public Long createNewCustomer(Customer customer) throws CustomerExistsException {
         try {
-            //retrieveCustomerByUsername(customer.getUsername());
+            retrieveCustomerByUsername(customer.getUsername());
             retrieveCustomerByMobileNumber(customer.getMobileNumber());
             retrieveCustomerByPassportNumber(customer.getPassportNumber());
             throw new CustomerExistsException("Customer already exists.");
@@ -91,7 +91,7 @@ public class CustomerSessionBean implements CustomerSessionBeanRemote, CustomerS
         }
     }
 
-    /*public Customer customerLogin(String username, String password) throws InvalidLoginCredentialsException {
+    public Customer customerLogin(String username, String password) throws InvalidLoginCredentialsException {
         try {
             Customer customer = retrieveCustomerByUsername(username);
 
@@ -103,5 +103,5 @@ public class CustomerSessionBean implements CustomerSessionBeanRemote, CustomerS
         } catch (CustomerNotFoundException ex) {
             throw new InvalidLoginCredentialsException("Username does not exist or invalid password!");
         }
-    }*/
+    }
 }

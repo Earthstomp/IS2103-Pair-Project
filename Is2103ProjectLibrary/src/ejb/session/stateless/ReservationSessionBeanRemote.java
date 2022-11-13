@@ -6,6 +6,7 @@
 package ejb.session.stateless;
 
 import entity.Car;
+import entity.Customer;
 import entity.Reservation;
 import java.util.Date;
 import java.util.List;
@@ -33,5 +34,7 @@ public interface ReservationSessionBeanRemote {
     public void assignCarToReservation(Reservation reservation, Car car) throws ReservationNotFoundException, CarNotFoundException;
 
     public void unassignReservationFromCar(Reservation reservation);
+
+    public List<Reservation> retrieveAllReservationsForCustomer(Customer customer) throws ReservationNotFoundException;
 
 }

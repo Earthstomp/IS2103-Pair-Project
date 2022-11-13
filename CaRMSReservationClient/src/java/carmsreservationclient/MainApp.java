@@ -15,7 +15,6 @@ import ejb.session.stateless.RentalRateRecordSessionBeanRemote;
 import ejb.session.stateless.ReservationSessionBeanRemote;
 import ejb.session.stateless.TransitDriverDispatchRecordSessionBeanRemote;
 import entity.Car;
-import entity.Employee;
 import entity.Outlet;
 import java.text.SimpleDateFormat;
 import java.util.Scanner;
@@ -25,12 +24,14 @@ import java.text.ParseException;
 import java.util.Date;
 import java.util.List;
 import entity.Category;
+import entity.Customer;
 import entity.Reservation;
 import java.util.ArrayList;
 import java.util.Calendar;
 import util.enumeration.CarStatusEnum;
 import util.enumeration.ReservationPaymentEnum;
 import util.exception.CarNotFoundException;
+import util.exception.CustomerExistsException;
 import util.exception.ReservationNotFoundException;
 
 /**
@@ -49,7 +50,7 @@ public class MainApp {
     private RentalRateRecordSessionBeanRemote rentalRateRecordSessionBeanRemote;
     private ReservationSessionBeanRemote reservationSessionBeanRemote;
 
-    private Employee employee;
+    private Customer customer;
     private List<Reservation> reservationsToUnassign;
 
     public MainApp() {
@@ -82,15 +83,10 @@ public class MainApp {
             System.out.println("1: Login");
             System.out.println("2: Register as Customer");
             System.out.println("3: Search Car");
-            System.out.println("4: Reserv Car");
-            System.out.println("5: Cancel Reservation");
-            System.out.println("6: View Reservation Details");
-            System.out.println("7: View All My Reservations");
-
-            System.out.println("9: Exit\n");
+            System.out.println("4: Exit\n");
             response = 0;
 
-            while (response < 1 || response > 9) {
+            while (response < 1 || response > 4) {
                 System.out.print("> ");
 
                 response = scanner.nextInt();
@@ -99,32 +95,22 @@ public class MainApp {
                     try {
                         doLogin();
                         System.out.println("Login successful!\n");
-                        // need more code here
+                        menuMain();
                     } catch (InvalidLoginCredentialsException ex) {
                         System.out.println("Invalid login credential: " + ex.getMessage() + "\n");
                     }
                 } else if (response == 2) {
-                    // register as customer method
+                    doRegistration();
                 } else if (response == 3) {
                     doSearchCar();
                 } else if (response == 4) {
-                    // Reserve Car method
-                } else if (response == 5) {
-                    // Cancel Reservation method
-                } else if (response == 6) {
-                    // View reservation details
-                } else if (response == 7) {
-                    // View All My Reservations
-                } else if (response == 8) {
-                    // Log out method
-                } else if (response == 9) {
                     break;
                 } else {
                     System.out.println("Invalid option, please try again!\n");
                 }
             }
 
-            if (response == 9) {
+            if (response == 4) {
                 break;
             }
         }
@@ -135,16 +121,42 @@ public class MainApp {
         String username = "";
         String password = "";
 
-        System.out.println("*** CaRMS Management Client :: Login ***\n");
+        System.out.println("*** CaRMS Reservation Client :: Login ***\n");
         System.out.print("Enter username> ");
         username = scanner.nextLine().trim();
         System.out.print("Enter password> ");
         password = scanner.nextLine().trim();
 
         if (username.length() > 0 && password.length() > 0) {
-            employee = employeeSessionBeanRemote.employeeLogin(username, password);
+            customer = customerSessionBeanRemote.customerLogin(username, password);
         } else {
             throw new InvalidLoginCredentialsException("Missing login credential!");
+        }
+    }
+
+    public void doRegistration() {
+        Scanner scanner = new Scanner(System.in);
+        System.out.print("Enter username> ");
+        String username = scanner.nextLine().trim();
+
+        System.out.print("Enter password> ");
+        String password = scanner.nextLine().trim();
+
+        System.out.print("Enter mobile number> ");
+        String mobileNumber = scanner.nextLine().trim();
+
+        System.out.print("Enter passport number> ");
+        String passportNumber = scanner.nextLine().trim();
+
+        System.out.print("Enter email> ");
+        String email = scanner.nextLine().trim();
+
+        Customer customer = new Customer(mobileNumber, passportNumber, email, username, password);
+
+        try {
+            Long customerId = customerSessionBeanRemote.createNewCustomer(customer);
+        } catch (CustomerExistsException ex) {
+            System.out.println(ex.getMessage());
         }
     }
 
@@ -186,7 +198,101 @@ public class MainApp {
         } catch (ParseException ex) {
             System.out.println("Invalid date input!\n");
         }
+    }
 
+    private void menuMain() {
+        Scanner scanner = new Scanner(System.in);
+        Integer response = 0;
+
+        while (true) {
+            System.out.println("*** CaRMS Reservation Client ***\n");
+            System.out.println("You are logged in as " + customer.getUsername());
+            System.out.println("1: Search Car");
+            System.out.println("2: Reserve Car");
+            System.out.println("3: Cancel Reservation");
+            System.out.println("4: View Reservation Details");
+            System.out.println("5: View All My Reservations");
+            System.out.println("6: Log Out\n");
+            response = 0;
+
+            while (response < 1 || response > 6) {
+                System.out.print("> ");
+
+                response = scanner.nextInt();
+
+                if (response == 1) {
+                    doSearchCar();
+                } else if (response == 2) {
+                    //doReserveCar();
+                } else if (response == 3) {
+                    doCancelReservation();
+                } else if (response == 4) {
+                    doViewReservationDetails();
+                } else if (response == 5) {
+                    doViewAllMyReservations();
+                } else if (response == 6) {
+                    break;
+                } else {
+                    System.out.println("Invalid option, please try again!\n");
+                }
+            }
+
+            if (response == 6) {
+                break;
+            }
+        }
+    }
+
+    private void doCancelReservation() {
+        try {
+            List<Reservation> reservations = reservationSessionBeanRemote.retrieveAllReservationsForCustomer(customer);
+            System.out.printf("\n%3s%35s%20s%35s%20s%15s%15s%15s", "S/N", "Start Date", "Pick Up Location", "End Date", "Return Location", "Payment Status", "Make", "Model");
+            int index = 1;
+            for (Reservation reservation : reservations) {
+                System.out.printf("\n%3s%35s%20s%35s%20s%15s%15s%15s", index + ".", reservation.getStartDateTime(), reservation.getPickUpLocation().getName(), reservation.getEndDateTime(), reservation.getReturnLocation().getName(), reservation.getReservationPaymentEnum(), reservation.getRequirements().get(0), reservation.getRequirements().get(1));
+                index++;
+            }
+            System.out.println("\n");
+            Scanner scanner = new Scanner(System.in);
+            System.out.println("\nSelect Reservation to cancel by S/N > ");
+            Long reservationId = reservations.get(scanner.nextInt() - 1).getId();
+            reservationSessionBeanRemote.removeReservation(reservationId);
+        } catch (ReservationNotFoundException ex) {
+            System.out.println(ex.getMessage());
+        }
+    }
+
+    private void doViewReservationDetails() {
+        Scanner scanner = new Scanner(System.in);
+        System.out.println("\nSelect Reservation to view by S/N > ");
+
+        try {
+            List<Reservation> reservations = reservationSessionBeanRemote.retrieveAllReservationsForCustomer(customer);
+            Long reservationId = reservations.get(scanner.nextInt() - 1).getId();
+            Reservation reservation = reservationSessionBeanRemote.retrieveReservationById(reservationId);
+
+            System.out.printf("\n%35s%20s%35s%20s%15s%15s%15s", "Start Date", "Pick Up Location", "End Date", "Return Location", "Payment Status", "Make", "Model");
+            System.out.printf("\n%35s%20s%35s%20s%15s%15s%15s", reservation.getStartDateTime(), reservation.getPickUpLocation(), reservation.getEndDateTime(), reservation.getReturnLocation().getName(), reservation.getReservationPaymentEnum(), reservation.getRequirements().get(0), reservation.getRequirements().get(1));
+
+            System.out.println("\n");
+        } catch (ReservationNotFoundException ex) {
+            System.out.println(ex.getMessage());
+        }
+    }
+
+    private void doViewAllMyReservations() {
+        try {
+            List<Reservation> reservations = reservationSessionBeanRemote.retrieveAllReservationsForCustomer(customer);
+            System.out.printf("\n%3s%35s%20s%35s%20s%15s%15s%15s", "S/N", "Start Date", "Pick Up Location", "End Date", "Return Location", "Payment Status", "Make", "Model");
+            int index = 1;
+            for (Reservation reservation : reservations) {
+                System.out.printf("\n%3s%35s%20s%35s%20s%15s%15s%15s", index + ".", reservation.getStartDateTime(), reservation.getPickUpLocation().getName(), reservation.getEndDateTime(), reservation.getReturnLocation().getName(), reservation.getReservationPaymentEnum(), reservation.getRequirements().get(0), reservation.getRequirements().get(1));
+                index++;
+            }
+            System.out.println("\n");
+        } catch (ReservationNotFoundException ex) {
+            System.out.println(ex.getMessage());
+        }
     }
 
     private void testReservationValidity(Outlet pickUpOutlet, Outlet returnOutlet, Date pickUpDate, Date returnDate) {
@@ -218,7 +324,6 @@ public class MainApp {
 
                     //doReserveCar();
                     // need more code here
-
                 } else if (response == 2) {
                     // register as customer method
                     break;
@@ -640,46 +745,3 @@ public class MainApp {
         }
     }
 }
-
-//    private void menuMain() {
-//        Scanner scanner = new Scanner(System.in);
-//        Integer response = 0;
-//
-//        while (true) {
-//            System.out.println("*** CaRMS Management Client ***\n");
-//            System.out.println("You are login as " + employee.getUsername() + " with " + employee.getRole().toString() + " rights\n");
-//            System.out.println("1: Sales Management Module");
-//            System.out.println("2: Customer Management Module");
-//            System.out.println("3: Logout\n");
-//            response = 0;
-//
-//            while (response < 1 || response > 3) {
-//                System.out.print("> ");
-//
-//                response = scanner.nextInt();
-//
-//                if (response == 1) {
-//                    try {
-//                        salesManagementModule.menuSalesManagementModule();
-//                    } catch (InvalidEmployeeRoleException ex) {
-//                        System.out.println("Invalid option, please try again!: " + ex.getMessage() + "\n");
-//                    }
-//                } else if (response == 2) {
-////                    try {
-////                        systemAdministrationModule.menuSystemAdministration();
-////                    } catch (InvalidAccessRightException ex) {
-////                        System.out.println("Invalid option, please try again!: " + ex.getMessage() + "\n");
-////                    }
-//                } else if (response == 3) {
-//                    break;
-//                } else {
-//                    System.out.println("Invalid option, please try again!\n");
-//                }
-//            }
-//
-//            if (response == 3) {
-//                break;
-//            }
-//        }
-//    }
-//}

@@ -26,8 +26,8 @@ public interface RentalRateRecordSessionBeanRemote {
     public Long createRentalRateRecord(RentalRateRecord rentalRateRecord);
 
     public void updateRentalRateRecord(RentalRateRecord rentalRateRecord) throws RentalRateRecordNotFoundException;
-    
-    public RentalRateRecord retrieveRentalRateRecordByName(String name) throws RentalRateRecordNotFoundException;
+
+    public List<RentalRateRecord> retrieveRentalRateRecordByName(String name) throws RentalRateRecordNotFoundException;
 
     public void merge(RentalRateRecord rentalRateRecord);
 

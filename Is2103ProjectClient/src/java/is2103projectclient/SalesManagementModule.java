@@ -21,6 +21,7 @@ import entity.TransitDriverDispatchRecord;
 import java.text.SimpleDateFormat;
 import java.util.Scanner;
 import java.text.ParseException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
@@ -29,6 +30,7 @@ import util.enumeration.EmployeeRoleEnum;
 import util.enumeration.RentalRateEnum;
 import util.enumeration.ReservationPaymentEnum;
 import util.exception.CarNotFoundException;
+import util.exception.CategoryNotFoundException;
 import util.exception.CustomerNotFoundException;
 import util.exception.DeleteCarException;
 import util.exception.DeleteModelException;
@@ -103,12 +105,10 @@ public class SalesManagementModule {
                 System.out.println("10: View Transit Dispatch Records for Current Day Reservations");
                 System.out.println("11: Assign Transit Driver");
                 System.out.println("12: Update Transit As Completed");
-                System.out.println("13: Pickup Car");
-                System.out.println("14: Return Car");
-                System.out.println("15: Back\n");
+                System.out.println("13: Back\n");
                 response = 0;
 
-                while (response < 1 || response > 14) {
+                while (response < 1 || response > 13) {
                     System.out.print("> ");
 
                     response = scanner.nextInt();
@@ -137,19 +137,12 @@ public class SalesManagementModule {
                         doAssignDriver();
                     } else if (response == 12) {
                         doUpdateTransitAsCompleted();
-                    } else if (response == 13) {
-                        doPickUpCar();
-                    } else if (response == 14) {
-                        doReturnCar();
-                    } else if (response == 15) {
-                        break;
-
                     } else {
                         System.out.println("Invalid option, please try again!\n");
                     }
                 }
 
-                if (response == 15) {
+                if (response == 13) {
                     break;
                 }
             }
@@ -159,7 +152,7 @@ public class SalesManagementModule {
             Integer response = 0;
 
             while (true) {
-                System.out.println("\n\n*** Management System :: Sales Management :: Sales Manager***\n");
+                System.out.println("\n\n*** Management System :: Sales Management :: Sales Manager ***\n");
                 System.out.println("1: Create Rental Rate");
                 System.out.println("2: View All Rental Rates");
                 System.out.println("3: View Rental Rate Details");
@@ -194,38 +187,6 @@ public class SalesManagementModule {
                     break;
                 }
 
-            }
-        } else if (employee.getRole() == EmployeeRoleEnum.CUSTOMER_SERVICE_EXECUTIVE) {
-
-            Scanner scanner = new Scanner(System.in);
-            Integer response = 0;
-
-            while (true) {
-                System.out.println("\n\n*** Management System :: Sales Management :: Sales Manager ***\n");
-                System.out.println("1: Pick Up Car");
-                System.out.println("2: Return Car");
-                System.out.println("3: Back\n");
-                response = 0;
-
-                while (response < 1 || response > 3) {
-                    System.out.print("> ");
-
-                    response = scanner.nextInt();
-
-                    if (response == 1) {
-                        doPickUpCar();
-                    } else if (response == 2) {
-                        doReturnCar();
-                    } else if (response == 3) {
-                        break;
-                    } else {
-                        System.out.println("Invalid option, please try again!\n");
-                    }
-                }
-
-                if (response == 6) {
-                    break;
-                }
             }
         } else {
             throw new InvalidEmployeeRoleException("You don't have EMPLOYEE rights to access the Sales Management module.");
@@ -625,8 +586,38 @@ public class SalesManagementModule {
             }
         }
 
+        System.out.println("Choose Category > ");
+
+        response = 0;
+
+        System.out.println("1: Standard Sedan");
+        System.out.println("2: Family Sedan");
+        System.out.println("3: Luxury Sedan");
+        System.out.println("4: SUV and Minivan");
+
+        response = 0;
+
+        while (response < 1 || response > 4) {
+            System.out.print("> ");
+            response = scanner.nextInt();
+
+            try {
+                Category category = categorySessionBeanRemote.retrieveCategoryById(new Long(response));
+
+                if (response < 1 || response > 4) {
+                    System.out.println("Invalid option, please try again!\n");
+                } else {
+                    rentalRate.setCategory(category);
+                }
+            } catch (CategoryNotFoundException ex) {
+                System.out.println(ex.getMessage());
+            }
+        }
+
         System.out.print("Enter Rate > ");
         Double rate = scanner.nextDouble();
+        rentalRate.setRate(rate);
+
         System.out.print("Enter Start Date and Time in DD/MM/YYYY hh:mm > ");
         scanner.nextLine(); // added to consume \n
         String startDateString = scanner.nextLine().trim();
@@ -638,31 +629,29 @@ public class SalesManagementModule {
         try {
             startDate = dateF.parse(startDateString);
             System.out.println("Entered Start Date is: " + startDate.toString());
-        } catch (Exception e) {
-            System.out.println("Exception: " + e.toString());
-        }
 
-        Date endDate = new Date();
-        try {
+            Date endDate = new Date();
             endDate = dateF.parse(endDateString);
             System.out.println("Entered End Date is: " + endDate.toString());
-        } catch (Exception e) {
-            System.out.println("Exception: " + e.toString());
+
+            List<Date> validityPeriod = Arrays.asList(startDate, endDate);
+            rentalRate.setValidityPeriod(validityPeriod);
+
+            Long rentalRateRecordId = rentalRateRecordSessionBeanRemote.createRentalRateRecord(rentalRate);
+                System.out.println("New Rental Rate Record created successfully!: " + rentalRateRecordSessionBeanRemote.retrieveRentalRateRecordById(rentalRateRecordId).getRecordName() + "\n");
+            } catch (RentalRateRecordNotFoundException | ParseException ex) {
+                System.out.println(ex.getMessage());
+            }
         }
 
-        List<Date> validityPeriod = Arrays.asList(startDate, endDate);
-        rentalRate.setValidityPeriod(validityPeriod);
-
-        Long rentalRateRecordId = rentalRateRecordSessionBeanRemote.createRentalRateRecord(rentalRate);
-        System.out.println("New Rental Rate Record created successfully!: " + rentalRate.getRecordName() + "\n");
-    }
+    
 
     public void doViewAllRentalRates() {
         List<RentalRateRecord> rentalRateRecords = rentalRateRecordSessionBeanRemote.retrieveAllRateRecords();
-        System.out.printf("\n%3s%20s%14s%14s%14s", "S/N", "Record Name", "Type", "Category", "Start", "End");
+        System.out.printf("\n%3s%20s%14s%14s%20s%35s%35s", "S/N", "Record Name", "Rate", "Type", "Category", "Start", "End");
         int index = 1;
         for (RentalRateRecord r : rentalRateRecords) {
-            System.out.printf("\n%3s%20s%14s%14s%14s%14s", index + ".", r.getRecordName(), r.getType().toString(), r.getCategory(), r.getValidityPeriod().get(0), r.getValidityPeriod().get(1));
+            System.out.printf("\n%3s%20s%14s%14s%20s%35s%35s", index + ".", r.getRecordName(), r.getRate(), r.getType().toString(), r.getCategory().getCategoryName(), r.getValidityPeriod().get(0), r.getValidityPeriod().get(1));
             index++;
         }
     }
@@ -672,9 +661,13 @@ public class SalesManagementModule {
         System.out.println("*** Management System :: Sales Management :: View Rental Rate Details ***\n");
         System.out.println("Enter Rental Rate Name > ");
         try {
-            RentalRateRecord r = rentalRateRecordSessionBeanRemote.retrieveRentalRateRecordByName(scanner.nextLine().trim());
-            System.out.printf("\n%20s%14s%14s%14s", "Record Name", "Type", "Category", "Start", "End");
-            System.out.printf("\n%3s%20s%14s%14s%14s%14s", r.getRecordName(), r.getType().toString(), r.getCategory(), r.getValidityPeriod().get(0), r.getValidityPeriod().get(1));
+            List<RentalRateRecord> rentalRateRecords = rentalRateRecordSessionBeanRemote.retrieveRentalRateRecordByName(scanner.nextLine().trim());
+            System.out.printf("\n%3s%20s%14s%14s%20s%35s%35s", "S/N", "Record Name", "Rate", "Type", "Category", "Start", "End");
+            int index = 1;
+            for (RentalRateRecord r : rentalRateRecords) {
+                System.out.printf("\n%3s%20s%14s%14s%20s%35s%35s", index + ".", r.getRecordName(), r.getRate(), r.getType().toString(), r.getCategory().getCategoryName(), r.getValidityPeriod().get(0), r.getValidityPeriod().get(1));
+                index++;
+            }
         } catch (RentalRateRecordNotFoundException ex) {
             System.out.println(ex.getMessage());
         }
@@ -684,16 +677,65 @@ public class SalesManagementModule {
         Scanner scanner = new Scanner(System.in);
 
         System.out.println("*** Management System :: Sales Management :: Update Rental Rate ***\n");
+        System.out.println("Enter Rental Rate Name > ");
 
         try {
-            RentalRateRecord rentalRateRecord = rentalRateRecordSessionBeanRemote.retrieveRentalRateRecordByName(scanner.nextLine().trim());
-            System.out.printf("\n%20s%14s%14s%14s", "Record Name", "Type", "Category", "Start", "End");
-            System.out.printf("\n%3s%20s%14s%14s%14s%14s", rentalRateRecord.getRecordName(), rentalRateRecord.getType().toString(), rentalRateRecord.getCategory(), rentalRateRecord.getValidityPeriod().get(0), rentalRateRecord.getValidityPeriod().get(1));
+            boolean hasResults = false;
+            List<RentalRateRecord> rentalRateRecords = new ArrayList<>();
 
-            System.out.println("\nEnter Rental Rate Record Name> ");
-            rentalRateRecord.setRecordName(scanner.nextLine().trim());
-            System.out.println("Enter Rental Rate Record Rate> ");
-            rentalRateRecord.setRate(scanner.nextDouble());
+            while (!hasResults) {
+                rentalRateRecords = rentalRateRecordSessionBeanRemote.retrieveRentalRateRecordByName(scanner.nextLine().trim());
+                System.out.printf("\n%3s%20s%14s%14s%20s%35s%35s", "S/N", "Record Name", "Rate", "Type", "Category", "Start", "End");
+                int index = 1;
+                for (RentalRateRecord r : rentalRateRecords) {
+                    System.out.printf("\n%3s%20s%14s%14s%20s%35s%35s", index + ".", r.getRecordName(), r.getRate(), r.getType().toString(), r.getCategory().getCategoryName(), r.getValidityPeriod().get(0), r.getValidityPeriod().get(1));
+                    index++;
+                }
+                if (rentalRateRecords.size() < 1) {
+                    System.out.println("No results, please try again!");
+                    hasResults = false;
+                } else {
+                    hasResults = true;
+                }
+            }
+            System.out.println("\nSelect Rental Rate Record by S/N > ");
+            Long rentalRateRecordId = rentalRateRecords.get(scanner.nextInt() - 1).getId();
+            RentalRateRecord r = rentalRateRecordSessionBeanRemote.retrieveRentalRateRecordById(rentalRateRecordId);
+            scanner.nextLine();
+
+            System.out.println("Enter new Rental Rate Record Name> ");
+            String recordName = scanner.nextLine().trim();
+            System.out.println("Enter new Rental Rate Record Rate> ");
+            Double rate = scanner.nextDouble();
+            System.out.println("Choose Record Type> ");
+
+            Integer response = 0;
+            RentalRateEnum type = RentalRateEnum.DEFAULT;
+
+            System.out.println("1: Default");
+            System.out.println("2: Promotion");
+            System.out.println("3: Peak");
+            response = 0;
+
+            while (response < 1 || response > 3) {
+                System.out.print("> ");
+                response = scanner.nextInt();
+                switch (response) {
+                    case 1:
+                        type = RentalRateEnum.DEFAULT;
+                        break;
+                    case 2:
+                        type = RentalRateEnum.PROMOTION;
+                        break;
+                    case 3:
+                        type = RentalRateEnum.PEAK;
+                        break;
+                    default:
+                        System.out.println("Invalid option, please try again!\n");
+                        break;
+                }
+            }
+
             System.out.print("Enter new Start Date and Time in DD/MM/YYYY hh:mm > ");
             scanner.nextLine(); // added to consume \n
             String startDateString = scanner.nextLine().trim();
@@ -702,44 +744,48 @@ public class SalesManagementModule {
 
             Date startDate = new Date();
             SimpleDateFormat dateF = new SimpleDateFormat("d/M/y h:m");
-            try {
-                startDate = dateF.parse(startDateString);
-                System.out.println("Entered Start Date is: " + startDate.toString());
-            } catch (Exception e) {
-                System.out.println("Exception: " + e.toString());
-            }
+
+            startDate = dateF.parse(startDateString);
+            System.out.println("Entered Start Date is: " + startDate.toString());
 
             Date endDate = new Date();
-            try {
-                endDate = dateF.parse(endDateString);
-                System.out.println("Entered End Date is: " + endDate.toString());
-            } catch (Exception e) {
-                System.out.println("Exception: " + e.toString());
+
+            endDate = dateF.parse(endDateString);
+            System.out.println("Entered End Date is: " + endDate.toString());
+
+            System.out.println("Choose Category > ");
+
+            response = 0;
+
+            System.out.println("1: Standard Sedan");
+            System.out.println("2: Family Sedan");
+            System.out.println("3: Luxury Sedan");
+            System.out.println("4: SUV and Minivan");
+
+            Category category = r.getCategory();
+
+            while (response < 1 || response > 4) {
+                System.out.print("> ");
+                response = scanner.nextInt();
+
+                if (response < 1 || response > 4) {
+                    System.out.println("Invalid option, please try again!\n");
+                } else {
+                    category = categorySessionBeanRemote.retrieveCategoryById(new Long(response));
+                }
             }
 
-            List<Date> newValidityPeriod = Arrays.asList(startDate, endDate);
-            rentalRateRecord.setValidityPeriod(newValidityPeriod);
-
-            System.out.println("Enter Rental Rate Record Category> ");
-            String newCategory = scanner.nextLine().trim();
-            Category retrievedCategory = categorySessionBeanRemote.retrieveCategoryByName(newCategory);
-            Category oldCategory = rentalRateRecord.getCategory();
-            oldCategory = categorySessionBeanRemote.retrieveCategoryByName(oldCategory.getCategoryName());
-            oldCategory.getRateRecords().remove(rentalRateRecord);
-            rentalRateRecord.setCategory(retrievedCategory);
             System.out.println("Enter Rental Rate Record's status (true: enabled or false: disabled) ");
-            rentalRateRecord.setEnabled(scanner.nextBoolean());
+            boolean enabled = scanner.nextBoolean();
 
-            // unsure if it is adding managed instance or not
-            rentalRateRecordSessionBeanRemote.merge(rentalRateRecord);
+            RentalRateRecord updatedR = new RentalRateRecord(recordName, type, category, rate, startDate, endDate, enabled);
+            rentalRateRecordSessionBeanRemote.updateRentalRateRecord(updatedR);
 
-            retrievedCategory.getRateRecords().add(rentalRateRecordSessionBeanRemote.retrieveRentalRateRecordByName(rentalRateRecord.getRecordName()));
-            categorySessionBeanRemote.merge(retrievedCategory);
             System.out.println("Rental Rate Record updated successfully!");
-            System.out.printf("\n%20s%14s%14s%14s", "Record Name", "Type", "Category", "Start", "End");
-            System.out.printf("\n%3s%20s%14s%14s%14s%14s", rentalRateRecord.getRecordName(), rentalRateRecord.getType().toString(), rentalRateRecord.getCategory(), rentalRateRecord.getValidityPeriod().get(0), rentalRateRecord.getValidityPeriod().get(1));
+            System.out.printf("\n%20s%14s%14s%20s%35s%35s", "Record Name", "Rate", "Type", "Category", "Start", "End");
+            System.out.printf("\n%20s%14s%14s%20s%35s%35s", r.getRecordName(), r.getRate(), r.getType().toString(), r.getCategory(), r.getValidityPeriod().get(0), r.getValidityPeriod().get(1));
 
-        } catch (RentalRateRecordNotFoundException ex) {
+        } catch (RentalRateRecordNotFoundException | CategoryNotFoundException | ParseException ex) {
             System.out.println(ex.getMessage());
         }
 
@@ -752,14 +798,22 @@ public class SalesManagementModule {
         System.out.println("*** Management System :: Sales Management :: Delete Rental Rate ***\n");
         System.out.println("Enter Rental Rate Name> ");
         try {
-            RentalRateRecord rentalRateRecord = rentalRateRecordSessionBeanRemote.retrieveRentalRateRecordByName(scanner.nextLine().trim());
-            System.out.printf("\n%20s%14s%14s%14s", "Record Name", "Type", "Category", "Start", "End");
-            System.out.printf("\n%3s%20s%14s%14s%14s%14s", rentalRateRecord.getRecordName(), rentalRateRecord.getType().toString(), rentalRateRecord.getCategory(), rentalRateRecord.getValidityPeriod().get(0), rentalRateRecord.getValidityPeriod().get(1));
+            List<RentalRateRecord> rentalRateRecords = rentalRateRecordSessionBeanRemote.retrieveRentalRateRecordByName(scanner.nextLine().trim());
+            System.out.printf("\n%3s%20s%14s%14s%20s%35s%35s", "S/N", "Record Name", "Rate", "Type", "Category", "Start", "End");
+            int index = 1;
+            for (RentalRateRecord r : rentalRateRecords) {
+                System.out.printf("\n%3s%20s%14s%14s%20s%35s%35s", index + ".", r.getRecordName(), r.getRate(), r.getType().toString(), r.getCategory().getCategoryName(), r.getValidityPeriod().get(0), r.getValidityPeriod().get(1));
+                index++;
+            }
 
+            System.out.println("Select Rental Rate Record by S/N > ");
+            Long rentalRateRecordId = rentalRateRecords.get(scanner.nextInt() - 1).getId();
+            RentalRateRecord rentalRateRecord = rentalRateRecordSessionBeanRemote.retrieveRentalRateRecordById(rentalRateRecordId);
+            scanner.nextLine();
             System.out.print("\n\nConfirm delete this Record? (Enter 'Y' to delete)> ");
             confirmDelete = scanner.nextLine().trim();
 
-            if (confirmDelete.equals("Y")) {
+            if (confirmDelete.equalsIgnoreCase("Y")) {
                 // try { add DeleteRecordException
                 rentalRateRecordSessionBeanRemote.removeRentalRateRecord(rentalRateRecord.getId());
                 System.out.println("Rental Rate Record " + rentalRateRecord.getRecordName() + " deleted successfully!");
@@ -771,112 +825,4 @@ public class SalesManagementModule {
         }
     }
 
-    //CUSTOMER SERVICE EXEC METHODS
-    public void doPickUpCar() {
-        Scanner scanner = new Scanner(System.in);
-        int i = 1;
-
-        System.out.println("*** Management System :: Sales Management :: Pickup Car ***\n");
-        System.out.println("Enter Customer Mobile Number> ");
-        // need exception
-        String mobileNumber = scanner.nextLine().trim();
-        try {
-            System.out.println("Trynig to retrive by mobile number");
-            Customer customer = customerSessionBeanRemote.retrieveCustomerByMobileNumber(mobileNumber);
-            System.out.println("Trynig to retrive customer's reservations");
-
-            List<Reservation> reservations = customer.getReservations();
-
-            Reservation selectedReservation;
-            // bad styling. need to change
-            Car reservedCar = new Car();
-
-            System.out.print("Choose reservation> ");
-            System.out.printf("\n\n%3s%14s%30s%30s%20s%14s%14s", "S/N", "Car Plate Number", "Start Time", "End Time", "Requirements", "Pick up Location", "Return Location");
-
-            for (Reservation r : customer.getReservations()) {
-                System.out.printf("\n%3s%14s%30s%30s%20s%14s%14s", i + ". ", r.getCar().getPlateNumber(), r.getStartDateTime().toString(), r.getEndDateTime().toString(),
-                        r.getRequirements().toString(), r.getPickUpLocation().getName(), r.getReturnLocation().getName());
-                i++;
-            }
-            while (true) {
-                System.out.println("> ");
-
-                Integer reservationChoice = scanner.nextInt();
-
-                // need to check if reservation is still active
-                if (reservationChoice <= reservations.size() && reservationChoice > 0) {
-                    selectedReservation = reservations.get(reservationChoice - 1);
-                    break;
-                } else {
-                    System.out.println("Invalid option, please try again!\n");
-                }
-            }
-            if (selectedReservation.getReservationPaymentEnum().equals("ATPICKUP")) {
-                // request for payment using credit card classes
-            } else { // payment has been made
-
-                try {
-                    reservedCar = carSessionBeanRemote.retrieveCarById(selectedReservation.getCar().getCarId());
-                } catch (CarNotFoundException ex) {
-                    System.out.println(ex.getMessage());
-                }
-                // check car status enum. should be "on rental"
-                carSessionBeanRemote.updateCarStatusLocation(reservedCar, CarStatusEnum.RESERVED, customer.getMobileNumber()); // using mobile number to uniquely identify customer
-                System.out.println("Car " + reservedCar.getPlateNumber() + " for Reservation " + selectedReservation.getId() + " has been picked up!\n");
-            }
-        } catch (CustomerNotFoundException ex) {
-            System.out.println(ex.getMessage());
-        }
-    }
-
-    public void doReturnCar() {
-        Scanner scanner = new Scanner(System.in);
-        int i = 1;
-
-        System.out.println("*** Management System :: Sales Management :: Return Car ***\n");
-        System.out.println("Enter Customer Mobile Number> ");
-        // need exception
-        String mobileNumber = scanner.nextLine();
-        try {
-            Customer customer = customerSessionBeanRemote.retrieveCustomerByMobileNumber(mobileNumber);
-            List<Reservation> reservations = customer.getReservations();
-            Reservation selectedReservation;// bad styling. need to change
-            Car reservedCar = new Car();
-
-            System.out.print("Choose reservation> ");
-            System.out.printf("\n\n%3s%14s%30s%30s%20s%14s%14s", "S/N", "Car Plate Number", "Start Time", "End Time", "Requirements", "Pick up Location", "Return Location");
-
-            for (Reservation r : customer.getReservations()) {
-                System.out.printf("\n%3s%14s%30s%30s%20s%14s%14s", i + ". ", r.getCar().getPlateNumber(), r.getStartDateTime().toString(), r.getEndDateTime().toString(),
-                        r.getRequirements().toString(), r.getPickUpLocation().getName(), r.getReturnLocation().getName());
-                i++;
-            }
-            while (true) {
-                System.out.println("> ");
-                Integer reservationChoice = scanner.nextInt();
-
-                // need to check if reservation is still active and has been picked up
-                if (reservationChoice <= reservations.size() && reservationChoice > 0) {
-                    selectedReservation = reservations.get(reservationChoice - 1);
-                    break;
-                } else {
-                    System.out.println("Invalid option, please try again!\n");
-                }
-            }
-            try {
-                reservedCar = carSessionBeanRemote.retrieveCarById(selectedReservation.getCar().getCarId());
-            } catch (CarNotFoundException ex) {
-                System.out.println(ex.getMessage());
-            }
-// need to check CarStatusEnum. Supposed to be "in outlet"
-            carSessionBeanRemote.updateCarStatusLocation(reservedCar, CarStatusEnum.AVAILABLE, selectedReservation.getReturnLocation().getName()); // using mobile number to uniquely identify customer
-            selectedReservation.setReservationPaymentEnum(ReservationPaymentEnum.COMPLETED);
-            reservationSessionBeanRemote.merge(selectedReservation);
-            System.out.println("Car " + reservedCar.getPlateNumber() + " for Reservation " + selectedReservation.getId() + " has been returned!\n");
-
-        } catch (CustomerNotFoundException ex) {
-            System.out.println(ex.getMessage());
-        }
-    }
 }

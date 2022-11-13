@@ -5,13 +5,12 @@
  */
 package ejb.session.stateless;
 
-import entity.Category;
 import entity.RentalRateRecord;
+import java.util.ArrayList;
 import java.util.List;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
-import javax.persistence.Query;
 import util.exception.RentalRateRecordNotFoundException;
 
 /**
@@ -73,16 +72,20 @@ public class RentalRateRecordSessionBean implements RentalRateRecordSessionBeanR
         }
     }
 
-    // CURRENTLY ONLY BY NAME, NEED BY CATEGORY FOR VIEW RENTAL RATE RECORD?
     @Override
-    public RentalRateRecord retrieveRentalRateRecordByName(String name) throws RentalRateRecordNotFoundException {
+    public List<RentalRateRecord> retrieveRentalRateRecordByName(String name) throws RentalRateRecordNotFoundException {
+        List<RentalRateRecord> rentalRateRecords = new ArrayList<>();
         try {
-            RentalRateRecord rentalRateRecord = (RentalRateRecord) em.createQuery("SELECT r FROM RentalRateRecord r WHERE r.recordName = :InName")
+            rentalRateRecords = em.createQuery("SELECT r FROM RentalRateRecord r WHERE r.recordName = :InName")
                     .setParameter("InName", name)            
-                    .getSingleResult();
+                    .getResultList();
 
-            rentalRateRecord.getValidityPeriod().size();
-            return rentalRateRecord;
+            for (RentalRateRecord r : rentalRateRecords) {
+                r.getValidityPeriod().size();
+            }
+            
+            return rentalRateRecords;
+
         } catch (NullPointerException ex) {
             throw new RentalRateRecordNotFoundException("Unable to locate record.");
         }
