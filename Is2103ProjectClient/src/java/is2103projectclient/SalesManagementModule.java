@@ -779,7 +779,7 @@ public class SalesManagementModule {
             boolean enabled = scanner.nextBoolean();
 
             RentalRateRecord updatedR = new RentalRateRecord(recordName, type, category, rate, startDate, endDate, enabled);
-            rentalRateRecordSessionBeanRemote.updateRentalRateRecord(updatedR);
+            rentalRateRecordSessionBeanRemote.updateRentalRateRecord(r, updatedR);
 
             System.out.println("Rental Rate Record updated successfully!");
             System.out.printf("\n%20s%14s%14s%20s%35s%35s", "Record Name", "Rate", "Type", "Category", "Start", "End");

@@ -14,6 +14,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
 
 /**
  *
@@ -34,8 +35,8 @@ public class Customer implements Serializable {
     private String email;
     @OneToMany (mappedBy = "customer")
     private List<Reservation> reservations;
-    /*@OneToMany(mappedBy = "customer")
-    private CreditCard creditCard; */
+    @OneToOne
+    private CreditCard creditCard;
     
     @Column(unique = true)
     private String username;
@@ -45,7 +46,7 @@ public class Customer implements Serializable {
         
     }
 
-    public Customer(String mobileNumber, String passportNumber, String email, String username, String password) {
+    public Customer(String mobileNumber, String passportNumber, String email, CreditCard creditCard, String username, String password) {
         this.mobileNumber = mobileNumber;
         this.passportNumber = passportNumber;
         this.email = email;
@@ -153,18 +154,28 @@ public class Customer implements Serializable {
         this.partner = partner;
     }
 
-    /*public CreditCard getCreditCard() {
+    /**
+     * @return the creditCard
+     */
+    public CreditCard getCreditCard() {
         return creditCard;
     }
 
+    /**
+     * @param creditCard the creditCard to set
+     */
     public void setCreditCard(CreditCard creditCard) {
         this.creditCard = creditCard;
-    } */
+    }
 
+    /**
+     * @return the creditCards
+     */
+    
     public String getUsername() {
         return username;
     }
-
+    
     public void setUsername(String username) {
         this.username = username;
     }

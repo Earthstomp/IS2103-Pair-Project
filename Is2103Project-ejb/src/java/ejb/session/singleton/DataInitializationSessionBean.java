@@ -2,6 +2,8 @@ package ejb.session.singleton;
 
 import ejb.session.stateless.CarSessionBeanLocal;
 import ejb.session.stateless.CategorySessionBeanLocal;
+import ejb.session.stateless.CreditCardSessionBean;
+import ejb.session.stateless.CreditCardSessionBeanLocal;
 import ejb.session.stateless.CustomerSessionBeanLocal;
 import ejb.session.stateless.EmployeeSessionBeanLocal;
 import ejb.session.stateless.ModelSessionBeanLocal;
@@ -10,6 +12,7 @@ import ejb.session.stateless.PartnerSessionBeanLocal;
 import ejb.session.stateless.ReservationSessionBeanLocal;
 import entity.Car;
 import entity.Category;
+import entity.CreditCard;
 import entity.Customer;
 import entity.Employee;
 import entity.Model;
@@ -74,6 +77,9 @@ public class DataInitializationSessionBean {
 
     @EJB
     private CarSessionBeanLocal carSessionBeanLocal;
+    
+    @EJB
+    private CreditCardSessionBeanLocal creditCardSessionBeanLocal;
 
     public DataInitializationSessionBean() {
 
@@ -274,7 +280,7 @@ public class DataInitializationSessionBean {
 
         categorySessionBeanLocal.createRentalRateRecord(new RentalRateRecord("Default", RentalRateEnum.DEFAULT, 100.0, null, null), standardSedanId);
         categorySessionBeanLocal.createRentalRateRecord(new RentalRateRecord("Weekend Promo", RentalRateEnum.PROMOTION, 80.0, rate2start, rate2end), standardSedanId);
-        categorySessionBeanLocal.createRentalRateRecord(new RentalRateRecord("Default", RentalRateEnum.DEFAULT, 200.0, null, null), standardSedanId);
+        categorySessionBeanLocal.createRentalRateRecord(new RentalRateRecord("Default", RentalRateEnum.DEFAULT, 200.0, null, null), familySedanId);
         categorySessionBeanLocal.createRentalRateRecord(new RentalRateRecord("Default", RentalRateEnum.DEFAULT, 300.0, null, null), luxurySedanId);
         categorySessionBeanLocal.createRentalRateRecord(new RentalRateRecord("Monday", RentalRateEnum.PEAK, 310.0, rate5start, rate5end), luxurySedanId);
         categorySessionBeanLocal.createRentalRateRecord(new RentalRateRecord("Tuesday", RentalRateEnum.PEAK, 320.0, rate6start, rate6end), luxurySedanId);
@@ -306,7 +312,9 @@ public class DataInitializationSessionBean {
         Outlet outletB = new Outlet();
         Outlet outletC = new Outlet();
         try {
-            Long customerId = customerSessionBeanLocal.createNewCustomer(new Customer("91234567", "E1234567A", "test@test.com", "user", "pw"));
+            Long cardId = creditCardSessionBeanLocal.createNewCard(new CreditCard("123456"));
+            CreditCard card = creditCardSessionBeanLocal.retrieveCardById(cardId);
+            Long customerId = customerSessionBeanLocal.createNewCustomer(new Customer("91234567", "12345678", "test@test.com", card, "user", "pw"));
             Customer testCustomer = customerSessionBeanLocal.retrieveCustomerByMobileNumber("91234567");
 
             // PERSONAL TEST DATA

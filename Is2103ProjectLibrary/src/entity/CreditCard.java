@@ -12,10 +12,11 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.OneToOne;
 
 /**
  *
- * @author dorothyyuan
+ * @author Keith test
  */
 @Entity
 public class CreditCard implements Serializable {
@@ -23,47 +24,46 @@ public class CreditCard implements Serializable {
     private static final long serialVersionUID = 1L;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long ccId;
+    private Long id;
     @Column(nullable = false)
-    private String name;
+    private String serialNumber;
     @Column(precision = 11, scale = 2)
     private BigDecimal penaltyAmount;
+    @OneToOne (mappedBy = "creditCard")
     private Customer customer; 
     
     public CreditCard() {
         
     }
 
-    public CreditCard(Long ccId, String name, BigDecimal penaltyAmount, Customer customer) {
-        this.ccId = ccId;
-        this.name = name;
-        this.penaltyAmount = penaltyAmount;
-        this.customer = customer;
+    public CreditCard(String name) {
+        this.serialNumber = name;
+        this.penaltyAmount = new BigDecimal(0.0);
     }
 
-    public Long getCcId() {
-        return ccId;
+    public Long getId() {
+        return id;
     }
 
-    public void setCcId(Long ccId) {
-        this.ccId = ccId;
+    public void setId(Long id) {
+        this.id = id;
     }
 
     @Override
     public int hashCode() {
         int hash = 0;
-        hash += (ccId != null ? ccId.hashCode() : 0);
+        hash += (id != null ? id.hashCode() : 0);
         return hash;
     }
 
     @Override
     public boolean equals(Object object) {
-        // TODO: Warning - this method won't work in the case the ccId fields are not set
+        // TODO: Warning - this method won't work in the case the id fields are not set
         if (!(object instanceof CreditCard)) {
             return false;
         }
         CreditCard other = (CreditCard) object;
-        if ((this.ccId == null && other.ccId != null) || (this.ccId != null && !this.ccId.equals(other.ccId))) {
+        if ((this.id == null && other.id != null) || (this.id != null && !this.id.equals(other.id))) {
             return false;
         }
         return true;
@@ -71,49 +71,14 @@ public class CreditCard implements Serializable {
 
     @Override
     public String toString() {
-        return "entity.CreditCard[ id=" + ccId + " ]";
-    }
-
-    /**
-     * @return the name
-     */
-    public String getName() {
-        return name;
-    }
-
-    /**
-     * @param name the name to set
-     */
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    /**
-     * @return the penaltyAmount
-     */
-    public BigDecimal getPenaltyAmount() {
-        return penaltyAmount;
-    }
-
-    /**
-     * @param penaltyAmount the penaltyAmount to set
-     */
-    public void setPenaltyAmount(BigDecimal penaltyAmount) {
-        this.penaltyAmount = penaltyAmount;
-    }
-
-    /**
-     * @return the customer
-     */
-    public Customer getCustomer() {
-        return customer;
-    }
-
-    /**
-     * @param customer the customer to set
-     */
-    public void setCustomer(Customer customer) {
-        this.customer = customer;
+        return "entity.CreditCard[ id=" + id + " ]";
     }
     
 }
+
+
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */

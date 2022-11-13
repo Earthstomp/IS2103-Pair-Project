@@ -67,14 +67,14 @@ public class OutletSessionBean implements OutletSessionBeanRemote, OutletSession
     }
     
     @Override
-    public Outlet retrieveOutletByLocation(String name) { //throws OutletNotFoundException {
+    public Outlet retrieveOutletByLocation(String name) throws OutletNotFoundException {
         Query query = em.createQuery("SELECT o FROM Outlet o WHERE o.name = :inName");
         query.setParameter("inName", name);
 
-//        try {
+        try {
             return (Outlet) query.getSingleResult();
-//        } catch (NoResultException | NonUniqueResultException ex) {
-//            throw new OutletNotFoundException("Outlet " + name + " does not exist!");
-//        }
+        } catch (NoResultException | NonUniqueResultException ex) {
+            throw new OutletNotFoundException("Outlet " + name + " does not exist!");
+        }
     }
 }

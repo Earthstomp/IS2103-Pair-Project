@@ -5,7 +5,9 @@
  */
 package ejb.session.stateless;
 
+import entity.Category;
 import entity.RentalRateRecord;
+import java.util.Date;
 import java.util.List;
 import javax.ejb.Remote;
 import util.exception.RentalRateRecordNotFoundException;
@@ -25,10 +27,14 @@ public interface RentalRateRecordSessionBeanRemote {
 
     public Long createRentalRateRecord(RentalRateRecord rentalRateRecord);
 
-    public void updateRentalRateRecord(RentalRateRecord rentalRateRecord) throws RentalRateRecordNotFoundException;
+    public void updateRentalRateRecord(RentalRateRecord rentalRateRecord, RentalRateRecord newRentalRateRecord) throws RentalRateRecordNotFoundException;
 
     public List<RentalRateRecord> retrieveRentalRateRecordByName(String name) throws RentalRateRecordNotFoundException;
 
     public void merge(RentalRateRecord rentalRateRecord);
+
+    public List<RentalRateRecord> retrieveAllRateRecordsByDatebyCategory(Date date, Category category);
+
+    public RentalRateRecord chooseRateRecord(List<RentalRateRecord> rates);
 
 }

@@ -7,6 +7,7 @@ package carmsreservationclient;
 
 import ejb.session.stateless.CarSessionBeanRemote;
 import ejb.session.stateless.CategorySessionBeanRemote;
+import ejb.session.stateless.CreditCardSessionBeanRemote;
 import ejb.session.stateless.CustomerSessionBeanRemote;
 import ejb.session.stateless.EmployeeSessionBeanRemote;
 import ejb.session.stateless.ModelSessionBeanRemote;
@@ -24,7 +25,9 @@ import java.text.ParseException;
 import java.util.Date;
 import java.util.List;
 import entity.Category;
+import entity.CreditCard;
 import entity.Customer;
+import entity.RentalRateRecord;
 import entity.Reservation;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -49,6 +52,7 @@ public class MainApp {
     private EmployeeSessionBeanRemote employeeSessionBeanRemote;
     private RentalRateRecordSessionBeanRemote rentalRateRecordSessionBeanRemote;
     private ReservationSessionBeanRemote reservationSessionBeanRemote;
+    private CreditCardSessionBeanRemote creditCardSessionBeanRemote;
 
     private Customer customer;
     private List<Reservation> reservationsToUnassign;
@@ -61,7 +65,7 @@ public class MainApp {
             TransitDriverDispatchRecordSessionBeanRemote transitDriverDispatchRecordSessionBeanRemote,
             OutletSessionBeanRemote outletSessionBeanRemote, EmployeeSessionBeanRemote employeeSessionBeanRemote,
             CategorySessionBeanRemote categorySessionBeanRemote, RentalRateRecordSessionBeanRemote rentalRateRecordSessionBeanRemote,
-            CustomerSessionBeanRemote customerSessionBeanRemote, ReservationSessionBeanRemote reservationSessionBeanRemote) {
+            CustomerSessionBeanRemote customerSessionBeanRemote, ReservationSessionBeanRemote reservationSessionBeanRemote, CreditCardSessionBeanRemote creditCardSessionBeanRemote) {
         this();
         this.modelSessionBeanRemote = modelSessionBeanRemote;
         this.carSessionBeanRemote = carSessionBeanRemote;
@@ -72,6 +76,7 @@ public class MainApp {
         this.rentalRateRecordSessionBeanRemote = rentalRateRecordSessionBeanRemote;
         this.customerSessionBeanRemote = customerSessionBeanRemote;
         this.reservationSessionBeanRemote = reservationSessionBeanRemote;
+        this.creditCardSessionBeanRemote = creditCardSessionBeanRemote;
     }
 
     public void runApp() {
@@ -150,8 +155,11 @@ public class MainApp {
 
         System.out.print("Enter email> ");
         String email = scanner.nextLine().trim();
+        
+        System.out.print("Credit card number>");
+        String num = scanner.nextLine().trim();
 
-        Customer customer = new Customer(mobileNumber, passportNumber, email, username, password);
+        Customer customer = new Customer(mobileNumber, passportNumber, email, new CreditCard(num), username, password);
 
         try {
             Long customerId = customerSessionBeanRemote.createNewCustomer(customer);
@@ -272,7 +280,7 @@ public class MainApp {
             Reservation reservation = reservationSessionBeanRemote.retrieveReservationById(reservationId);
 
             System.out.printf("\n%35s%20s%35s%20s%15s%15s%15s", "Start Date", "Pick Up Location", "End Date", "Return Location", "Payment Status", "Make", "Model");
-            System.out.printf("\n%35s%20s%35s%20s%15s%15s%15s", reservation.getStartDateTime(), reservation.getPickUpLocation(), reservation.getEndDateTime(), reservation.getReturnLocation().getName(), reservation.getReservationPaymentEnum(), reservation.getRequirements().get(0), reservation.getRequirements().get(1));
+            System.out.printf("\n%35s%20s%35s%20s%15s%15s%15s", reservation.getStartDateTime(), reservation.getPickUpLocation().getName(), reservation.getEndDateTime(), reservation.getReturnLocation().getName(), reservation.getReservationPaymentEnum(), reservation.getRequirements().get(0), reservation.getRequirements().get(1));
 
             System.out.println("\n");
         } catch (ReservationNotFoundException ex) {
@@ -303,9 +311,12 @@ public class MainApp {
         assignReservations();
         System.out.printf("\n%3s%16s%15s%15s", "ID", "Car Category", "Available?", "Rental Fee");
         for (Category category : categories) {
-            boolean availability = assignReservationByCategory(category, pickUpOutlet, returnOutlet, returnDate, returnDate);
-            System.out.printf("\n%3s%16s%15s%15s", category.getCategoryId(), category.getCategoryName(), availability, "???");
+            // was an error here need to check
+            boolean availability = assignReservationByCategory(category, pickUpOutlet, returnOutlet, pickUpDate, returnDate);
+            Double rentalFee = calculateRentalFee(category, pickUpDate, returnDate);
+            System.out.printf("\n%3s%16s%15s%15s", category.getCategoryId(), category.getCategoryName(), availability, rentalFee);
             categoryAvailabilities.add(availability);
+
         }
         unassignReservations();
         Scanner scanner = new Scanner(System.in);
@@ -743,5 +754,26 @@ public class MainApp {
             reservationSessionBeanRemote.unassignReservationFromCar(r);
 
         }
+    }
+
+    public double calculateRentalFee(Category category, Date pickUpDate, Date returnDate) {
+        Date rentalDate = pickUpDate;
+        double rentalFee = 0.0;
+        Calendar c = Calendar.getInstance();
+        System.out.println("Calculating fee for category " + category.getCategoryName());
+
+        // loop while date of rental calculation fee is before return date
+        while (rentalDate.before(returnDate)) {
+            System.out.println("Rental fee is " + rentalFee);
+
+            List<RentalRateRecord> ratesAvailableOnDate = rentalRateRecordSessionBeanRemote.retrieveAllRateRecordsByDatebyCategory(rentalDate, category);
+            if (category.getRateRecords().size() > 0) { // need more errors here to check if record is enabled
+                rentalFee += rentalRateRecordSessionBeanRemote.chooseRateRecord(ratesAvailableOnDate).getRate();
+            }
+            c.setTime(rentalDate);
+            c.add(Calendar.DATE, 1);
+            rentalDate = c.getTime();
+        }
+        return rentalFee;
     }
 }

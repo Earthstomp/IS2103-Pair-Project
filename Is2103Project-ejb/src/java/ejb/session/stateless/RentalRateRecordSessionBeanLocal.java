@@ -26,7 +26,7 @@ public interface RentalRateRecordSessionBeanLocal {
 
     public Long createRentalRateRecord(RentalRateRecord rentalRateRecord);
 
-    public void updateRentalRateRecord(RentalRateRecord rentalRateRecord) throws RentalRateRecordNotFoundException;
+    public void updateRentalRateRecord(RentalRateRecord rentalRateRecord,  RentalRateRecord newRentalRateRecord) throws RentalRateRecordNotFoundException;
 
     public List<RentalRateRecord> retrieveRentalRateRecordByName(String name) throws RentalRateRecordNotFoundException;
 

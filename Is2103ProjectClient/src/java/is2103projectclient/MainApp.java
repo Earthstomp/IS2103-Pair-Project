@@ -132,7 +132,7 @@ public class MainApp {
         Scanner scanner = new Scanner(System.in);
         Integer response = 0;
 
-        while (true) {
+        while (employee != null) {
             System.out.println("*** CaRMS Management Client ***\n");
             System.out.println("You are logged in as " + employee.getUsername() + " with " + employee.getRole().toString() + " rights\n");
             System.out.println("1: Sales Management Module");
@@ -170,6 +170,7 @@ public class MainApp {
                         System.out.println("Invalid date input!\n");
                     }
                 } else if (response == 4) {
+                    employee = null;
                     break;
                 } else {
                     System.out.println("Invalid option, please try again!\n");
