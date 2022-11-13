@@ -160,7 +160,9 @@ public class MainApp {
         Customer customer = new Customer(mobileNumber, passportNumber, email, username, password);
 
         try {
-            Long customerId = customerSessionBeanRemote.createNewCustomer(customer, new CreditCard(num));
+            Long cardId = creditCardSessionBeanRemote.createNewCard(new CreditCard(num));
+            CreditCard card = creditCardSessionBeanRemote.retrieveCardById(cardId);
+            Long customerId = customerSessionBeanRemote.createNewCustomer(customer, card);
         } catch (CustomerExistsException ex) {
             System.out.println(ex.getMessage());
         }
@@ -227,8 +229,7 @@ public class MainApp {
 
                 if (response == 1) {
                     doSearchCar();
-                } else if (response == 2) {
-                    //doReserveCar();
+
                 } else if (response == 2) {
                     doCancelReservation();
                 } else if (response == 3) {
@@ -278,6 +279,12 @@ public class MainApp {
 
         try {
             List<Reservation> reservations = reservationSessionBeanRemote.retrieveAllReservationsForCustomer(customer);
+            for (Reservation r : reservations) {
+                System.out.printf("\n%3s%35s%20s%35s%20s%15s%15s%15s", "S/N", "Start Date", "Pick Up Location", "End Date", "Return Location", "Payment Status", "Make", "Model");
+                System.out.printf("\n%3s%35s%20s%35s%20s%15s%15s%15s", 1 + ".", r.getStartDateTime(), r.getPickUpLocation().getName(), r.getEndDateTime(), r.getReturnLocation().getName(), r.getReservationPaymentEnum(), r.getRequirements().get(0), r.getRequirements().get(1));
+
+                System.out.println("\n");
+            }
             int sn = scanner.nextInt();
             Long reservationId = reservations.get(sn - 1).getId();
             Reservation reservation = reservationSessionBeanRemote.retrieveReservationById(reservationId);
@@ -294,10 +301,10 @@ public class MainApp {
     private void doViewAllMyReservations() {
         try {
             List<Reservation> reservations = reservationSessionBeanRemote.retrieveAllReservationsForCustomer(customer);
-            System.out.printf("\n%3s%35s%20s%35s%20s%15s%15s%15s", "S/N", "Start Date", "Pick Up Location", "End Date", "Return Location", "Payment Status", "Make", "Model");
+            System.out.printf("\n%3s%35s%20s%35s%20s%15s%15s", "S/N", "Start Date", "Pick Up Location", "End Date", "Return Location", "Payment Status", "Category");
             int index = 1;
             for (Reservation reservation : reservations) {
-                System.out.printf("\n%3s%35s%20s%35s%20s%15s%15s%15s", index + ".", reservation.getStartDateTime(), reservation.getPickUpLocation().getName(), reservation.getEndDateTime(), reservation.getReturnLocation().getName(), reservation.getReservationPaymentEnum(), reservation.getRequirements().get(0), reservation.getRequirements().get(1));
+                System.out.printf("\n%3s%35s%20s%35s%20s%15s%15s", index + ".", reservation.getStartDateTime(), reservation.getPickUpLocation().getName(), reservation.getEndDateTime(), reservation.getReturnLocation().getName(), reservation.getReservationPaymentEnum(), reservation.getRequirements().get(0));
                 index++;
             }
             System.out.println("\n");
