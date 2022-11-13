@@ -6,6 +6,7 @@
 package ejb.session.stateless;
 
 import entity.CreditCard;
+import java.math.BigDecimal;
 import javax.ejb.Remote;
 
 /**
@@ -16,5 +17,7 @@ import javax.ejb.Remote;
 public interface CreditCardSessionBeanRemote {
 
     public Long createNewCard(CreditCard creditCard);
+
+    public void makePayment(BigDecimal payment, Long id);
     
 }

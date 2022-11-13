@@ -21,6 +21,8 @@ import javax.persistence.OneToOne;
 @Entity
 public class CreditCard implements Serializable {
 
+   
+
     private static final long serialVersionUID = 1L;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -28,7 +30,7 @@ public class CreditCard implements Serializable {
     @Column(nullable = false)
     private String serialNumber;
     @Column(precision = 11, scale = 2)
-    private BigDecimal penaltyAmount;
+    private BigDecimal amountDue;
     @OneToOne (mappedBy = "creditCard")
     private Customer customer; 
     
@@ -38,7 +40,7 @@ public class CreditCard implements Serializable {
 
     public CreditCard(String name) {
         this.serialNumber = name;
-        this.penaltyAmount = new BigDecimal(0.0);
+        this.amountDue = new BigDecimal(0.0);
     }
 
     public Long getId() {
@@ -67,6 +69,33 @@ public class CreditCard implements Serializable {
             return false;
         }
         return true;
+    }
+     /**
+     * @return the amountDue
+     */
+    public BigDecimal getAmountDue() {
+        return amountDue;
+    }
+
+    /**
+     * @param amountDue the amountDue to set
+     */
+    public void setAmountDue(BigDecimal amountDue) {
+        this.amountDue = amountDue;
+    }
+
+    /**
+     * @return the serialNumber
+     */
+    public String getSerialNumber() {
+        return serialNumber;
+    }
+
+    /**
+     * @param serialNumber the serialNumber to set
+     */
+    public void setSerialNumber(String serialNumber) {
+        this.serialNumber = serialNumber;
     }
 
     @Override
