@@ -157,10 +157,10 @@ public class MainApp {
         System.out.print("Credit card number>");
         String num = scanner.nextLine().trim();
 
-        Customer customer = new Customer(mobileNumber, passportNumber, email, new CreditCard(num), username, password);
+        Customer customer = new Customer(mobileNumber, passportNumber, email, username, password);
 
         try {
-            Long customerId = customerSessionBeanRemote.createNewCustomer(customer);
+            Long customerId = customerSessionBeanRemote.createNewCustomer(customer, new CreditCard(num));
         } catch (CustomerExistsException ex) {
             System.out.println(ex.getMessage());
         }
@@ -214,14 +214,13 @@ public class MainApp {
             System.out.println("*** CaRMS Reservation Client ***\n");
             System.out.println("You are logged in as " + customer.getUsername());
             System.out.println("1: Search Car");
-            System.out.println("2: Reserve Car");
-            System.out.println("3: Cancel Reservation");
-            System.out.println("4: View Reservation Details");
-            System.out.println("5: View All My Reservations");
-            System.out.println("6: Log Out\n");
+            System.out.println("2: Cancel Reservation");
+            System.out.println("3: View Reservation Details");
+            System.out.println("4: View All My Reservations");
+            System.out.println("5: Log Out\n");
             response = 0;
 
-            while (response < 1 || response > 6) {
+            while (response < 1 || response > 5) {
                 System.out.print("> ");
 
                 response = scanner.nextInt();
@@ -230,20 +229,20 @@ public class MainApp {
                     doSearchCar();
                 } else if (response == 2) {
                     //doReserveCar();
-                } else if (response == 3) {
+                } else if (response == 2) {
                     doCancelReservation();
-                } else if (response == 4) {
+                } else if (response == 3) {
                     doViewReservationDetails();
-                } else if (response == 5) {
+                } else if (response == 4) {
                     doViewAllMyReservations();
-                } else if (response == 6) {
+                } else if (response == 5) {
                     break;
                 } else {
                     System.out.println("Invalid option, please try again!\n");
                 }
             }
 
-            if (response == 6) {
+            if (response == 5) {
                 break;
             }
         }
@@ -310,16 +309,20 @@ public class MainApp {
     private void testReservationValidity(Outlet pickUpOutlet, Outlet returnOutlet, Date pickUpDate, Date returnDate) {
         List<Category> categories = categorySessionBeanRemote.retrieveAllCategories();
         List<Boolean> categoryAvailabilities = new ArrayList<Boolean>(); // not sure why small b does not work
+        List<BigDecimal> rentalFees = new ArrayList<BigDecimal>();
 
         // assign currently unassigned reservations to system so system can check for most updated availabiliry
         assignReservations();
-        System.out.printf("\n%3s%16s%15s%15s", "ID", "Car Category", "Available?", "Rental Fee");
+        int index = 1;
+        System.out.printf("\n%3s%16s%15s%15s", "S/N", "Car Category", "Available?", "Rental Fee");
         for (Category category : categories) {
             // was an error here need to check
             boolean availability = assignReservationByCategory(category, pickUpOutlet, returnOutlet, pickUpDate, returnDate);
             BigDecimal rentalFee = calculateRentalFee(category, pickUpDate, returnDate);
             System.out.printf("\n%3s%16s%15s%15s", category.getCategoryId(), category.getCategoryName(), availability, rentalFee);
             categoryAvailabilities.add(availability);
+            rentalFees.add(rentalFee);
+            index++;
 
         }
         unassignReservations();
@@ -327,33 +330,60 @@ public class MainApp {
         Integer response = 0;
 
         while (true) {
-            System.out.println("1: Reserve a Car");
+            response = 0;
+
+            System.out.println("\n1: Reserve a Car");
             System.out.println("2: Back");
 
             while (response < 1 || response > 2) {
                 System.out.print("> ");
-
+                response = 0;
                 response = scanner.nextInt();
 
                 if (response == 1) {
+                    if (customer == null) {
+                        System.out.println("You need to log in to reserve a car> ");
+                        break;
+                    }
+                    scanner.nextLine();
+                    System.out.println("Enter S/N of Category of Car you would like to reserve> ");
+                    int chosenCategorySn = scanner.nextInt();
 
+                    if (categoryAvailabilities.get(chosenCategorySn - 1) == false) {
+                        System.out.println("Cars of chosen Category cannot be reserved> ");
+                        break;
+                    } else {
+                        System.out.println("1: Pay Online");
+                        System.out.println("2: Pay At Pick up ");
+
+                        int paymentMethod = scanner.nextInt();
+
+                        if (paymentMethod == 1) {
+//                            System.out.println("getting rental fee " + rentalFees.get(chosenCategorySn - 1));
+                            System.out.println("Reservation paid for! " + rentalFees.get(chosenCategorySn - 1) + " charged to your credit card " + customer.getCreditCard().getSerialNumber());
+                            creditCardSessionBeanRemote.makePayment(rentalFees.get(chosenCategorySn - 1), customer.getCreditCard().getId());
+                            customerSessionBeanRemote.createNewReservation(new Reservation(pickUpDate, returnDate, pickUpOutlet, returnOutlet, ReservationPaymentEnum.PAID, customer, categories.get(chosenCategorySn - 1).getCategoryName()), customer.getCustomerId());
+                            break;
+                        } else { // 2
+                            System.out.println("Reservation paid at Pick up! Saving your credit card: " + customer.getCreditCard().getSerialNumber());
+                            customerSessionBeanRemote.createNewReservation(new Reservation(pickUpDate, returnDate, pickUpOutlet, returnOutlet, ReservationPaymentEnum.ATPICKUP, customer, categories.get(chosenCategorySn - 1).getCategoryName()), customer.getCustomerId());
+                            break;
+                        }
+                    }
                     //doReserveCar();
                     // need more code here
-                } else if (response == 2) {
-                    // register as customer method
+                }
+
+                if (response == 2) {
                     break;
-                } else {
-                    System.out.println("Invalid option, please try again!\n");
                 }
             }
+            break;
 
-            if (response == 2) {
-                break;
-            }
         }
     }
-
     // assign any unassigned reservations to update current system. should be successful for all
+
     private void assignReservations() {
         //System.out.println("Starting assigning reservations");
         List<Reservation> reservations = new ArrayList<>();
@@ -389,9 +419,9 @@ public class MainApp {
 
             /*for (Car car : carsAvailable) {
                 System.out.println(car.getPlateNumber() + " " + car.getModel().getMake() + " " + car.getModel().getModel());
-                System.out.println("Reservations");
+//                System.out.println("Reservations");
                 for (Reservation r : car.getReservations()) {
-                    System.out.println("Reservation " + r.getId());
+//                    System.out.println("Reservation " + r.getId());
                 }
             }*/
             Calendar calendar = Calendar.getInstance();
@@ -559,10 +589,10 @@ public class MainApp {
         carsAvailable = categorySessionBeanRemote.retrieveAllCarsFromCategory(categoryName);
 
         for (Car car : carsAvailable) {
-            System.out.println(car.getPlateNumber() + " " + car.getModel().getMake() + " " + car.getModel().getModel());
-            System.out.println("Reservations");
+//            System.out.println(car.getPlateNumber() + " " + car.getModel().getMake() + " " + car.getModel().getModel());
+//            System.out.println("Reservations");
             for (Reservation r : car.getReservations()) {
-                System.out.println("Reservation " + r.getId());
+//                System.out.println("Reservation " + r.getId());
             }
         }
 
@@ -670,8 +700,7 @@ public class MainApp {
                     }
                 }
 
-                System.out.println("Done iterating through all reservations for car " + c.getPlateNumber());
-
+//                System.out.println("Done iterating through all reservations for car " + c.getPlateNumber());
                 // if there is a 
                 if (updatedLatestReservation) {
                     // assign car if the it will be at the outlet already
@@ -709,8 +738,8 @@ public class MainApp {
 
     private void unassignReservations() {
         for (Reservation r : reservationsToUnassign) {
-            System.out.println("Unassigning Reservation with ID " + r.getId());
-            System.out.println("Unassigned reservation from car " + r.getCar());
+//            System.out.println("Unassigning Reservation with ID " + r.getId());
+//            System.out.println("Unassigned reservation from car " + r.getCar());
             reservationSessionBeanRemote.unassignReservationFromCar(r);
 
         }

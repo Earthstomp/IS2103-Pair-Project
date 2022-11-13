@@ -77,8 +77,8 @@ public class ReservationSessionBean implements ReservationSessionBeanRemote, Res
         currentDateTime = c.getTime(); //  current day converted to 2359. need to change to 0159
         c.add(Calendar.DATE, -1);
         Date dayBeforeDateTime = c.getTime(); // previous day converted to 2359
-        System.out.println("New current time is " + currentDateTime);
-        System.out.println("Day before time is " + dayBeforeDateTime);
+//        System.out.println("New current time is " + currentDateTime);
+//        System.out.println("Day before time is " + dayBeforeDateTime);
         List<Reservation> reservationsOnDate = new ArrayList<>();
 
         // only returns reservations on date that has NOT been assigned
@@ -124,7 +124,7 @@ public class ReservationSessionBean implements ReservationSessionBeanRemote, Res
         car = carSessionBeanLocal.retrieveCarById(car.getCarId());
 
         // will probably need more error checking here
-        System.out.println("Assigning Car " + car.getPlateNumber() + " to Reservation" + reservation.getId());
+//        System.out.println("Assigning Car " + car.getPlateNumber() + " to Reservation" + reservation.getId());
 
         reservation.setCar(car);
         car.getReservations().add(reservation);

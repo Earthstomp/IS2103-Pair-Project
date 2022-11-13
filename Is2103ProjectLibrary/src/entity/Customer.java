@@ -46,10 +46,10 @@ public class Customer implements Serializable {
         
     }
 
-    public Customer(String mobileNumber, String passportNumber, String email, CreditCard creditCard, String username, String password) {
+    public Customer(String mobileNumber, String passportNumber, String email, String username, String password) {
         this.mobileNumber = mobileNumber;
         this.passportNumber = passportNumber;
-        this.email = email;
+       this.email = email;
         this.username = username;
         this.password = password;
     }

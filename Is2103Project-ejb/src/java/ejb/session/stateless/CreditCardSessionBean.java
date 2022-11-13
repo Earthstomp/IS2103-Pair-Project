@@ -6,6 +6,7 @@
 package ejb.session.stateless;
 
 import entity.CreditCard;
+import java.math.BigDecimal;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
@@ -34,4 +35,11 @@ public class CreditCardSessionBean implements CreditCardSessionBeanRemote, Credi
     public CreditCard retrieveCardById(Long id) {
         return em.find(CreditCard.class, id);
     }
+    
+    public void makePayment(BigDecimal payment, Long id) {
+        CreditCard card = retrieveCardById(id);
+        card.setAmountDue(card.getAmountDue().add(payment));
+        em.merge(card);
+    }
+    
 }
