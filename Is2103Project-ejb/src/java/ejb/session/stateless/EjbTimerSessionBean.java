@@ -41,8 +41,8 @@ public class EjbTimerSessionBean implements EjbTimerSessionBeanLocal, EjbTimerSe
     // For testing purpose, we are allowing the timer to trigger every 8 seconds instead of every day at 8am
     // To trigger the timer once every day at 8am instead, use the following the @Schedule annotation
     // @Schedule(dayOfWeek="*", hour = "8", info = "currentDayCarAllocationTransitDriverDispatchRecordGeneratorTimer")    
-//    @Schedule(hour = "2", minute = "0", second = "0", info = "currentDayCarAllocationTimer")
-    @Schedule(hour = "*", minute = "*/8", info = "currentDayCarAllocationTimer")
+    @Schedule(hour = "2", minute = "0", second = "0", info = "currentDayCarAllocationTimer")
+//    @Schedule(hour = "*", minute = "*/8", info = "currentDayCarAllocationTimer")
     public void currentDayCarAllocationTimer() {
         Date timeStamp = new Date(); // new SimpleDateFormat("yyyy.MM.dd.HH.mm.ss").format(
         System.out.println("********** EjbTimerSessionBean.currentDayCarAllocationTimer(): Timeout at " + timeStamp);
@@ -135,7 +135,7 @@ public class EjbTimerSessionBean implements EjbTimerSessionBeanLocal, EjbTimerSe
         Date startTimeForTransit = calendar.getTime();
         List<Car> carsAvailableFiltered = new ArrayList<Car>();
         // setting a boolean to check if the reservation led to the car being removed
-        boolean reservationRemovedCar;
+        boolean reservationRemovedCar = false;
         // setting a date for initial comparison
         calendar.add(Calendar.DAY_OF_YEAR, -300);
         Date latestReservationTiming = calendar.getTime();
@@ -143,7 +143,6 @@ public class EjbTimerSessionBean implements EjbTimerSessionBeanLocal, EjbTimerSe
         // keeping the latest reservation
         Reservation latestReservation = new Reservation();
         // to track if the latestReservation was updated
-        boolean updatedLatestReservation = false;
         // to track if the input reservation was assigned
         boolean assigned = false;
         // a car that can be assigned with a transit, when there is no car at the outlet to be picked up at
@@ -163,7 +162,8 @@ public class EjbTimerSessionBean implements EjbTimerSessionBeanLocal, EjbTimerSe
             } else {
                 // for every reservation the car has
                 System.out.println("test reservation");
-
+                
+                
                 for (Reservation r : c.getReservations()) {
                     reservationRemovedCar = false;
                     System.out.println(r.getStartDateTime() + " " + r.getEndDateTime());
@@ -184,6 +184,7 @@ public class EjbTimerSessionBean implements EjbTimerSessionBeanLocal, EjbTimerSe
                             carsAvailableFiltered.remove(c); // problem is here 
                             reservationRemovedCar = true;
                             System.out.println("removed ! 1");
+                            break;
 
                             // 2. if there is a reservation on car that returns to another outlet that will prevent car from being returned before reservation time (by accounting for 2hr transit) 
                         } else if (r.getStartDateTime().before(startDateTime) && r.getReturnLocation() != pickUpOutlet && r.getEndDateTime().after(startTimeForTransit)) {
@@ -191,6 +192,7 @@ public class EjbTimerSessionBean implements EjbTimerSessionBeanLocal, EjbTimerSe
 
                             carsAvailableFiltered.remove(c);
                             reservationRemovedCar = true;
+                            break;
 
                             // 3. if there is a reservation that starts between the startDateTime and endDateTime of this reservation
                         } else if (r.getStartDateTime().after(startDateTime) && r.getStartDateTime().before(endDateTime)) {
@@ -198,6 +200,7 @@ public class EjbTimerSessionBean implements EjbTimerSessionBeanLocal, EjbTimerSe
 
                             carsAvailableFiltered.remove(c);
                             reservationRemovedCar = true;
+                            break;
 
                             // 4. if there is a future reservation that starts at another outlet at a time less than 2hrs after this reservation end time
                         } else if (r.getPickUpLocation() != pickUpOutlet && endDateTime.after(rStartTimeForTransit)) {
@@ -205,34 +208,37 @@ public class EjbTimerSessionBean implements EjbTimerSessionBeanLocal, EjbTimerSe
 
                             carsAvailableFiltered.remove(c);
                             reservationRemovedCar = true;
+                            break;
 
                         } else {
                             System.out.println("this reservation " + r.getId() + " has no conflicts with the current reservation");
                         }
-                    } // ignore reservations which have been completed or cancelled
+                    }
                     // if this reservation did not remove the car, and its end time is the latest so far while still before the incoming reservation's start time
-                    if (reservationRemovedCar = false && r.getEndDateTime().after(latestReservationTiming) && r.getEndDateTime().before(startDateTime)) {
+                    if (r.getEndDateTime().after(latestReservationTiming) && r.getEndDateTime().before(startDateTime)) {
                         latestReservation = r;
-                        updatedLatestReservation = true;
                         System.out.println("updatedLatestReservation");
                     }
                 }
                 if (c.getReservations().size() == 0) {
                     // if the car has no reservations and is at outlet, assign 
-                    if (c.getLocation().toString() == pickUpOutlet.getName().toString()) {
-                        System.out.println("Car " + c.getPlateNumber() + "has no reservations and is assigned to reservation " + chosenReservation.getId());
+                    if (c.getLocation().equals(pickUpOutlet.getName())) {
+                        System.out.println("Car " + c.getPlateNumber() + " has no reservations and is assigned to reservation " + chosenReservation.getId());
                         reservationSessionBeanLocal.assignCarToReservation(chosenReservation, c);
                         assigned = true;
-                    } else { // if car has no reservations but not at outlet, consider for transit
+                        break;
+                    } else if (carForAssignmentWithTransit.getPlateNumber() == null) { // if car has no reservations but not at outlet, and no car has been designated yet, use for transit 
                         System.out.println("Car that has no reservations can be assigned with transit " + c.getPlateNumber());
                         carForAssignmentWithTransit = c;
+                    } else {
+                        // skip if there is already a car designated for transit
                     }
                 }
 
                 System.out.println("Done iterating through all reservations for car " + c.getPlateNumber());
 
-                // if there is a 
-                if (updatedLatestReservation) {
+                // if the car has reservations but none of them conflict
+                if (!reservationRemovedCar) {
                     // assign car if the it will be at the outlet already
                     if (latestReservation.getReturnLocation() == pickUpOutlet) {
                         System.out.println("Reservation is being assigned to car " + c.getPlateNumber());
@@ -242,10 +248,11 @@ public class EjbTimerSessionBean implements EjbTimerSessionBeanLocal, EjbTimerSe
                             System.out.println(ex.getMessage());
                         }
                         assigned = true;
-                    } else { // car will not be at the outlet and can be considered for transit
+                    } else if (carForAssignmentWithTransit.getPlateNumber() == null) { // if car has no reservations but not at outlet, and no car has been designated yet, use for transit 
                         System.out.println("Car that can be assigned with transit " + c.getPlateNumber());
-
                         carForAssignmentWithTransit = c;
+                    } else {
+                        // skip since transit car has already been assigned
                     }
                 }
             }

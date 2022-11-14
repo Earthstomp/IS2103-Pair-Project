@@ -28,10 +28,8 @@ public class Outlet implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long outletId;
     private String name;
-    @Temporal(TemporalType.TIMESTAMP)
-    private Date openingTime;
-    @Temporal(TemporalType.TIMESTAMP)
-    private Date closingTime;
+    private int openingHour;
+    private int closingHour;
     @OneToMany (mappedBy = "outlet")
     private List<Employee> employees;
     @OneToMany (mappedBy = "returnLocation")
@@ -40,10 +38,10 @@ public class Outlet implements Serializable {
     public Outlet() {
     }
 
-    public Outlet(String location, Date openingTime, Date closingTime) {
+    public Outlet(String location, int openingHour, int closingHour) {
         this.name = location;
-        this.openingTime = openingTime;
-        this.closingTime = closingTime;
+        this.openingHour = openingHour;
+        this.closingHour = closingHour;
     }
 
     public Long getOutletId() {
@@ -96,30 +94,12 @@ public class Outlet implements Serializable {
     /**
      * @return the openingTime
      */
-    public Date getOpeningTime() {
-        return openingTime;
-    }
 
-    /**
-     * @param openingTime the openingTime to set
-     */
-    public void setOpeningTime(Date openingTime) {
-        this.openingTime = openingTime;
-    }
 
     /**
      * @return the closingTime
      */
-    public Date getClosingTime() {
-        return closingTime;
-    }
 
-    /**
-     * @param closingTime the closingTime to set
-     */
-    public void setClosingTime(Date closingTime) {
-        this.closingTime = closingTime;
-    }
 
     /**
      * @return the employees
@@ -147,5 +127,33 @@ public class Outlet implements Serializable {
      */
     public void setDispatches(List<TransitDriverDispatchRecord> dispatches) {
         this.dispatches = dispatches;
+    }
+
+    /**
+     * @return the closingHour
+     */
+    public int getClosingHour() {
+        return closingHour;
+    }
+
+    /**
+     * @param closingHour the closingHour to set
+     */
+    public void setClosingHour(int closingHour) {
+        this.closingHour = closingHour;
+    }
+
+    /**
+     * @return the openingHour
+     */
+    public int getOpeningHour() {
+        return openingHour;
+    }
+
+    /**
+     * @param openingHour the openingHour to set
+     */
+    public void setOpeningHour(int openingHour) {
+        this.openingHour = openingHour;
     }
 }

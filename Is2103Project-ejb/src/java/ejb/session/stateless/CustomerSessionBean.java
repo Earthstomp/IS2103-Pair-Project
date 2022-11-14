@@ -50,6 +50,9 @@ public class CustomerSessionBean implements CustomerSessionBeanRemote, CustomerS
 
         Customer customer = em.find(Customer.class, customerId);
         customer.getReservations().add(reservation);
+        em.merge(customer);
+        reservation.setCustomer(customer);
+        em.merge(reservation);
         em.flush();
 
         return reservation.getId();

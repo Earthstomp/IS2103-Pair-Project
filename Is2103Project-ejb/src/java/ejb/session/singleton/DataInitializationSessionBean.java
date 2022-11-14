@@ -133,18 +133,16 @@ public class DataInitializationSessionBean {
         Long audiA6 = 0L;
 
         try {
-            // PERSONAL TEST DATA
-
-            outletAId = outletSessionBeanLocal.createNewOutlet(new Outlet("Outlet A", null, null));
-            outletBId = outletSessionBeanLocal.createNewOutlet(new Outlet("Outlet B", null, null));
-            outletCId = outletSessionBeanLocal.createNewOutlet(new Outlet("Outlet C", new Date(), new Date())); //  supposed to be String 10:00 and 22:00
+            // -1 represents open 24hrs
+            outletAId = outletSessionBeanLocal.createNewOutlet(new Outlet("Outlet A", -1, -1));
+            outletBId = outletSessionBeanLocal.createNewOutlet(new Outlet("Outlet B", -1, -1));
+            outletCId = outletSessionBeanLocal.createNewOutlet(new Outlet("Outlet C", 8, 22)); //  supposed to be String 10:00 and 22:00
 
         } catch (OutletExistsException | UnknownPersistenceException ex) {
             ex.printStackTrace();
         }
 
         try {
-            // PERSONAL TEST DATA
             employeeSessionBeanLocal.createNewEmployeeWithExistingOutlet(new Employee(EmployeeRoleEnum.SALES_MANAGER, "Employee A1", "pw"), outletSessionBeanLocal.retrieveOutletByLocation("Outlet A").getOutletId());
             employeeSessionBeanLocal.createNewEmployeeWithExistingOutlet(new Employee(EmployeeRoleEnum.OPERATIONS_MANAGER, "Employee A2", "pw"), outletSessionBeanLocal.retrieveOutletByLocation("Outlet A").getOutletId());
             employeeSessionBeanLocal.createNewEmployeeWithExistingOutlet(new Employee(EmployeeRoleEnum.CUSTOMER_SERVICE_EXECUTIVE, "Employee A3", "pw"), outletSessionBeanLocal.retrieveOutletByLocation("Outlet A").getOutletId());
@@ -284,10 +282,9 @@ public class DataInitializationSessionBean {
 
         partnerSessionBeanLocal.createPartner(new Partner("Holiday.com"));
 
-        // PERSONAL TEST DATA
+//        // PERSONAL TEST DATA
 //        GregorianCalendar calendar = new GregorianCalendar();
 //        calendar.setTime(new Date());
-//
 //        Date date1start = calendar.getTime(); // current time
 //        calendar.add(GregorianCalendar.HOUR_OF_DAY, 1); // set return 1 hour later
 //        Date date1end = calendar.getTime();
@@ -308,8 +305,8 @@ public class DataInitializationSessionBean {
 //        try {
 //            Long cardId = creditCardSessionBeanLocal.createNewCard(new CreditCard("123456"));
 //            CreditCard card = creditCardSessionBeanLocal.retrieveCardById(cardId);
-//            Customer customer = new Customer("91234567", "12345678", "test@test.com", "user", "pw");
-//            Long customerId = customerSessionBeanLocal.createNewCustomer(new Customer("91234567", "12345678", "test@test.com", "user", "pw"), card);
+//            Customer customer = new Customer("91234567", "12345678", "test@test.com", "alice", "pw");
+//            Long customerId = customerSessionBeanLocal.createNewCustomer(new Customer("91234567", "12345678", "test@test.com", "alice", "pw"), card);
 //            Customer testCustomer = customerSessionBeanLocal.retrieveCustomerByMobileNumber("91234567");
 //
 //            // PERSONAL TEST DATA
@@ -320,22 +317,21 @@ public class DataInitializationSessionBean {
 //            } catch (OutletNotFoundException ex) {
 //                System.out.println(ex.getMessage());
 //            }
-            // PERSONAL TEST DATA
+//            // PERSONAL TEST DATA
 //            Long reservationId = customerSessionBeanLocal.createNewReservation(new Reservation(date2start, date1end, outletA, outletB, ReservationPaymentEnum.PAID, testCustomer, "Honda", "Civic"), customerId);
 //            Long reservationId3 = customerSessionBeanLocal.createNewReservation(new Reservation(date1start, date1end2, outletA, outletB, ReservationPaymentEnum.ATPICKUP, testCustomer, "Honda", "Civic"), customerId);
 //            Long reservationId2 = customerSessionBeanLocal.createNewReservation(new Reservation(date1end, date1end2, outletA, outletB, ReservationPaymentEnum.ATPICKUP, testCustomer, "Honda", "Civic"), customerId);
-
-//            Long reservationId = customerSessionBeanLocal.createNewReservation(new Reservation(date2start, date1end, outletA, outletB, ReservationPaymentEnum.PAID, testCustomer, "Mercedes", "E Class"), customerId);
-//            Long reservationId2 = customerSessionBeanLocal.createNewReservation(new Reservation(date1end, date1end2, outletB, outletB, ReservationPaymentEnum.ATPICKUP, testCustomer, "BMW", "5 Series"), customerId);
-//            Long reservationId3 = customerSessionBeanLocal.createNewReservation(new Reservation(date1start, date1end2, outletC, outletB, ReservationPaymentEnum.ATPICKUP, testCustomer, "Audi", "A6"), customerId);
-
+//
+////            Long reservationId = customerSessionBeanLocal.createNewReservation(new Reservation(date2start, date1end, outletA, outletB, ReservationPaymentEnum.PAID, testCustomer, "Mercedes", "E Class"), customerId);
+////            Long reservationId2 = customerSessionBeanLocal.createNewReservation(new Reservation(date1end, date1end2, outletB, outletB, ReservationPaymentEnum.ATPICKUP, testCustomer, "BMW", "5 Series"), customerId);
+////            Long reservationId3 = customerSessionBeanLocal.createNewReservation(new Reservation(date1start, date1end2, outletC, outletB, ReservationPaymentEnum.ATPICKUP, testCustomer, "Audi", "A6"), customerId);
 //            try {
 //                // car 4 SS00B1HC reserved by reservation 1
 //                reservationSessionBeanLocal.assignCarToReservation(reservationSessionBeanLocal.retrieveReservationById(reservationId), carSessionBeanLocal.retrieveCarById(carId));
 //                // car 5 SS00B2HC reserved by reservation 2
 //                reservationSessionBeanLocal.assignCarToReservation(reservationSessionBeanLocal.retrieveReservationById(reservationId2), carSessionBeanLocal.retrieveCarById(carId2));
 //                // car 6 SS00B3HC reserved by reservation 3
-////                reservationSessionBeanLocal.assignCarToReservation(reservationSessionBeanLocal.retrieveReservationById(reservationId3), carSessionBeanLocal.retrieveCarById(carId3));
+//                reservationSessionBeanLocal.assignCarToReservation(reservationSessionBeanLocal.retrieveReservationById(reservationId3), carSessionBeanLocal.retrieveCarById(carId3));
 //
 //                System.out.println("Reservation assigned");
 //            } catch (CarNotFoundException ex) {
@@ -346,9 +342,12 @@ public class DataInitializationSessionBean {
 //        } catch (CustomerExistsException | CustomerNotFoundException ex) {
 //        }
 
-    }
-//        } catch (PartnerExistsException ex) { //UnknownPersistenceException ex
+
+//        catch (PartnerExistsException ex)
+
+//    
+//         { //UnknownPersistenceException ex
 //            ex.printStackTrace();
-//        }
+    }
 
 }

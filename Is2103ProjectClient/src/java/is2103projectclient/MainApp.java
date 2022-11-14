@@ -167,6 +167,7 @@ public class MainApp {
                         SimpleDateFormat inputDateFormat = new SimpleDateFormat("dd/MM/yyyy hh:mm a");
                         Date date = inputDateFormat.parse(scanner.nextLine().trim());
                         ejbTimerSessionBeanRemote.allocateCarsManual(date);
+                        System.out.println("Cars allocated for date " + date + "\n");
                     } catch (ParseException ex) {
                         System.out.println("Invalid date input!\n");
                     }
@@ -178,8 +179,8 @@ public class MainApp {
                 }
             }
 
-            if (response == 3) {
-                break;
+            if (response == 4) {
+                break; // not sure
             }
         }
     }

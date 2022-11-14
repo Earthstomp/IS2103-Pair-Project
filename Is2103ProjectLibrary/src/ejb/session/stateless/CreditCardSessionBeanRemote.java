@@ -19,5 +19,7 @@ public interface CreditCardSessionBeanRemote {
     public Long createNewCard(CreditCard creditCard);
 
     public void makePayment(BigDecimal payment, Long id);
+
+    public CreditCard retrieveCardById(Long id);
     
 }
