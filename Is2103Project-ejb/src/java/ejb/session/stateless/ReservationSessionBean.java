@@ -102,8 +102,8 @@ public class ReservationSessionBean implements ReservationSessionBeanRemote, Res
     @Override
     public List<Reservation> retrieveAllReservationsForCustomer(Customer customer) throws ReservationNotFoundException {
         List<Reservation> reservations = em.createQuery(
-                "SELECT r FROM Reservation r WHERE r.customer = :InCustomer")
-                .setParameter("InCustomer", customer)
+                "SELECT r FROM Reservation r WHERE r.customer.username = :InCustomer")
+                .setParameter("InCustomer", customer.getUsername())
                 .getResultList();
 
         if (reservations != null) {
