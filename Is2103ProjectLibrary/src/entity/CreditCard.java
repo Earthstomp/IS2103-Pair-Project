@@ -38,8 +38,8 @@ public class CreditCard implements Serializable {
         
     }
 
-    public CreditCard(String name) {
-        this.serialNumber = name;
+    public CreditCard(String number) {
+        this.serialNumber = number;
         this.amountDue = new BigDecimal(0.0);
     }
 

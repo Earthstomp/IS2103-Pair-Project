@@ -7,6 +7,8 @@ package ejb.session.stateless;
 
 import entity.CreditCard;
 import javax.ejb.Local;
+import util.exception.CreditCardExistsException;
+import util.exception.CreditCardNotFoundException;
 
 /**
  *
@@ -14,7 +16,10 @@ import javax.ejb.Local;
  */
 @Local
 public interface CreditCardSessionBeanLocal {
-   public Long createNewCard(CreditCard creditCard); 
+
+    public Long createNewCard(CreditCard creditCard) throws CreditCardExistsException;
 
     public CreditCard retrieveCardById(Long id);
+
+    public CreditCard retrieveCreditCardBySerialNumber(String number) throws CreditCardNotFoundException;
 }

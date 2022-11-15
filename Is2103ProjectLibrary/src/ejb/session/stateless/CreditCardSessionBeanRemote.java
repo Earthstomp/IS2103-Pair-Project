@@ -8,6 +8,7 @@ package ejb.session.stateless;
 import entity.CreditCard;
 import java.math.BigDecimal;
 import javax.ejb.Remote;
+import util.exception.CreditCardExistsException;
 
 /**
  *
@@ -16,7 +17,7 @@ import javax.ejb.Remote;
 @Remote
 public interface CreditCardSessionBeanRemote {
 
-    public Long createNewCard(CreditCard creditCard);
+        public Long createNewCard(CreditCard creditCard) throws CreditCardExistsException;
 
     public void makePayment(BigDecimal payment, Long id);
 
