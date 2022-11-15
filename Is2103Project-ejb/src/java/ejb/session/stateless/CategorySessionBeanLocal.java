@@ -21,24 +21,23 @@ import util.exception.UnknownPersistenceException;
  */
 @Local
 public interface CategorySessionBeanLocal {
-    
+
     public Long createNewCategory(Category category) throws CategoryExistsException, UnknownPersistenceException;
 
-    public Long createNewModelWithExistingCategory(Model model, Long categoryId);
+    public Long createNewModelWithExistingCategory(Model model, Long categoryId) throws CategoryNotFoundException;
 
     public Long createRentalRateRecord(RentalRateRecord rateRecord, Long categoryId);
 
     public List<Category> retrieveAllCategories();
-    
+
     public Category retrieveCategoryById(Long id) throws CategoryNotFoundException;
 
-    public Long createNewModelWithExistingCategoryClass(Model model, Category category);
+    public Long createNewModelWithExistingCategoryClass(Model model, Category category) throws CategoryNotFoundException;
 
-    public Category retrieveCategoryByName(String name);
+    public Category retrieveCategoryByName(String name) throws CategoryNotFoundException;
 
     public void merge(Category category);
 
     public List<Car> retrieveAllCarsFromCategory(String categoryName);
 
-    
 }

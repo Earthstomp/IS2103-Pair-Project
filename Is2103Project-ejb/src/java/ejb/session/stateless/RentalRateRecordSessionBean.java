@@ -28,6 +28,7 @@ public class RentalRateRecordSessionBean implements RentalRateRecordSessionBeanR
 
     @Override
     public Long createRentalRateRecord(RentalRateRecord rentalRateRecord) {
+        
         em.persist(rentalRateRecord);
         em.flush();
 

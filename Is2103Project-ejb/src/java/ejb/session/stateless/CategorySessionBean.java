@@ -16,6 +16,7 @@ import javax.persistence.PersistenceContext;
 import javax.persistence.PersistenceException;
 import util.exception.CategoryExistsException;
 import util.exception.CategoryNotFoundException;
+import util.exception.ModelExistsException;
 import util.exception.UnknownPersistenceException;
 
 /**
@@ -49,17 +50,17 @@ public class CategorySessionBean implements CategorySessionBeanRemote, CategoryS
     }
 
     public List<Car> retrieveAllCarsFromCategory(String categoryName) {
-        
+
         List<Car> cars = em.createQuery("SELECT c FROM Car c JOIN c.model m JOIN m.category cat WHERE cat.categoryName = :categoryName")
                 .setParameter("categoryName", categoryName)
                 .getResultList();
-        
-        for (Car car: cars) {
+
+        for (Car car : cars) {
             car.getReservations().size();
             car.getModel();
             car.getTransitRecords().size();
         }
-        
+
         return cars;
     }
 
@@ -70,7 +71,7 @@ public class CategorySessionBean implements CategorySessionBeanRemote, CategoryS
             category.getModels().size();
             category.getRateRecords().size();
         }
-        
+
         return categories;
     }
 
@@ -85,43 +86,56 @@ public class CategorySessionBean implements CategorySessionBeanRemote, CategoryS
         }
     }
 
-    public Category retrieveCategoryByName(String name) {
+    public Category retrieveCategoryByName(String name) throws CategoryNotFoundException {
         Category category = (Category) em.createQuery("SELECT c FROM Category c WHERE c.categoryName = :InName")
                 .setParameter("InName", name)
                 .getSingleResult();
 
-        category.getModels().size();
-        return category;
+        if (category == null) {
+            category.getModels().size();
+            return category;
+        } else {
+            throw new CategoryNotFoundException("No category found");
+        }
     }
 
     @Override
-    public Long createNewModelWithExistingCategory(Model model, Long categoryId) {
-        em.persist(model);
+    public Long createNewModelWithExistingCategory(Model model, Long categoryId) throws CategoryNotFoundException {
 
+        em.persist(model);
         Category category = em.find(Category.class,
                 categoryId);
-        category.getModels().add(model);
-        model.setCategory(category);
+        if (category != null) {
 
-        em.flush();
+            category.getModels().add(model);
+            model.setCategory(category);
 
-        return model.getModelId();
+            em.flush();
+
+            return model.getModelId();
+        } else {
+            throw new CategoryNotFoundException("Category not found.");
+        }
     }
 
-    public Long createNewModelWithExistingCategoryClass(Model model, Category category) { //  need to account for exception
+    @Override
+    public Long createNewModelWithExistingCategoryClass(Model model, Category category) throws CategoryNotFoundException {
         em.persist(model);
 
-        // need to account for exception
         Category managedCategory = (Category) em.createQuery("SELECT c FROM Category c WHERE c = :category")
                 .setParameter("category", category)
                 .getSingleResult();
 
-        managedCategory.getModels().add(model);
-        model.setCategory(managedCategory);
+        if (managedCategory != null) {
+            managedCategory.getModels().add(model);
+            model.setCategory(managedCategory);
 
-        em.flush();
+            em.flush();
 
-        return model.getModelId();
+            return model.getModelId();
+        } else {
+            throw new CategoryNotFoundException("Category not found.");
+        }
     }
 
     @Override

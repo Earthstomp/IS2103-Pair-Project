@@ -1,9 +1,6 @@
 package ejb.session.stateless;
 
-import com.sun.javafx.scene.control.skin.VirtualFlow;
 import entity.Car;
-import entity.Category;
-import entity.Model;
 import entity.Outlet;
 import java.util.ArrayList;
 import java.util.Date;
@@ -18,6 +15,7 @@ import java.util.Calendar;
 import util.enumeration.CarStatusEnum;
 import util.enumeration.ReservationPaymentEnum;
 import util.exception.CarNotFoundException;
+import util.exception.ModelNotFoundException;
 import util.exception.OutletNotFoundException;
 import util.exception.ReservationNotFoundException;
 
@@ -117,7 +115,12 @@ public class EjbTimerSessionBean implements EjbTimerSessionBeanLocal, EjbTimerSe
             carsAvailable = categorySessionBeanLocal.retrieveAllCarsFromCategory(requirements.get(0));
         } else // require car from specific make, model
         {
-            carsAvailable = modelSessionBeanLocal.retrieveAllCarsFromModel(requirements.get(0), requirements.get(1));
+try {
+    carsAvailable = modelSessionBeanLocal.retrieveAllCarsFromModel(requirements.get(0), requirements.get(1));
+    
+} catch (ModelNotFoundException ex) {
+    System.out.println(ex.getMessage());
+}
         }
 
         for (Car car : carsAvailable) {

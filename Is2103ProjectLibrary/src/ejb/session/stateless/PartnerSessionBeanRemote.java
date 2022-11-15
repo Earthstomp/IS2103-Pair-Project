@@ -6,9 +6,14 @@
 package ejb.session.stateless;
 
 import entity.Partner;
+import entity.Reservation;
 import java.util.List;
 import javax.ejb.Remote;
+import util.exception.CustomerNotFoundException;
+import util.exception.InvalidLoginCredentialsException;
+import util.exception.PartnerExistsException;
 import util.exception.PartnerNotFoundException;
+import util.exception.ReservationNotFoundException;
 
 /**
  *
@@ -17,12 +22,18 @@ import util.exception.PartnerNotFoundException;
 @Remote
 public interface PartnerSessionBeanRemote {
 
-    public void removePartner(Long id);
+    public void removePartner(Long id) throws PartnerNotFoundException;
 
     public Partner retrievePartnerById(Long id) throws PartnerNotFoundException;
 
-    public List<Partner> retrieveAllPartners();
+    public List<Partner> retrieveAllPartners() throws PartnerNotFoundException;
 
-    public Long createPartner(Partner partner);
-    
+    public Long createPartner(Partner partner) throws PartnerExistsException;
+
+    public Partner partnerLogin(String username, String password) throws InvalidLoginCredentialsException;
+
+    public Partner retrievePartnerByUsername(String username) throws PartnerNotFoundException;
+
+    public List<Reservation> retrieveAllPartnerReservations(Long partnerId) throws ReservationNotFoundException, CustomerNotFoundException, PartnerNotFoundException;
+
 }

@@ -11,14 +11,9 @@ import ejb.session.stateless.PartnerSessionBeanLocal;
 import ejb.session.stateless.ReservationSessionBeanLocal;
 import entity.Car;
 import entity.Category;
-import entity.CreditCard;
-import entity.Customer;
-import entity.Employee;
 import entity.Model;
-import entity.Outlet;
 import entity.Partner;
 import entity.RentalRateRecord;
-import entity.Reservation;
 import java.util.Date;
 import javax.annotation.PostConstruct;
 import javax.ejb.EJB;
@@ -26,23 +21,18 @@ import javax.ejb.Singleton;
 import javax.ejb.LocalBean;
 import javax.ejb.Startup;
 import util.enumeration.CarStatusEnum;
-import util.enumeration.EmployeeRoleEnum;
 import util.enumeration.RentalRateEnum;
 import util.exception.CategoryExistsException;
-import util.exception.EmployeeExistsException;
-import util.exception.OutletExistsException;
 import util.exception.OutletNotFoundException;
 import util.exception.UnknownPersistenceException;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
-import java.util.GregorianCalendar;
-import util.enumeration.ReservationPaymentEnum;
-import util.exception.CarNotFoundException;
-import util.exception.CustomerExistsException;
-import util.exception.CustomerNotFoundException;
-import util.exception.ReservationNotFoundException;
+import util.exception.CarExistsException;
+import util.exception.CategoryNotFoundException;
+import util.exception.ModelNotFoundException;
+import util.exception.PartnerExistsException;
 
 /**
  *
@@ -132,7 +122,7 @@ public class DataInitializationSessionBean {
         Long bmw5Series = 0L;
         Long audiA6 = 0L;
 
-        try {
+        /*try {
             // PERSONAL TEST DATA
 
             outletAId = outletSessionBeanLocal.createNewOutlet(new Outlet("Outlet A", null, null));
@@ -159,8 +149,7 @@ public class DataInitializationSessionBean {
 
         } catch (EmployeeExistsException | OutletNotFoundException | UnknownPersistenceException ex) {
             ex.printStackTrace();
-        }
-
+        }*/
         try {
             standardSedanId = categorySessionBeanLocal.createNewCategory(new Category("Standard Sedan"));
             familySedanId = categorySessionBeanLocal.createNewCategory(new Category("Family Sedan"));
@@ -171,27 +160,33 @@ public class DataInitializationSessionBean {
             ex.printStackTrace();
         }
 
-//        try { no exception created yet
-        toyotaCorollaId = categorySessionBeanLocal.createNewModelWithExistingCategory(new Model("Toyota", "Corolla"), standardSedanId);
-        hondaCividId = categorySessionBeanLocal.createNewModelWithExistingCategory(new Model("Honda", "Civic"), standardSedanId);
-        nissanSunnyId = categorySessionBeanLocal.createNewModelWithExistingCategory(new Model("Nissan", "Sunny"), standardSedanId);
-        mercedesEClass = categorySessionBeanLocal.createNewModelWithExistingCategory(new Model("Mercedes", "E Class"), luxurySedanId);
-        bmw5Series = categorySessionBeanLocal.createNewModelWithExistingCategory(new Model("BMW", "5 Series"), luxurySedanId);
-        audiA6 = categorySessionBeanLocal.createNewModelWithExistingCategory(new Model("Audi", "A6"), luxurySedanId);
+        try {
+            toyotaCorollaId = categorySessionBeanLocal.createNewModelWithExistingCategory(new Model("Toyota", "Corolla"), standardSedanId);
+            hondaCividId = categorySessionBeanLocal.createNewModelWithExistingCategory(new Model("Honda", "Civic"), standardSedanId);
+            nissanSunnyId = categorySessionBeanLocal.createNewModelWithExistingCategory(new Model("Nissan", "Sunny"), standardSedanId);
+            mercedesEClass = categorySessionBeanLocal.createNewModelWithExistingCategory(new Model("Mercedes", "E Class"), luxurySedanId);
+            bmw5Series = categorySessionBeanLocal.createNewModelWithExistingCategory(new Model("BMW", "5 Series"), luxurySedanId);
+            audiA6 = categorySessionBeanLocal.createNewModelWithExistingCategory(new Model("Audi", "A6"), luxurySedanId);
+        } catch (CategoryNotFoundException ex) {
+            System.out.println(ex.getMessage());
+        }
 
-//        try {  no exception created yet
-        modelSessionBeanLocal.createNewCarWithExistingModel(new Car(CarStatusEnum.AVAILABLE, "Outlet A", "SS00A1TC"), toyotaCorollaId);
-        modelSessionBeanLocal.createNewCarWithExistingModel(new Car(CarStatusEnum.AVAILABLE, "Outlet A", "SS00A2TC"), toyotaCorollaId);
-        modelSessionBeanLocal.createNewCarWithExistingModel(new Car(CarStatusEnum.AVAILABLE, "Outlet A", "SS00A3TC"), toyotaCorollaId);
-        modelSessionBeanLocal.createNewCarWithExistingModel(new Car(CarStatusEnum.AVAILABLE, "Outlet B", "SS00B1HC"), hondaCividId);
-        modelSessionBeanLocal.createNewCarWithExistingModel(new Car(CarStatusEnum.AVAILABLE, "Outlet B", "SS00B2HC"), hondaCividId);
-        modelSessionBeanLocal.createNewCarWithExistingModel(new Car(CarStatusEnum.AVAILABLE, "Outlet B", "SS00B3HC"), hondaCividId);
-        modelSessionBeanLocal.createNewCarWithExistingModel(new Car(CarStatusEnum.AVAILABLE, "Outlet C", "SS00C1NS"), nissanSunnyId);
-        modelSessionBeanLocal.createNewCarWithExistingModel(new Car(CarStatusEnum.AVAILABLE, "Outlet C", "SS00C2NS"), nissanSunnyId);
-        modelSessionBeanLocal.createNewCarWithExistingModel(new Car(CarStatusEnum.SERVICING_OR_REPAIR, "Outlet C", "SS00C3NS"), nissanSunnyId);
-        Long carId = modelSessionBeanLocal.createNewCarWithExistingModel(new Car(CarStatusEnum.AVAILABLE, "Outlet A", "LS00A4ME"), mercedesEClass);
-        Long carId2 = modelSessionBeanLocal.createNewCarWithExistingModel(new Car(CarStatusEnum.AVAILABLE, "Outlet B", "LS00B4B5"), bmw5Series);
-        Long carId3 = modelSessionBeanLocal.createNewCarWithExistingModel(new Car(CarStatusEnum.AVAILABLE, "Outlet C", "LS00C4A6"), audiA6);
+        try {
+            modelSessionBeanLocal.createNewCarWithExistingModel(new Car(CarStatusEnum.AVAILABLE, "Outlet A", "SS00A1TC"), toyotaCorollaId);
+            modelSessionBeanLocal.createNewCarWithExistingModel(new Car(CarStatusEnum.AVAILABLE, "Outlet A", "SS00A2TC"), toyotaCorollaId);
+            modelSessionBeanLocal.createNewCarWithExistingModel(new Car(CarStatusEnum.AVAILABLE, "Outlet A", "SS00A3TC"), toyotaCorollaId);
+            modelSessionBeanLocal.createNewCarWithExistingModel(new Car(CarStatusEnum.AVAILABLE, "Outlet B", "SS00B1HC"), hondaCividId);
+            modelSessionBeanLocal.createNewCarWithExistingModel(new Car(CarStatusEnum.AVAILABLE, "Outlet B", "SS00B2HC"), hondaCividId);
+            modelSessionBeanLocal.createNewCarWithExistingModel(new Car(CarStatusEnum.AVAILABLE, "Outlet B", "SS00B3HC"), hondaCividId);
+            modelSessionBeanLocal.createNewCarWithExistingModel(new Car(CarStatusEnum.AVAILABLE, "Outlet C", "SS00C1NS"), nissanSunnyId);
+            modelSessionBeanLocal.createNewCarWithExistingModel(new Car(CarStatusEnum.AVAILABLE, "Outlet C", "SS00C2NS"), nissanSunnyId);
+            modelSessionBeanLocal.createNewCarWithExistingModel(new Car(CarStatusEnum.SERVICING_OR_REPAIR, "Outlet C", "SS00C3NS"), nissanSunnyId);
+            Long carId = modelSessionBeanLocal.createNewCarWithExistingModel(new Car(CarStatusEnum.AVAILABLE, "Outlet A", "LS00A4ME"), mercedesEClass);
+            Long carId2 = modelSessionBeanLocal.createNewCarWithExistingModel(new Car(CarStatusEnum.AVAILABLE, "Outlet B", "LS00B4B5"), bmw5Series);
+            Long carId3 = modelSessionBeanLocal.createNewCarWithExistingModel(new Car(CarStatusEnum.AVAILABLE, "Outlet C", "LS00C4A6"), audiA6);
+        } catch (ModelNotFoundException | CarExistsException ex) {
+            System.out.println(ex.getMessage());
+        }
 
         SimpleDateFormat inputDateFormat = new SimpleDateFormat("d/M/y");
         Date rate2start = new Date();
@@ -281,8 +276,11 @@ public class DataInitializationSessionBean {
         categorySessionBeanLocal.createRentalRateRecord(new RentalRateRecord("Wednesday", RentalRateEnum.PEAK, 330.0, rate7start, rate7end), luxurySedanId);
         categorySessionBeanLocal.createRentalRateRecord(new RentalRateRecord("Weekday Promo", RentalRateEnum.PROMOTION, 250.0, rate8start, rate8end), luxurySedanId);
         categorySessionBeanLocal.createRentalRateRecord(new RentalRateRecord("Default", RentalRateEnum.DEFAULT, 400.0, null, null), luxurySedanId);
-
-        partnerSessionBeanLocal.createPartner(new Partner("Holiday.com"));
+        try {
+            partnerSessionBeanLocal.createPartner(new Partner("Holiday.com"));
+        } catch (PartnerExistsException ex) {
+            System.out.println(ex.getMessage());
+        }
 
         // PERSONAL TEST DATA
 //        GregorianCalendar calendar = new GregorianCalendar();
@@ -320,15 +318,13 @@ public class DataInitializationSessionBean {
 //            } catch (OutletNotFoundException ex) {
 //                System.out.println(ex.getMessage());
 //            }
-            // PERSONAL TEST DATA
+        // PERSONAL TEST DATA
 //            Long reservationId = customerSessionBeanLocal.createNewReservation(new Reservation(date2start, date1end, outletA, outletB, ReservationPaymentEnum.PAID, testCustomer, "Honda", "Civic"), customerId);
 //            Long reservationId3 = customerSessionBeanLocal.createNewReservation(new Reservation(date1start, date1end2, outletA, outletB, ReservationPaymentEnum.ATPICKUP, testCustomer, "Honda", "Civic"), customerId);
 //            Long reservationId2 = customerSessionBeanLocal.createNewReservation(new Reservation(date1end, date1end2, outletA, outletB, ReservationPaymentEnum.ATPICKUP, testCustomer, "Honda", "Civic"), customerId);
-
 //            Long reservationId = customerSessionBeanLocal.createNewReservation(new Reservation(date2start, date1end, outletA, outletB, ReservationPaymentEnum.PAID, testCustomer, "Mercedes", "E Class"), customerId);
 //            Long reservationId2 = customerSessionBeanLocal.createNewReservation(new Reservation(date1end, date1end2, outletB, outletB, ReservationPaymentEnum.ATPICKUP, testCustomer, "BMW", "5 Series"), customerId);
 //            Long reservationId3 = customerSessionBeanLocal.createNewReservation(new Reservation(date1start, date1end2, outletC, outletB, ReservationPaymentEnum.ATPICKUP, testCustomer, "Audi", "A6"), customerId);
-
 //            try {
 //                // car 4 SS00B1HC reserved by reservation 1
 //                reservationSessionBeanLocal.assignCarToReservation(reservationSessionBeanLocal.retrieveReservationById(reservationId), carSessionBeanLocal.retrieveCarById(carId));
@@ -345,7 +341,6 @@ public class DataInitializationSessionBean {
 //            }
 //        } catch (CustomerExistsException | CustomerNotFoundException ex) {
 //        }
-
     }
 //        } catch (PartnerExistsException ex) { //UnknownPersistenceException ex
 //            ex.printStackTrace();

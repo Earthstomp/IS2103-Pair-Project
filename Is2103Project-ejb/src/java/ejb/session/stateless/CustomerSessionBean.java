@@ -31,10 +31,11 @@ public class CustomerSessionBean implements CustomerSessionBeanRemote, CustomerS
     @Override
     public Long createNewCustomer(Customer customer, CreditCard card) throws CustomerExistsException {
         try {
-            retrieveCustomerByUsername(customer.getUsername());
-            retrieveCustomerByMobileNumber(customer.getMobileNumber());
-            retrieveCustomerByPassportNumber(customer.getPassportNumber());
-            throw new CustomerExistsException("Customer already exists.");
+            if (retrieveCustomerByUsername(customer.getUsername()) != null
+                    || retrieveCustomerByMobileNumber(customer.getMobileNumber()) != null
+                    || retrieveCustomerByPassportNumber(customer.getPassportNumber()) != null) {
+                throw new CustomerExistsException("Customer already exists.");
+            }
         } catch (CustomerNotFoundException ex) {
             em.persist(customer);
             customer.setCreditCard(card);

@@ -15,7 +15,6 @@ import entity.Category;
 import entity.Employee;
 import entity.Outlet;
 import entity.RentalRateRecord;
-import entity.Reservation;
 import entity.TransitDriverDispatchRecord;
 import java.text.SimpleDateFormat;
 import java.util.Scanner;
@@ -27,12 +26,14 @@ import java.util.List;
 import util.enumeration.CarStatusEnum;
 import util.enumeration.EmployeeRoleEnum;
 import util.enumeration.RentalRateEnum;
+import util.exception.CarExistsException;
 import util.exception.CategoryNotFoundException;
 import util.exception.DeleteCarException;
 import util.exception.DeleteModelException;
 import util.exception.EmployeeNotFoundException;
 import util.exception.InvalidDateInputException;
 import util.exception.InvalidEmployeeRoleException;
+import util.exception.ModelNotFoundException;
 import util.exception.OutletNotFoundException;
 import util.exception.RentalRateRecordNotFoundException;
 import util.exception.TransitDriverDispatchRecordNotFoundException;
@@ -222,20 +223,27 @@ public class SalesManagementModule {
         System.out.println("Enter Model: ");
         model.setModel(scanner.nextLine().trim());
 
-//        try { need to try and catch exception
-        Long newModelId = categorySessionBeanRemote.createNewModelWithExistingCategoryClass(model, model.getCategory());
-        System.out.println("New model created successfully!: " + model.getMake() + " " + model.getModel() + "\n");
+        try {
+            Long newModelId = categorySessionBeanRemote.createNewModelWithExistingCategoryClass(model, model.getCategory());
+            System.out.println("New model created successfully!: " + model.getMake() + " " + model.getModel() + "\n");
+        } catch (CategoryNotFoundException ex) {
+            System.out.println(ex.getMessage());
+        }
     }
 
     public void doViewAllModels() {
-        List<Model> models = modelSessionBeanRemote.viewAllModels();
-        System.out.printf("\n%3s%16s%15s%15s", "S/N", "Car Category", "Make", "Model");
-        int index = 1;
-        for (Model model : models) {
-            System.out.printf("\n%3s%16s%15s%15s", index + ".", model.getCategory().getCategoryName(), model.getMake(), model.getModel());
-            index++;
+        try {
+            List<Model> models = modelSessionBeanRemote.viewAllModels();
+            System.out.printf("\n%3s%16s%15s%15s", "S/N", "Car Category", "Make", "Model");
+            int index = 1;
+            for (Model model : models) {
+                System.out.printf("\n%3s%16s%15s%15s", index + ".", model.getCategory().getCategoryName(), model.getMake(), model.getModel());
+                index++;
+            }
+            System.out.println("\n");
+        } catch (ModelNotFoundException ex) {
+            System.out.println(ex.getMessage());
         }
-        System.out.println("\n");
     }
 
     public void doUpdateModel() {
@@ -248,28 +256,33 @@ public class SalesManagementModule {
 
         System.out.println("Enter Model Name> ");
         String modelName = scanner.nextLine().trim();
-        Model model = modelSessionBeanRemote.retrieveModelByName(makeName, modelName);
-        System.out.printf("\n%12s%15s%15s", "Car Category", "Make", "Model");
-        System.out.printf("\n%12s%15s%15s", model.getCategory().getCategoryName(), model.getMake(), model.getModel());
+        try {
+            Model model = modelSessionBeanRemote.retrieveModelByName(makeName, modelName);
+            System.out.printf("\n%12s%15s%15s", "Car Category", "Make", "Model");
+            System.out.printf("\n%12s%15s%15s", model.getCategory().getCategoryName(), model.getMake(), model.getModel());
 
-        System.out.println("\nEnter Model's New Category> ");
-        System.out.print("> ");
-        Category category = categorySessionBeanRemote.retrieveCategoryByName(scanner.nextLine().trim());
+            System.out.println("\nEnter Model's New Category> ");
+            System.out.print("> ");
 
-        model.setCategory(category);
-        System.out.println("Enter New Make Name> ");
-        model.setMake(scanner.nextLine().trim());
+            Category category = categorySessionBeanRemote.retrieveCategoryByName(scanner.nextLine().trim());
 
-        System.out.println("Enter New Model Name> ");
-        model.setModel(scanner.nextLine().trim());
+            model.setCategory(category);
+            System.out.println("Enter New Make Name> ");
+            model.setMake(scanner.nextLine().trim());
 
-        modelSessionBeanRemote.merge(model);
-        category.getModels().add(model);
-        categorySessionBeanRemote.merge(category);
+            System.out.println("Enter New Model Name> ");
+            model.setModel(scanner.nextLine().trim());
 
-        System.out.println("Model updated successfully!");
-        System.out.printf("\n%20s%15s%15s", "Car Category", "Make", "Model");
-        System.out.printf("\n%20s%15s%15s\n", model.getCategory().getCategoryName(), model.getMake(), model.getModel());
+            modelSessionBeanRemote.merge(model);
+            category.getModels().add(model);
+            categorySessionBeanRemote.merge(category);
+
+            System.out.println("Model updated successfully!");
+            System.out.printf("\n%20s%15s%15s", "Car Category", "Make", "Model");
+            System.out.printf("\n%20s%15s%15s\n", model.getCategory().getCategoryName(), model.getMake(), model.getModel());
+        } catch (CategoryNotFoundException | ModelNotFoundException ex) {
+            System.out.println(ex.getMessage());
+        }
     }
 
     public void doDeleteModel() {
@@ -282,23 +295,26 @@ public class SalesManagementModule {
 
         System.out.println("Enter Model: ");
         String model = scanner.nextLine().trim();
-//        try { need to try and catch exception
-        Model modelToDelete = modelSessionBeanRemote.retrieveModelByName(make, model);
-        System.out.printf("\n%12s%15s%15s", "Car Category", "Make", "Model");
-        System.out.printf("\n%12s%15s%15s", modelToDelete.getCategory().getCategoryName(), modelToDelete.getMake(), modelToDelete.getModel());
+        try {
+            Model modelToDelete = modelSessionBeanRemote.retrieveModelByName(make, model);
+            System.out.printf("\n%12s%15s%15s", "Car Category", "Make", "Model");
+            System.out.printf("\n%12s%15s%15s", modelToDelete.getCategory().getCategoryName(), modelToDelete.getMake(), modelToDelete.getModel());
 
-        System.out.print("\nConfirm delete this Model? (Enter 'Y' to delete)> ");
-        confirmDelete = scanner.nextLine().trim();
+            System.out.print("\nConfirm delete this Model? (Enter 'Y' to delete)> ");
+            confirmDelete = scanner.nextLine().trim();
 
-        if (confirmDelete.equals("Y")) {
-            try {
-                modelSessionBeanRemote.deleteModel(modelToDelete.getModelId());
-                System.out.println("Model " + modelToDelete.getMake() + " " + modelToDelete.getModel() + " deleted successfully!");
-            } catch (DeleteModelException ex) {
-                System.out.println("An error has occurred while deleting the model: " + ex.getMessage() + "\n");
+            if (confirmDelete.equals("Y")) {
+                try {
+                    modelSessionBeanRemote.deleteModel(modelToDelete.getModelId());
+                    System.out.println("Model " + modelToDelete.getMake() + " " + modelToDelete.getModel() + " deleted successfully!");
+                } catch (DeleteModelException | ModelNotFoundException ex) {
+                    System.out.println("An error has occurred while deleting the model: " + ex.getMessage() + "\n");
+                }
+            } else {
+                System.out.println("Delete cancelled!\n");
             }
-        } else {
-            System.out.println("Delete cancelled!\n");
+        } catch (ModelNotFoundException ex) {
+            System.out.println(ex.getMessage());
         }
     }
 
@@ -315,14 +331,17 @@ public class SalesManagementModule {
         String make = scanner.nextLine().trim();
         System.out.println("Enter Car Model> ");
         String model = scanner.nextLine().trim();
+        try {
+            Model retrievedModel = modelSessionBeanRemote.retrieveModelByName(make, model);
+            car.setModel(retrievedModel);
+            System.out.println("Enter Car Location> ");
+            car.setLocation(scanner.nextLine().trim());
 
-        Model retrievedModel = modelSessionBeanRemote.retrieveModelByName(make, model);
-        car.setModel(retrievedModel);
-        System.out.println("Enter Car Location> ");
-        car.setLocation(scanner.nextLine().trim());
-
-        Long carId = modelSessionBeanRemote.createNewCarWithExistingModel(car, retrievedModel.getModelId());
-        System.out.println("New Car created successfully!: " + car.getPlateNumber() + "\n");
+            Long carId = modelSessionBeanRemote.createNewCarWithExistingModel(car, retrievedModel.getModelId());
+            System.out.println("New Car created successfully!: " + car.getPlateNumber() + "\n");
+        } catch (ModelNotFoundException | CarExistsException ex) {
+            System.out.println(ex.getMessage());
+        }
     }
 
     public void doViewAllCars() {
@@ -362,50 +381,53 @@ public class SalesManagementModule {
         String make = scanner.nextLine().trim();
         System.out.println("Enter Car Model> ");
         String model = scanner.nextLine().trim();
+        try {
+            Model retrievedModel = modelSessionBeanRemote.retrieveModelByName(make, model);
+            System.out.println("found model");
+            // need to set
+            Model oldModel = car.getModel(); // finding old model
+            System.out.println("found model from car");
 
-        Model retrievedModel = modelSessionBeanRemote.retrieveModelByName(make, model);
-        System.out.println("found model");
-        // need to set
-        Model oldModel = car.getModel(); // finding old model
-        System.out.println("found model from car");
+            oldModel = modelSessionBeanRemote.retrieveModelByName(oldModel.getMake(), oldModel.getModel());
 
-        oldModel = modelSessionBeanRemote.retrieveModelByName(oldModel.getMake(), oldModel.getModel());
+            oldModel.getCars().remove(car);
 
-        oldModel.getCars().remove(car);
+            System.out.println("removed car");
 
-        System.out.println("removed car");
+            car.setModel(retrievedModel); //  setting new model
+            System.out.println("set model");
 
-        car.setModel(retrievedModel); //  setting new model
-        System.out.println("set model");
+            System.out.println("Enter Car's New Color> ");
+            car.setColor(scanner.nextLine().trim());
+            System.out.println("Enter Car's New Location> ");
+            car.setLocation(scanner.nextLine().trim());
+            System.out.println("Enter Car's status (1: enabled or 2: disabled) ");
 
-        System.out.println("Enter Car's New Color> ");
-        car.setColor(scanner.nextLine().trim());
-        System.out.println("Enter Car's New Location> ");
-        car.setLocation(scanner.nextLine().trim());
-        System.out.println("Enter Car's status (1: enabled or 2: disabled) ");
+            boolean statusChosen = false;
+            do {
+                int status = scanner.nextInt();
+                if (status == 1) {
+                    car.setStatus(CarStatusEnum.AVAILABLE);
+                    statusChosen = true;
+                } else if (status == 2) {
+                    car.setStatus(CarStatusEnum.DISABLED);
+                    statusChosen = true;
+                }
+            } while (!statusChosen);
 
-        boolean statusChosen = false;
-        do {
-            int status = scanner.nextInt();
-            if (status == 1) {
-                car.setStatus(CarStatusEnum.AVAILABLE);
-                statusChosen = true;
-            } else if (status == 2) {
-                car.setStatus(CarStatusEnum.DISABLED);
-                statusChosen = true;
-            }
-        } while (!statusChosen);
+            // unsure if it is adding managed instance or not
+            carSessionBeanRemote.merge(car);
+            System.out.println("merged car ");
 
-        // unsure if it is adding managed instance or not
-        carSessionBeanRemote.merge(car);
-        System.out.println("merged car ");
-
-        retrievedModel.getCars().add(carSessionBeanRemote.retrieveCarByPlateNumber(car.getPlateNumber()));
-        modelSessionBeanRemote.merge(retrievedModel);
-        System.out.println("Car updated successfully!");
-        System.out.printf("\n%12s%14s%14s%20s%15s%20s%10s", "Car Category", "Make", "Model", "Plate Number", "Color", "Location", "Enabled Status");
-        System.out.printf("\n%12s%14s%14s%20s%15s%20s%10s", car.getModel().getCategory().getCategoryName(), car.getModel().getMake(), car.getModel().getModel(), car.getPlateNumber(),
-                car.getColor(), car.getLocation(), car.getStatus());
+            retrievedModel.getCars().add(carSessionBeanRemote.retrieveCarByPlateNumber(car.getPlateNumber()));
+            modelSessionBeanRemote.merge(retrievedModel);
+            System.out.println("Car updated successfully!");
+            System.out.printf("\n%12s%14s%14s%20s%15s%20s%10s", "Car Category", "Make", "Model", "Plate Number", "Color", "Location", "Enabled Status");
+            System.out.printf("\n%12s%14s%14s%20s%15s%20s%10s", car.getModel().getCategory().getCategoryName(), car.getModel().getMake(), car.getModel().getModel(), car.getPlateNumber(),
+                    car.getColor(), car.getLocation(), car.getStatus());
+        } catch (ModelNotFoundException ex) {
+            System.out.println(ex.getMessage());
+        }
     }
 
     public void doDeleteCar() {
@@ -536,7 +558,7 @@ public class SalesManagementModule {
         System.out.println("Enter Transit Record Id> ");
         try {
             transit = transitDriverDispatchRecordSessionBeanRemote.retrieveTransitDriverDispatchRecordById(scanner.nextLong(), outlet);
-           
+
         } catch (TransitDriverDispatchRecordNotFoundException | TransitDriverDispatchRecordNotFromOutletException ex) {
             System.out.println("An error has occurred while finding the Transit Record: " + ex.getMessage() + "\n");
         }
@@ -818,7 +840,7 @@ public class SalesManagementModule {
 
             if (confirmDelete.equalsIgnoreCase("Y")) {
                 boolean isUsed = reservationSessionBeanRemote.checkIfRentalRateUsed(rentalRateRecord);
-                
+
                 rentalRateRecordSessionBeanRemote.removeRentalRateRecord(rentalRateRecord.getId(), isUsed);
                 System.out.println("Rental Rate Record " + rentalRateRecord.getRecordName() + " deleted successfully!");
             } else {

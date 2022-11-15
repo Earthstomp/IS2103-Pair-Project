@@ -3,28 +3,28 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package ejb.session.stateless;
+package util.exception;
 
 /**
  *
  * @author dorothyyuan
  */
-public class RemovalException extends Exception {
+public class ModelNotFoundException extends Exception {
 
     /**
-     * Creates a new instance of <code>RemovalException</code> without detail
-     * message.
+     * Creates a new instance of <code>ModelNotFoundException</code> without
+     * detail message.
      */
-    public RemovalException() {
+    public ModelNotFoundException() {
     }
 
     /**
-     * Constructs an instance of <code>RemovalException</code> with the
+     * Constructs an instance of <code>ModelNotFoundException</code> with the
      * specified detail message.
      *
      * @param msg the detail message.
      */
-    public RemovalException(String msg) {
+    public ModelNotFoundException(String msg) {
         super(msg);
     }
 }

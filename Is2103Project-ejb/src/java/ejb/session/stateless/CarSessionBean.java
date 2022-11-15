@@ -12,7 +12,6 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
@@ -21,6 +20,7 @@ import util.enumeration.CarStatusEnum;
 import util.enumeration.ReservationPaymentEnum;
 import util.exception.CarNotFoundException;
 import util.exception.DeleteCarException;
+import util.exception.ModelNotFoundException;
 import util.exception.ReservationNotFoundException;
 
 /**
@@ -87,7 +87,11 @@ public class CarSessionBean implements CarSessionBeanRemote, CarSessionBeanLocal
             carsAvailable = categorySessionBeanLocal.retrieveAllCarsFromCategory(requirements.get(0));
         } else // require car from specific make, model
         {
-            carsAvailable = modelSessionBeanLocal.retrieveAllCarsFromModel(requirements.get(0), requirements.get(1));
+            try {
+                carsAvailable = modelSessionBeanLocal.retrieveAllCarsFromModel(requirements.get(0), requirements.get(1));
+            } catch (ModelNotFoundException ex) {
+                System.out.println(ex.getMessage());
+            }
         }
 
         for (Car car : carsAvailable) {
@@ -236,7 +240,7 @@ public class CarSessionBean implements CarSessionBeanRemote, CarSessionBeanLocal
         }
         if (carsAvailableFiltered.size() == 0) {
             throw new CarNotFoundException();
-        }               
+        }
     }
 
     @Override

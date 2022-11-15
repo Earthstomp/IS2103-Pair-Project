@@ -37,6 +37,7 @@ import util.enumeration.CarStatusEnum;
 import util.enumeration.ReservationPaymentEnum;
 import util.exception.CarNotFoundException;
 import util.exception.CustomerExistsException;
+import util.exception.ModelNotFoundException;
 import util.exception.ReservationNotFoundException;
 
 /**
@@ -421,7 +422,11 @@ public class MainApp {
                 carsAvailable = categorySessionBeanRemote.retrieveAllCarsFromCategory(requirements.get(0));
             } else // require car from specific make, model
             {
-                carsAvailable = modelSessionBeanRemote.retrieveAllCarsFromModel(requirements.get(0), requirements.get(1));
+                try {
+                    carsAvailable = modelSessionBeanRemote.retrieveAllCarsFromModel(requirements.get(0), requirements.get(1));
+                } catch (ModelNotFoundException | CarNotFoundException ex) {
+                    System.out.println(ex.getMessage());
+                }
             }
 
             /*for (Car car : carsAvailable) {
